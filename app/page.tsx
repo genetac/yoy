@@ -2,97 +2,60 @@
 
 import { useMemo, useState } from "react";
 import {
-  Zap,
-  ArrowRight,
-  ArrowUpRight,
-  Eye,
-  Check,
-  Layers,
-  ChevronDown,
-  Tag,
-  FileText,
-  LayoutGrid,
-  Boxes,
-  type LucideIcon,
+  Zap, ArrowRight, ArrowUpRight, Eye, Check, Layers, ChevronDown, Tag,
+  LayoutGrid, Boxes, Flame, type LucideIcon,
 } from "lucide-react";
 import type { MockupConfig } from "@/data/businessTypes";
-import { BrowserFrame } from "@/components/BrowserFrame";
 import {
-  productTierCategories,
-  subscriptionSection,
-  type ProductType,
-  type ProductExample,
+  productTierCategories, subscriptionSection, type ProductType, type ProductExample,
 } from "@/data/exampleProducts";
 import { tierOrder, tierDisplay, getPackage } from "@/data/servicePackages";
 import { familyTokens, getFamilyForProductType, type DesignFamilyId } from "@/data/designFamilies";
+import { deriveOffer, heroCount, type OfferV2 } from "@/data/product-catalog";
+import { ProductPlate } from "@/components/plate/ProductPlate";
+import { PresentationStudio } from "@/components/studio/PresentationStudio";
+import { MotionMedia, posterFrom } from "@/components/MotionMedia";
 
-// ─── Family metadata ──────────────────────────────────────────────
+/* ─── Family metadata (prestige: shared finish, family identity) ── */
 
 const familyMeta: Record<DesignFamilyId, {
-  label: string;
-  short: string;
-  recipe: string;
-  blurb: string;
-  chip: string;
-  text: string;
-  border: string;
-  bg: string;
-  icon: LucideIcon;
+  label: string; short: string; recipe: string; blurb: string;
+  chip: string; text: string; border: string; bg: string; icon: LucideIcon;
 }> = {
   micro: {
-    label: "Micro Products",
-    short: "Micro",
-    recipe: "Pentagram + Raycast",
-    blurb: "Small, focused digital products — landing templates, calculators, resume kits, checklists, template packs. Bold typographic heroes, numbered feature lists, instant-buy CTAs.",
+    label: "Micro Products", short: "Micro", recipe: "Pentagram + Raycast",
+    blurb: "Small, focused digital products — landing templates, calculators, resume kits, checklists. Bold typographic heroes, numbered feature lists, instant-buy CTAs.",
     chip: "text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800",
-    text: "text-zinc-700 dark:text-zinc-300",
-    border: "border-zinc-300 dark:border-zinc-700",
-    bg: "bg-zinc-50 dark:bg-zinc-900",
-    icon: Zap,
+    text: "text-zinc-700 dark:text-zinc-300", border: "border-zinc-300 dark:border-zinc-700",
+    bg: "bg-zinc-50 dark:bg-zinc-900", icon: Zap,
   },
   "industry-warm": {
-    label: "Industry & Hospitality",
-    short: "Industry",
-    recipe: "Aesop + Stripe Press",
+    label: "Industry & Hospitality", short: "Industry", recipe: "Aesop + Stripe Press",
     blurb: "Website kits for dental clinics, gyms, law firms, restaurants. Serif body copy, editorial layouts, full-bleed photography, small-caps section labels.",
     chip: "text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40",
-    text: "text-amber-700 dark:text-amber-400",
-    border: "border-amber-300 dark:border-amber-800",
-    bg: "bg-amber-50 dark:bg-amber-950/30",
-    icon: LayoutGrid,
+    text: "text-amber-700 dark:text-amber-400", border: "border-amber-300 dark:border-amber-800",
+    bg: "bg-amber-50 dark:bg-amber-950/30", icon: LayoutGrid,
   },
   "data-dense": {
-    label: "Data Dashboards",
-    short: "Data",
-    recipe: "Bloomberg Terminal",
+    label: "Data Dashboards", short: "Data", recipe: "Bloomberg Terminal",
     blurb: "Dashboards, design systems, inventory tools, monitoring platforms. Monospaced type, tabular data, hairline panels, ticker strips, zero radius.",
     chip: "text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40",
-    text: "text-emerald-700 dark:text-emerald-400",
-    border: "border-emerald-300 dark:border-emerald-800",
-    bg: "bg-emerald-50 dark:bg-emerald-950/30",
-    icon: Boxes,
+    text: "text-emerald-700 dark:text-emerald-400", border: "border-emerald-300 dark:border-emerald-800",
+    bg: "bg-emerald-50 dark:bg-emerald-950/30", icon: Boxes,
   },
   "saas-product": {
-    label: "SaaS Products",
-    short: "SaaS",
-    recipe: "Linear",
+    label: "SaaS Products", short: "SaaS", recipe: "Linear",
     blurb: "Appointment systems, client portals, CRMs, booking platforms, SaaS tools. Hairline borders, gradient-mesh heroes, feature grids, keyboard-chip UI.",
     chip: "text-sky-700 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/40",
-    text: "text-sky-700 dark:text-sky-400",
-    border: "border-sky-300 dark:border-sky-800",
-    bg: "bg-sky-50 dark:bg-sky-950/30",
-    icon: Layers,
+    text: "text-sky-700 dark:text-sky-400", border: "border-sky-300 dark:border-sky-800",
+    bg: "bg-sky-50 dark:bg-sky-950/30", icon: Layers,
   },
   "enterprise-platform": {
-    label: "Enterprise Platforms",
-    short: "Enterprise",
-    recipe: "Bloomberg + Linear",
+    label: "Enterprise Platforms", short: "Enterprise", recipe: "Bloomberg + Linear",
     blurb: "Custom SaaS, marketplaces, multi-tenant apps, enterprise systems. Dashboard interfaces with sidebar rails, KPI panels, activity feeds, and request-demo funnels.",
     chip: "text-violet-700 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/40",
-    text: "text-violet-700 dark:text-violet-400",
-    border: "border-violet-300 dark:border-violet-800",
-    bg: "bg-violet-50 dark:bg-violet-950/30",
-    icon: Eye,
+    text: "text-violet-700 dark:text-violet-400", border: "border-violet-300 dark:border-violet-800",
+    bg: "bg-violet-50 dark:bg-violet-950/30", icon: Eye,
   },
 };
 
@@ -105,14 +68,10 @@ const tierColorMap: Record<string, { text: string; chip: string; badge: string; 
   violet: { text: "text-violet-600 dark:text-violet-400", chip: "text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/40", badge: "bg-violet-600", dot: "bg-violet-400" },
 };
 
-// ─── Aggregate data: products grouped by family, with tier info ──
+/* ─── Aggregate: products by family with tier info + plate numbers ── */
 
 type FamilyProduct = {
-  product: ProductType;
-  tierLetter: string;
-  tierName: string;
-  tierColor: string;
-  priceRange: string;
+  product: ProductType; tierLetter: string; tierName: string; tierColor: string; priceRange: string;
 };
 
 const allTierSections = [
@@ -121,140 +80,63 @@ const allTierSections = [
 ];
 
 const familyProductMap: Record<DesignFamilyId, FamilyProduct[]> = {
-  micro: [],
-  "industry-warm": [],
-  "data-dense": [],
-  "saas-product": [],
-  "enterprise-platform": [],
+  micro: [], "industry-warm": [], "data-dense": [], "saas-product": [], "enterprise-platform": [],
 };
 for (const section of allTierSections) {
   for (const product of section.products) {
-    const fid = getFamilyForProductType(product.id);
-    familyProductMap[fid].push({
-      product,
-      tierLetter: section.letter,
-      tierName: section.name,
-      tierColor: section.color,
-      priceRange: section.priceRange,
+    familyProductMap[getFamilyForProductType(product.id)].push({
+      product, tierLetter: section.letter, tierName: section.name, tierColor: section.color, priceRange: section.priceRange,
     });
   }
 }
 
 const totalProducts = familyOrder.reduce((n, f) => n + familyProductMap[f].length, 0);
-const totalExamples = familyOrder.reduce(
-  (n, f) => n + familyProductMap[f].reduce((m, fp) => m + fp.product.examples.length, 0),
-  0
-);
+const totalExamples = familyOrder.reduce((n, f) => n + familyProductMap[f].reduce((m, fp) => m + fp.product.examples.length, 0), 0);
 
-// ─── Label → productId lookup for ExampleCard family badges ──────
-
+/* label → productId + engraved plate numbers (deterministic) */
 const labelToProductId: Record<string, string> = {};
+const plateNumbers: Record<string, string> = {};
+let plateCounter = 0;
 for (const section of allTierSections) {
   for (const product of section.products) {
-    for (const ex of product.examples) labelToProductId[ex.label] = product.id;
+    for (const ex of product.examples) {
+      labelToProductId[ex.label] = product.id;
+      plateCounter += 1;
+      plateNumbers[ex.label] = String(plateCounter).padStart(3, "0");
+    }
   }
 }
-function guessProductId(example: ProductExample): string {
+function productIdFor(example: ProductExample): string {
   return labelToProductId[example.label] ?? "landing-template";
 }
 
-// ─── MiniPreview (unchanged) ──────────────────────────────────────
+/* ─── Studio state ─────────────────────────────────────────────── */
 
-function MiniPreview({ config }: { config: MockupConfig }) {
-  const t = config.theme;
-  const isElevated = config.layout === "premium" || config.layout === "standard";
-  const isPremium = config.layout === "premium";
-  const [imgFailed, setImgFailed] = useState(false);
-  const showImg = config.heroImage && !imgFailed;
-  return (
-    <div style={{ fontFamily: t.font }} className="w-full h-full overflow-hidden flex flex-col pointer-events-none select-none">
-      <div
-        className="flex items-center justify-between px-2 py-1.5 shrink-0"
-        style={{
-          background: showImg ? "rgba(0,0,0,0.25)" : t.nav,
-          borderBottom: showImg ? "none" : `1px solid ${t.border}`,
-          position: showImg ? "absolute" : "relative",
-          top: 0, left: 0, right: 0, zIndex: 10,
-        }}
-      >
-        <div className="flex items-center gap-1">
-          <div className="w-2 h-2" style={{ background: t.accent, borderRadius: isElevated ? 3 : 999 }} />
-          <span className="text-[7px] font-bold" style={{ color: showImg ? "#fff" : t.text }}>{config.label}</span>
-        </div>
-        <div className="flex gap-1">
-          {[0, 1, 2].map((i) => (
-            <div key={i} className="w-2.5 h-0.5 rounded-full" style={{ background: showImg ? "rgba(255,255,255,0.4)" : t.muted, opacity: 0.5 }} />
-          ))}
-        </div>
-      </div>
-      <div className="relative flex-1 min-h-0" style={{ backgroundColor: t.bg, marginTop: isElevated ? 0 : undefined }}>
-        {showImg ? (
-          <img src={config.heroImage} alt="" onError={() => setImgFailed(true)} className="absolute inset-0 w-full h-full object-cover" />
-        ) : (
-          <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${t.accent}, ${t.surface})` }} />
-        )}
-        {showImg && (
-          <div className="absolute inset-0" style={{ background: isPremium ? "linear-gradient(135deg, rgba(0,0,0,0.65), rgba(0,0,0,0.25))" : "linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.55))" }} />
-        )}
-        <div className={`relative p-2.5 h-full flex flex-col justify-center ${isPremium ? "" : "items-center text-center"}`}>
-          <div className="text-[6px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded mb-1 inline-block w-fit" style={{ background: t.accent, color: "#fff" }}>
-            {tierDisplay[config.tier].label}
-          </div>
-          <div className="text-[9px] font-bold leading-tight max-w-[92%]" style={{ color: showImg ? "#fff" : t.text, textShadow: showImg ? "0 1px 6px rgba(0,0,0,0.5)" : "none" }}>
-            {config.tagline.length > 36 ? config.tagline.slice(0, 36) + "…" : config.tagline}
-          </div>
-          {showImg && (
-            <div className="mt-1.5 inline-block text-[6px] font-semibold px-1.5 py-0.5 rounded w-fit" style={{ background: t.accent, color: "#fff" }}>
-              {config.tier === "enterprise" ? "Request Demo" : "Get Started"}
-            </div>
-          )}
-        </div>
-      </div>
-      <div className="px-2 py-1.5 space-y-1 shrink-0" style={{ background: t.bg }}>
-        <div className="flex gap-1">
-          {[0, 1, 2].map((i) => (
-            <div key={i} className="flex-1 h-3.5 rounded" style={{ background: t.surface, border: `1px solid ${t.border}` }} />
-          ))}
-        </div>
-        <div className="h-1.5 rounded" style={{ background: t.accentSoft, opacity: 0.4 }} />
-      </div>
-    </div>
-  );
-}
+type View = { kind: "home" } | { kind: "family"; familyId: DesignFamilyId } | { kind: "pricing" };
+type StudioState = { offer: OfferV2; config: MockupConfig; businessName: string; example?: ProductExample } | null;
 
-// ─── View type & preview fn ───────────────────────────────────────
-
-type View =
-  | { kind: "home" }
-  | { kind: "family"; familyId: DesignFamilyId }
-  | { kind: "pricing" };
-
-type PreviewFn = (config: MockupConfig, name: string, example?: ProductExample) => void;
-
-// ─── TopNav: design families are the primary axis ─────────────────
+/* ─── TopNav: design families are the primary axis ─────────────── */
 
 function TopNav({ view, onSelect }: { view: View; onSelect: (v: View) => void }) {
   return (
-    <div className="sticky top-14 z-20 bg-zinc-50/95 dark:bg-zinc-950/95 backdrop-blur-md border-b border-zinc-200/80 dark:border-zinc-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5">
+    <div className="of-hairline-b sticky top-14 z-20 bg-[var(--of-plate-bg)]/95 backdrop-blur-md">
+      <div className="mx-auto max-w-7xl px-4 py-2.5 sm:px-6 lg:px-8">
         <div className="flex items-center gap-1.5 overflow-x-auto">
           <button
             onClick={() => onSelect({ kind: "home" })}
-            className={`group flex items-center gap-2 py-2 px-2.5 rounded-lg border transition-all duration-150 shrink-0 ${
+            className={`group flex shrink-0 items-center gap-2 rounded-lg border px-2.5 py-2 transition-all duration-150 ${
               view.kind === "home"
-                ? "bg-zinc-900 dark:bg-zinc-100 border-zinc-900 dark:border-zinc-100"
-                : "bg-white dark:bg-zinc-900 border-zinc-200/70 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700"
+                ? "border-brass-500/60 bg-brass-500/15"
+                : "border-zinc-200/70 bg-[var(--of-plate-bg-2)] hover:border-brass-500/40 dark:border-zinc-800"
             }`}
           >
-            <Zap className={`w-4 h-4 ${view.kind === "home" ? "text-white dark:text-zinc-900" : "text-zinc-400 dark:text-zinc-500"}`} />
-            <div className="text-left min-w-0 hidden sm:block">
-              <div className={`text-[11px] font-semibold leading-tight truncate ${view.kind === "home" ? "text-white dark:text-zinc-900" : "text-zinc-600 dark:text-zinc-400"}`}>
-                Home
-              </div>
-              <div className="font-mono text-[9px] text-zinc-400 dark:text-zinc-500 mt-0.5">All families</div>
+            <Zap className={`h-4 w-4 ${view.kind === "home" ? "text-brass-600 dark:text-brass-400" : "text-zinc-400"}`} />
+            <div className="hidden min-w-0 text-left sm:block">
+              <div className="text-[11px] font-semibold leading-tight">Home</div>
+              <div className="mt-0.5 font-mono text-[9px] text-zinc-400">All families</div>
             </div>
           </button>
-          <div className="w-px h-8 bg-zinc-200 dark:bg-zinc-800 shrink-0 mx-0.5" />
+          <div className="of-hairline-b h-8 w-px shrink-0 !border-0 border-l border-brass-500/25" />
           {familyOrder.map((fid) => {
             const fm = familyMeta[fid];
             const isActive = view.kind === "family" && view.familyId === fid;
@@ -263,37 +145,31 @@ function TopNav({ view, onSelect }: { view: View; onSelect: (v: View) => void })
               <button
                 key={fid}
                 onClick={() => onSelect({ kind: "family", familyId: fid })}
-                className={`group flex items-center gap-2 py-2 px-2.5 rounded-lg border transition-all duration-150 shrink-0 ${
-                  isActive
-                    ? `${fm.bg} ${fm.border}`
-                    : "bg-white dark:bg-zinc-900 border-zinc-200/70 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700"
+                className={`group flex shrink-0 items-center gap-2 rounded-lg border px-2.5 py-2 transition-all duration-150 ${
+                  isActive ? `${fm.bg} ${fm.border}` : "border-zinc-200/70 bg-[var(--of-plate-bg-2)] hover:border-brass-500/40 dark:border-zinc-800"
                 }`}
               >
-                <fm.icon className={`w-4 h-4 ${isActive ? fm.text : "text-zinc-400 dark:text-zinc-500"}`} />
-                <div className="text-left min-w-0 hidden sm:block">
-                  <div className={`text-[11px] font-semibold leading-tight truncate ${isActive ? "text-zinc-900 dark:text-zinc-50" : "text-zinc-600 dark:text-zinc-400"}`}>
-                    {fm.short}
-                  </div>
-                  <div className="font-mono text-[9px] text-zinc-400 dark:text-zinc-500 mt-0.5">{count} products</div>
+                <fm.icon className={`h-4 w-4 ${isActive ? fm.text : "text-zinc-400"}`} />
+                <div className="hidden min-w-0 text-left sm:block">
+                  <div className="text-[11px] font-semibold leading-tight">{fm.short}</div>
+                  <div className="mt-0.5 font-mono text-[9px] text-zinc-400">{count} products</div>
                 </div>
               </button>
             );
           })}
-          <div className="w-px h-8 bg-zinc-200 dark:bg-zinc-800 shrink-0 mx-0.5" />
+          <div className="h-8 w-px shrink-0 border-l border-brass-500/25" />
           <button
             onClick={() => onSelect({ kind: "pricing" })}
-            className={`group flex items-center gap-2 py-2 px-2.5 rounded-lg border transition-all duration-150 shrink-0 ${
+            className={`group flex shrink-0 items-center gap-2 rounded-lg border px-2.5 py-2 transition-all duration-150 ${
               view.kind === "pricing"
-                ? "bg-zinc-900 dark:bg-zinc-100 border-zinc-900 dark:border-zinc-100"
-                : "bg-white dark:bg-zinc-900 border-zinc-200/70 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700"
+                ? "border-brass-500/60 bg-brass-500/15"
+                : "border-zinc-200/70 bg-[var(--of-plate-bg-2)] hover:border-brass-500/40 dark:border-zinc-800"
             }`}
           >
-            <Tag className={`w-4 h-4 ${view.kind === "pricing" ? "text-white dark:text-zinc-900" : "text-zinc-400 dark:text-zinc-500"}`} />
-            <div className="text-left min-w-0 hidden sm:block">
-              <div className={`text-[11px] font-semibold leading-tight truncate ${view.kind === "pricing" ? "text-white dark:text-zinc-900" : "text-zinc-600 dark:text-zinc-400"}`}>
-                Pricing
-              </div>
-              <div className="font-mono text-[9px] text-zinc-400 dark:text-zinc-500 mt-0.5">4 plans</div>
+            <Tag className={`h-4 w-4 ${view.kind === "pricing" ? "text-brass-600 dark:text-brass-400" : "text-zinc-400"}`} />
+            <div className="hidden min-w-0 text-left sm:block">
+              <div className="text-[11px] font-semibold leading-tight">Pricing</div>
+              <div className="mt-0.5 font-mono text-[9px] text-zinc-400">4 plans</div>
             </div>
           </button>
         </div>
@@ -302,51 +178,162 @@ function TopNav({ view, onSelect }: { view: View; onSelect: (v: View) => void })
   );
 }
 
-// ─── PricingView (unchanged) ──────────────────────────────────────
+/* ─── ProductSection: COLLAPSED BY DEFAULT (user rule) ─────────── */
+
+function ProductSection({
+  fp, familyShort, onOpen, index,
+}: {
+  fp: FamilyProduct;
+  familyShort: string;
+  onOpen: (example: ProductExample, productName: string) => void;
+  index: number;
+}) {
+  const [expanded, setExpanded] = useState(false); // ← minimized until clicked
+  const tc = tierColorMap[fp.tierColor] ?? tierColorMap.amber;
+  const offer = deriveOffer(fp.product.id, fp.product.examples[0]);
+  return (
+    <div className="of-plate of-slide-up overflow-hidden" style={{ animationDelay: `${index * 60}ms` }}>
+      <button
+        onClick={() => setExpanded(!expanded)}
+        aria-expanded={expanded}
+        className="flex w-full items-center justify-between gap-3 p-3.5 text-left transition-colors hover:bg-brass-500/5 sm:p-4"
+      >
+        <div className="flex min-w-0 items-center gap-3">
+          <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded font-mono text-[10px] font-bold ${tc.chip}`}>
+            {fp.tierLetter}
+          </span>
+          <div className="min-w-0">
+            <h3 className="font-display text-[15px] font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">{fp.product.name}</h3>
+            <p className="mt-0.5 line-clamp-1 text-[11.5px] text-zinc-500 dark:text-zinc-400">{fp.product.description}</p>
+          </div>
+        </div>
+        <div className="flex shrink-0 items-center gap-3">
+          <span className="hidden font-mono text-[9px] text-zinc-400 sm:inline">{fp.product.examples.length} examples · {offer.price.amount !== null ? `from $${Math.min(...fp.product.examples.map((e) => deriveOffer(fp.product.id, e).price.amount ?? 999))}` : "quote"}</span>
+          <ChevronDown className={`h-4 w-4 text-zinc-400 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`} />
+        </div>
+      </button>
+      {expanded && (
+        <div className="of-expand border-t border-brass-500/15 px-3.5 pb-4 pt-3 sm:px-4">
+          <div className="mt-1 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {fp.product.examples.map((ex, i) => (
+              <ProductPlate
+                key={ex.label}
+                offer={deriveOffer(fp.product.id, ex)}
+                example={ex}
+                familyShort={familyShort}
+                plateNo={plateNumbers[ex.label] ?? "001"}
+                index={i}
+                onOpen={() => onOpen(ex, fp.product.name)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─── FamilyView: all products in a family, grouped by tier ────── */
+
+function FamilyView({ familyId, onOpen }: { familyId: DesignFamilyId; onOpen: (example: ProductExample, productName: string) => void }) {
+  const fm = familyMeta[familyId];
+  const tokens = familyTokens[familyId];
+  const items = familyProductMap[familyId];
+  const exampleCount = items.reduce((n, fp) => n + fp.product.examples.length, 0);
+
+  const byTier = useMemo(() => {
+    const groups: Record<string, FamilyProduct[]> = {};
+    for (const fp of items) {
+      (groups[fp.tierLetter] ??= []).push(fp);
+    }
+    return Object.entries(groups).sort(([a], [b]) => a.localeCompare(b));
+  }, [items]);
+
+  return (
+    <main className="mx-auto max-w-7xl space-y-5 px-4 py-6 sm:px-6 lg:px-8">
+      {/* family header — prestige plate */}
+      <div className={`of-plate of-slide-up ${fm.bg} ${fm.border} p-4 sm:p-5`}>
+        <div className="mb-2 flex flex-wrap items-start justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <fm.icon className={`h-5 w-5 ${fm.text}`} />
+            <h2 className="font-display text-xl font-semibold tracking-tight sm:text-2xl">{fm.label}</h2>
+          </div>
+          <span className={`rounded font-mono text-[10px] font-semibold px-2 py-1 ${fm.chip}`}>
+            {items.length} products · {exampleCount} examples
+          </span>
+        </div>
+        <p className="mb-3 max-w-2xl text-[13px] leading-relaxed text-zinc-600 dark:text-zinc-400">{fm.blurb}</p>
+        <div className="flex flex-wrap items-center gap-3 font-mono text-[10px] text-zinc-500 dark:text-zinc-400">
+          <span>Recipe: {fm.recipe}</span><span>·</span>
+          <span>{tokens.radius.md}px radius</span><span>·</span>
+          <span>{tokens.sectionStyle}</span><span>·</span>
+          <span className="of-engrave">Obsidian + brass finish</span>
+        </div>
+      </div>
+
+      {byTier.map(([tierLetter, tierProducts]) => {
+        const tc = tierColorMap[tierProducts[0].tierColor] ?? tierColorMap.amber;
+        return (
+          <div key={tierLetter} className="space-y-2.5">
+            <div className="mb-1 flex items-center gap-2">
+              <span className={`flex h-6 w-6 items-center justify-center rounded font-mono text-[10px] font-bold ${tc.chip}`}>{tierLetter}</span>
+              <h3 className="font-display text-base font-semibold tracking-tight">{tierProducts[0].tierName}</h3>
+              <span className="font-mono text-[11px] text-zinc-400">{tierProducts[0].priceRange}</span>
+              <span className="font-mono text-[10px] text-zinc-400">· {tierProducts.length} products</span>
+            </div>
+            <div className="space-y-2.5">
+              {tierProducts.map((fp, i) => (
+                <ProductSection key={fp.product.id} fp={fp} familyShort={fm.short} onOpen={onOpen} index={i} />
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </main>
+  );
+}
+
+/* ─── PricingView (prestige) ───────────────────────────────────── */
 
 function PricingView() {
   return (
-    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-      <div className="animate-slide-up">
-        <div className="flex items-center gap-3 mb-4">
-          <Tag className="w-5 h-5 text-zinc-900 dark:text-zinc-50" />
-          <h2 className="font-display text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-50">Pricing Plans</h2>
+    <main className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
+      <div className="of-slide-up">
+        <div className="mb-4 flex items-center gap-3">
+          <Tag className="h-5 w-5 text-brass-600 dark:text-brass-400" />
+          <h2 className="font-display text-xl font-semibold tracking-tight sm:text-2xl">Pricing Plans</h2>
         </div>
-        <p className="text-sm text-zinc-600 dark:text-zinc-400 max-w-2xl">
-          Four service tiers from a single-page Starter to a full Enterprise platform. Every product example maps to one of these tiers.
+        <p className="max-w-2xl text-[13px] text-zinc-600 dark:text-zinc-400">
+          Four service tiers from a single-page Starter to a full Enterprise platform. Every product example maps to one of these tiers — and every tier gets the same craft floor.
         </p>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {tierOrder.map((tier, i) => {
           const pkg = getPackage(tier);
           const td = tierDisplay[tier];
           const tc = tierColorMap[td.color];
           return (
-            <div
-              key={tier}
-              className="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200/80 dark:border-zinc-800 p-4 animate-slide-up"
-              style={{ animationDelay: `${i * 50}ms` }}
-            >
-              <div className="flex items-center justify-between mb-3">
+            <div key={tier} className="of-plate of-lift of-slide-up p-4" style={{ animationDelay: `${i * 50}ms` }}>
+              <div className="mb-3 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className={`w-1.5 h-1.5 rounded-full ${tc.dot}`} />
+                  <div className={`h-1.5 w-1.5 rounded-full ${tc.dot}`} />
                   <span className={`text-xs font-bold ${tc.text}`}>{td.label}</span>
                 </div>
-                <span className="font-mono text-[9px] text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">{td.short}</span>
+                <span className="of-plate-num">{td.short}</span>
               </div>
-              <div className="font-mono text-base font-bold text-zinc-900 dark:text-zinc-50 mb-0.5">{pkg.priceRange}</div>
-              <div className="text-[11px] text-zinc-500 dark:text-zinc-400 mb-3">{pkg.deliveryWeeks}</div>
-              <div className="space-y-1.5 mb-3">
+              <div className="of-foil-text mb-0.5 font-display text-lg font-bold">{pkg.priceRange}</div>
+              <div className="mb-3 text-[11px] text-zinc-500 dark:text-zinc-400">{pkg.deliveryWeeks}</div>
+              <div className="mb-3 space-y-1.5">
                 {pkg.features.slice(0, 4).map((f, j) => (
                   <div key={j} className="flex items-start gap-1.5">
-                    <Check className={`w-3 h-3 ${tc.text} shrink-0 mt-0.5`} strokeWidth={3} />
-                    <span className="text-[10px] text-zinc-600 dark:text-zinc-400 leading-tight">{f}</span>
+                    <Check className={`mt-0.5 h-3 w-3 shrink-0 ${tc.text}`} strokeWidth={3} />
+                    <span className="text-[10.5px] leading-tight text-zinc-600 dark:text-zinc-400">{f}</span>
                   </div>
                 ))}
-                <div className="text-[10px] text-zinc-400 dark:text-zinc-500 pt-0.5">+{pkg.features.length - 4} more</div>
+                <div className="pt-0.5 text-[10px] text-zinc-400">+{pkg.features.length - 4} more</div>
               </div>
-              <div className="pt-2.5 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
-                <span className="font-mono text-[9px] text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Modules</span>
+              <div className="of-hairline-t flex items-center justify-between pt-2.5">
+                <span className="of-plate-num">Modules</span>
                 <span className={`font-mono text-[10px] font-bold ${tc.text}`}>{pkg.modules.length}/22</span>
               </div>
             </div>
@@ -357,330 +344,168 @@ function PricingView() {
   );
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────
+/* ─── HomeView: prestige hero + family picker + living showcase ─── */
 
-function extractPageCount(features: string[]): number | null {
-  for (const f of features) {
-    const m = f.match(/(\d+)\s*pages?/i);
-    if (m) return parseInt(m[1], 10);
-  }
-  for (const f of features) {
-    if (/one-page|single-page|1-page/i.test(f)) return 1;
-  }
-  return null;
-}
-
-// ─── ExampleCard ──────────────────────────────────────────────────
-
-function ExampleCard({ example, onPreview, index }: { example: ProductExample; onPreview: () => void; index: number }) {
-  const td = tierDisplay[example.tier];
-  const tc = tierColorMap[td.color];
-  const pages = extractPageCount(example.features);
-  const familyId = getFamilyForProductType(guessProductId(example));
-  const fm = familyMeta[familyId];
-  return (
-    <button
-      onClick={onPreview}
-      className="group text-left bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200/80 dark:border-zinc-800 overflow-hidden hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-md transition-all duration-150 hover:-translate-y-0.5 animate-slide-up"
-      style={{ animationDelay: `${index * 50}ms` }}
-    >
-      <div className="relative aspect-[16/10] overflow-hidden bg-zinc-100 dark:bg-zinc-800">
-        <MiniPreview config={example} />
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-          <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-50 rounded-md px-2.5 py-1 text-[11px] font-semibold shadow-md flex items-center gap-1.5">
-            <Eye className="w-3 h-3" /> Preview <ArrowRight className="w-3 h-3" />
-          </div>
-        </div>
-        <div className="absolute top-1.5 right-1.5 z-20 flex items-center gap-1">
-          {pages !== null && (
-            <span className="font-mono px-1.5 py-0.5 rounded text-[8px] font-bold text-zinc-600 dark:text-zinc-300 bg-white/90 dark:bg-zinc-800/90 shadow-sm flex items-center gap-0.5">
-              <FileText className="w-2.5 h-2.5" />
-              {pages === 1 ? "1 pg" : `${pages} pgs`}
-            </span>
-          )}
-          <span className={`font-mono px-1.5 py-0.5 rounded text-[8px] font-bold text-white shadow-sm ${tc.badge}`}>
-            {td.short}
-          </span>
-        </div>
-        <div className="absolute bottom-1.5 left-1.5 z-20">
-          <span className={`font-mono px-1.5 py-0.5 rounded text-[7px] font-semibold ${fm.chip}`}>
-            {fm.short}
-          </span>
-        </div>
-      </div>
-      <div className="p-2.5">
-        <div className="text-[11px] font-bold text-zinc-900 dark:text-zinc-50 truncate mb-0.5">{example.exampleName}</div>
-        <p className="text-[10px] text-zinc-500 dark:text-zinc-400 line-clamp-2 leading-snug">{example.exampleDescription}</p>
-        <div className="mt-1.5 flex items-center justify-between">
-          <span className="font-mono text-[8px] text-zinc-400 dark:text-zinc-500">{fm.recipe}</span>
-          {pages !== null && (
-            <div className="flex items-center gap-1 text-[9px] text-zinc-400 dark:text-zinc-500">
-              <FileText className="w-2.5 h-2.5" />
-              <span className="font-mono">{pages === 1 ? "Single page" : `${pages} pages`}</span>
-            </div>
-          )}
-        </div>
-      </div>
-    </button>
-  );
-}
-
-// ─── ProductSection: expandable, shows tier badge ─────────────────
-
-function ProductSection({
-  fp,
-  onPreview,
-  index,
-}: {
-  fp: FamilyProduct;
-  onPreview: PreviewFn;
-  index: number;
-}) {
-  const [expanded, setExpanded] = useState(true);
-  const tc = tierColorMap[fp.tierColor] ?? tierColorMap.amber;
-  return (
-    <div
-      className="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200/80 dark:border-zinc-800 overflow-hidden animate-slide-up"
-      style={{ animationDelay: `${index * 60}ms` }}
-    >
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between p-3.5 sm:p-4 hover:bg-zinc-50 dark:hover:bg-zinc-850 transition-colors text-left"
-      >
-        <div className="flex items-center gap-3 min-w-0">
-          <span className={`flex items-center justify-center w-6 h-6 rounded font-mono text-[10px] font-bold shrink-0 ${tc.chip}`}>
-            {fp.tierLetter}
-          </span>
-          <div className="min-w-0">
-            <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-50">{fp.product.name}</h3>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 line-clamp-1">{fp.product.description}</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2.5 shrink-0">
-          <span className="font-mono text-[9px] font-semibold text-zinc-400 dark:text-zinc-500 hidden sm:inline">{fp.product.examples.length} examples</span>
-          <ChevronDown className={`w-4 h-4 text-zinc-400 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`} />
-        </div>
-      </button>
-      {expanded && (
-        <div className="px-3.5 sm:px-4 pb-4 pt-1 border-t border-zinc-100 dark:border-zinc-800 animate-expand">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 mt-3">
-            {fp.product.examples.map((ex, i) => (
-              <ExampleCard
-                key={i}
-                example={ex}
-                index={i}
-                onPreview={() => onPreview(ex, fp.product.name, ex)}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── FamilyView: all products in a family, grouped by tier ────────
-
-function FamilyView({ familyId, onPreview }: { familyId: DesignFamilyId; onPreview: PreviewFn }) {
-  const fm = familyMeta[familyId];
-  const tokens = familyTokens[familyId];
-  const items = familyProductMap[familyId];
-  const exampleCount = items.reduce((n, fp) => n + fp.product.examples.length, 0);
-
-  // Group by tier letter for sub-sections
-  const byTier = useMemo(() => {
-    const groups: Record<string, FamilyProduct[]> = {};
-    for (const fp of items) {
-      const key = fp.tierLetter;
-      if (!groups[key]) groups[key] = [];
-      groups[key].push(fp);
-    }
-    return Object.entries(groups).sort(([a], [b]) => a.localeCompare(b));
-  }, [items]);
+function HomeView({ onSelect, onOpen }: { onSelect: (v: View) => void; onOpen: (example: ProductExample, productName: string) => void }) {
+  const featured = useMemo(() => {
+    return familyOrder
+      .map((fid) => {
+        const items = familyProductMap[fid];
+        if (!items.length) return null;
+        // pick the example that has a hero offer (authored) — else the first
+        for (const fp of items) {
+          const heroEx = fp.product.examples.find((ex) => deriveOffer(fp.product.id, ex).authored);
+          if (heroEx) return { fid, fp, example: heroEx };
+        }
+        const fp0 = items[0];
+        return { fid, fp: fp0, example: fp0.product.examples[0] };
+      })
+      .filter(Boolean) as { fid: DesignFamilyId; fp: FamilyProduct; example: ProductExample }[];
+  }, []);
 
   return (
-    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-      {/* Family header */}
-      <div className={`rounded-lg ${fm.bg} border ${fm.border} p-4 sm:p-5 animate-slide-up`}>
-        <div className="flex items-start justify-between flex-wrap gap-3 mb-2">
-          <div className="flex items-center gap-3">
-            <fm.icon className={`w-5 h-5 ${fm.text}`} />
-            <h2 className="font-display text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-50">{fm.label}</h2>
-          </div>
-          <span className={`font-mono text-[10px] font-semibold px-2 py-1 rounded ${fm.chip}`}>
-            {items.length} products · {exampleCount} examples
-          </span>
-        </div>
-        <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed max-w-2xl mb-3">{fm.blurb}</p>
-        <div className="flex items-center gap-3 font-mono text-[10px] text-zinc-500 dark:text-zinc-400">
-          <span>Recipe: {fm.recipe}</span>
-          <span>·</span>
-          <span>{tokens.radius.md}px radius</span>
-          <span>·</span>
-          <span>{tokens.sectionStyle}</span>
-        </div>
-      </div>
-
-      {/* Products grouped by tier */}
-      {byTier.map(([tierLetter, tierProducts]) => {
-        const tc = tierColorMap[tierProducts[0].tierColor] ?? tierColorMap.amber;
-        const tierName = tierProducts[0].tierName;
-        const priceRange = tierProducts[0].priceRange;
-        return (
-          <div key={tierLetter} className="space-y-2.5">
-            <div className="flex items-center gap-2 mb-1">
-              <span className={`flex items-center justify-center w-6 h-6 rounded font-mono text-[10px] font-bold ${tc.chip}`}>
-                {tierLetter}
-              </span>
-              <h3 className="font-display text-base font-bold text-zinc-900 dark:text-zinc-50">{tierName}</h3>
-              <span className="font-mono text-[11px] text-zinc-400 dark:text-zinc-500">{priceRange}</span>
-              <span className="font-mono text-[10px] text-zinc-400 dark:text-zinc-500">· {tierProducts.length} products</span>
-            </div>
-            <div className="space-y-2.5">
-              {tierProducts.map((fp, i) => (
-                <ProductSection key={fp.product.id} fp={fp} onPreview={onPreview} index={i} />
-              ))}
+    <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      {/* ── Hero ────────────────────────────────────────────────── */}
+      <section className="pb-8 pt-8 of-slide-up">
+        <div className="of-plate relative overflow-hidden p-6 sm:p-10">
+          <MotionMedia
+            asset={posterFrom(featured[0]?.example.heroImage ?? "", [0.62, 0.5], 0.82)}
+            eager
+            className="absolute inset-0 !rounded-none"
+          />
+          <div className="relative max-w-3xl">
+            <div className="of-plate-num mb-3 !text-[#f3dfa6]/90">/ The forge · Edition 2026</div>
+            <h1 className="font-display text-3xl font-semibold leading-[1.06] tracking-tight text-white drop-shadow-sm sm:text-5xl">
+              Every template,{" "}
+              <span className="of-foil-text of-sheen inline-block rounded">finished</span>
+              <br className="hidden sm:block" /> before you buy it.
+            </h1>
+            <p className="mt-4 max-w-2xl text-[13.5px] leading-relaxed text-white/85 sm:text-[15px]">
+              {totalProducts} product types · {totalExamples} live examples · {heroCount} hand-authored kits. Open any plate: play the working demo,
+              read the real files, buy, and download the ZIP — in one sitting, from this page.
+            </p>
+            <div className="mt-5 flex flex-wrap items-center gap-2.5">
+              <button onClick={() => onSelect({ kind: "family", familyId: "industry-warm" })} className="of-btn">
+                <Flame className="h-4 w-4" /> Browse the showcase kits
+              </button>
+              <button onClick={() => onSelect({ kind: "pricing" })} className="of-btn-ghost !border-white/30 !text-white">
+                Compare plans <ArrowRight className="h-3.5 w-3.5" />
+              </button>
             </div>
           </div>
-        );
-      })}
-    </main>
-  );
-}
-
-// ─── HomeView: family picker + featured examples ──────────────────
-
-function HomeView({ onSelect, onPreview }: { onSelect: (v: View) => void; onPreview: PreviewFn }) {
-  return (
-    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      {/* Hero */}
-      <section className="pt-8 pb-6 animate-slide-up">
-        <div className="font-mono text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-3">
-          <span className="text-zinc-400 dark:text-zinc-600">/</span> Product tier engine
         </div>
-        <h1 className="font-display text-3xl sm:text-4xl lg:text-[2.75rem] font-bold tracking-tight mb-4 text-zinc-900 dark:text-zinc-50 leading-[1.08] max-w-3xl">
-          Pick a design family. See every product we can build in it.
-        </h1>
-        <p className="text-sm sm:text-base text-zinc-600 dark:text-zinc-400 leading-relaxed max-w-2xl mb-4">
-          {totalProducts} product types across {totalExamples} live examples. Each design family has its own visual language — typography, color, layout, and interaction patterns. Start with a family, then drill into its products and preview real examples.
-        </p>
 
-        {/* Stat strip */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-6">
+        {/* stat plates */}
+        <div className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
           {[
             { label: "Design families", value: "5", sub: "Distinct visual languages" },
             { label: "Product types", value: String(totalProducts), sub: "Across all tiers" },
             { label: "Live examples", value: String(totalExamples), sub: "Previewable now" },
-            { label: "Pricing tiers", value: "4", sub: "Starter → Enterprise" },
+            { label: "Authored kits", value: String(heroCount), sub: "Real files, real ZIPs" },
           ].map((s, i) => (
-            <div
-              key={s.label}
-              className="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200/80 dark:border-zinc-800 p-3 animate-slide-up"
-              style={{ animationDelay: `${i * 40}ms` }}
-            >
-              <div className="font-mono text-[9px] text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-1">{s.label}</div>
-              <div className="font-display text-xl font-bold text-zinc-900 dark:text-zinc-50 leading-none mb-1">{s.value}</div>
-              <div className="text-[10px] text-zinc-500 dark:text-zinc-400">{s.sub}</div>
+            <div key={s.label} className="of-plate of-slide-up p-3" style={{ animationDelay: `${i * 40}ms` }}>
+              <div className="of-plate-num mb-1">{s.label}</div>
+              <div className="of-foil-text font-display text-xl font-bold leading-none">{s.value}</div>
+              <div className="mt-1 text-[10px] text-zinc-500 dark:text-zinc-400">{s.sub}</div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Family picker — the primary entry point */}
+      {/* ── Family picker ───────────────────────────────────────── */}
       <section className="pb-6">
-        <div className="flex items-center gap-2 mb-4">
-          <LayoutGrid className="w-4 h-4 text-zinc-900 dark:text-zinc-50" />
-          <h2 className="font-display text-lg font-bold text-zinc-900 dark:text-zinc-50">Design families</h2>
-          <span className="font-mono text-[11px] text-zinc-400 dark:text-zinc-500">click to browse products</span>
+        <div className="mb-4 flex items-center gap-2">
+          <LayoutGrid className="h-4 w-4 text-brass-600 dark:text-brass-400" />
+          <h2 className="font-display text-lg font-semibold tracking-tight">Design families</h2>
+          <span className="font-mono text-[11px] text-zinc-400">click to browse — sections open collapsed, by design</span>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {familyOrder.map((fid, i) => {
             const fm = familyMeta[fid];
             const items = familyProductMap[fid];
             const exampleCount = items.reduce((n, fp) => n + fp.product.examples.length, 0);
-            // Collect tier letters present in this family
             const tierLetters = [...new Set(items.map((fp) => fp.tierLetter))].sort();
             return (
               <button
                 key={fid}
                 onClick={() => onSelect({ kind: "family", familyId: fid })}
-                className={`group text-left p-4 rounded-lg border ${fm.border} ${fm.bg} hover:shadow-md transition-all duration-150 animate-slide-up`}
+                className={`of-plate of-lift group of-slide-up p-4 text-left ${fm.border}`}
                 style={{ animationDelay: `${i * 50}ms` }}
               >
-                <div className="flex items-center justify-between mb-3">
+                <div className="mb-3 flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <fm.icon className={`w-4 h-4 ${fm.text}`} />
+                    <fm.icon className={`h-4 w-4 ${fm.text}`} />
                     <span className={`font-mono text-[9px] font-semibold ${fm.text}`}>FAMILY</span>
                   </div>
-                  <ArrowUpRight className="w-4 h-4 text-zinc-400 dark:text-zinc-600 group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-colors" />
+                  <ArrowUpRight className="h-4 w-4 text-zinc-400 transition-colors group-hover:text-brass-600 dark:group-hover:text-brass-400" />
                 </div>
-                <h3 className="font-display text-base font-bold text-zinc-900 dark:text-zinc-50 mb-1">{fm.label}</h3>
-                <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed mb-3 line-clamp-2">{fm.blurb}</p>
-                <div className="flex items-center gap-1.5 mb-3 flex-wrap">
+                <h3 className="mb-1 font-display text-base font-semibold tracking-tight">{fm.label}</h3>
+                <p className="mb-3 line-clamp-2 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">{fm.blurb}</p>
+                <div className="mb-3 flex flex-wrap items-center gap-1.5">
                   {tierLetters.map((l) => {
                     const fp = items.find((fp) => fp.tierLetter === l)!;
                     const tc = tierColorMap[fp.tierColor] ?? tierColorMap.amber;
-                    return (
-                      <span key={l} className={`font-mono text-[8px] font-bold px-1.5 py-0.5 rounded ${tc.chip}`}>{l}</span>
-                    );
+                    return <span key={l} className={`rounded font-mono text-[8px] font-bold px-1.5 py-0.5 ${tc.chip}`}>{l}</span>;
                   })}
                 </div>
-                <div className="flex items-center justify-between pt-2.5 border-t border-zinc-200/60 dark:border-zinc-800">
+                <div className="of-hairline-t flex items-center justify-between pt-2.5">
                   <span className="text-[11px] font-medium text-zinc-600 dark:text-zinc-400">{items.length} products · {exampleCount} examples</span>
-                  <span className="font-mono text-[9px] text-zinc-400 dark:text-zinc-500">{fm.recipe}</span>
+                  <span className="of-plate-num">{fm.recipe}</span>
                 </div>
               </button>
             );
           })}
-          {/* Pricing card */}
+          {/* pricing card */}
           <button
             onClick={() => onSelect({ kind: "pricing" })}
-            className="group text-left p-4 rounded-lg border border-zinc-900 dark:border-zinc-100 bg-zinc-900 dark:bg-zinc-100 hover:shadow-md transition-all duration-150 animate-slide-up"
+            className="of-plate of-lift group of-slide-up border-0 bg-gradient-to-br from-[#2b2721] to-[#17140f] p-4 text-left"
             style={{ animationDelay: `${familyOrder.length * 50}ms` }}
           >
-            <div className="flex items-center justify-between mb-3">
+            <div className="mb-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Tag className="w-4 h-4 text-white dark:text-zinc-900" />
-                <span className="font-mono text-[9px] font-semibold text-white dark:text-zinc-900">PLANS</span>
+                <Tag className="h-4 w-4 text-brass-400" />
+                <span className="font-mono text-[9px] font-semibold text-brass-400">PLANS</span>
               </div>
-              <ArrowUpRight className="w-4 h-4 text-zinc-500 dark:text-zinc-500 group-hover:text-white dark:group-hover:text-zinc-900 transition-colors" />
+              <ArrowUpRight className="h-4 w-4 text-zinc-500 transition-colors group-hover:text-[#f3dfa6]" />
             </div>
-            <h3 className="font-display text-base font-bold text-white dark:text-zinc-900 mb-1">Pricing Plans</h3>
-            <p className="text-xs text-zinc-400 dark:text-zinc-500 leading-relaxed mb-3 line-clamp-2">Starter, Growth, Professional, Enterprise — compare modules, deliverables, and support.</p>
-            <div className="flex items-center gap-1.5 mb-3">
+            <h3 className="mb-1 font-display text-base font-semibold tracking-tight text-white">Pricing Plans</h3>
+            <p className="mb-3 line-clamp-2 text-xs leading-relaxed text-zinc-400">
+              Starter, Growth, Professional, Enterprise — compare modules, deliverables, and support.
+            </p>
+            <div className="mb-3 flex flex-wrap items-center gap-1.5">
               {tierOrder.map((t) => (
-                <span key={t} className="font-mono text-[8px] font-bold px-1.5 py-0.5 rounded text-white/70 dark:text-zinc-900/70 bg-white/10 dark:bg-zinc-900/10">
+                <span key={t} className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-[8px] font-bold text-white/70">
                   {tierDisplay[t].short}
                 </span>
               ))}
             </div>
-            <div className="flex items-center justify-between pt-2.5 border-t border-white/10 dark:border-zinc-900/10">
-              <span className="text-[11px] font-medium text-zinc-300 dark:text-zinc-600">Compare all plans</span>
-              <ArrowRight className="w-3 h-3 text-zinc-400 dark:text-zinc-500 group-hover:translate-x-0.5 transition-transform" />
+            <div className="flex items-center justify-between border-t border-white/10 pt-2.5">
+              <span className="text-[11px] font-medium text-zinc-300">Compare all plans</span>
+              <ArrowRight className="h-3 w-3 text-zinc-400 transition-transform group-hover:translate-x-0.5" />
             </div>
           </button>
         </div>
       </section>
 
-      {/* Featured examples — one from each family */}
+      {/* ── Featured showcase — one authored kit per family ─────── */}
       <section className="pb-12">
-        <div className="flex items-center gap-2 mb-4">
-          <Eye className="w-4 h-4 text-zinc-900 dark:text-zinc-50" />
-          <h2 className="font-display text-lg font-bold text-zinc-900 dark:text-zinc-50">Featured examples</h2>
-          <span className="font-mono text-[11px] text-zinc-400 dark:text-zinc-500">one from each family — click to preview</span>
+        <div className="mb-4 flex items-center gap-2">
+          <Eye className="h-4 w-4 text-brass-600 dark:text-brass-400" />
+          <h2 className="font-display text-lg font-semibold tracking-tight">The showcase wall</h2>
+          <span className="font-mono text-[11px] text-zinc-400">hand-authored kits — try, read, buy, download</span>
         </div>
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-2.5">
-          {familyOrder.map((fid, i) => {
-            const items = familyProductMap[fid];
-            if (items.length === 0) return null;
-            const product = items[0].product;
-            const example = product.examples[0];
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+          {featured.map(({ fid, fp, example }, i) => {
+            const offer = deriveOffer(fp.product.id, example);
             return (
-              <ExampleCard
+              <ProductPlate
                 key={fid}
+                offer={offer}
                 example={example}
+                familyShort={familyMeta[fid].short}
+                plateNo={plateNumbers[example.label] ?? "001"}
                 index={i}
-                onPreview={() => onPreview(example, product.name, example)}
+                onOpen={() => onOpen(example, fp.product.name)}
               />
             );
           })}
@@ -690,81 +515,74 @@ function HomeView({ onSelect, onPreview }: { onSelect: (v: View) => void; onPrev
   );
 }
 
-// ─── App ──────────────────────────────────────────────────────────
+/* ─── App ────────────────────────────────────────────────────────── */
 
 function App() {
   const [view, setView] = useState<View>({ kind: "home" });
-  const [selectedConfig, setSelectedConfig] = useState<{ config: MockupConfig; businessName: string; example?: ProductExample } | null>(null);
+  const [studio, setStudio] = useState<StudioState>(null);
+
+  const handleOpen = (example: ProductExample, productName: string) => {
+    const productId = productIdFor(example);
+    setStudio({ offer: deriveOffer(productId, example), config: example, businessName: productName, example });
+  };
 
   const activeFamily = view.kind === "family" ? view.familyId : null;
 
-  const handlePreview: PreviewFn = (config, businessName, example) =>
-    setSelectedConfig({ config, businessName, example });
-
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50">
-      {/* Header */}
-      <header className="sticky top-0 z-30 bg-white/85 dark:bg-zinc-950/85 backdrop-blur-lg border-b border-zinc-200/80 dark:border-zinc-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-14">
+    <div className="min-h-screen text-zinc-900 dark:text-zinc-50">
+      {/* Header — engraved brand, brass hairline */}
+      <header className="of-hairline-b sticky top-0 z-30 bg-[var(--of-plate-bg)]/90 backdrop-blur-lg">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex h-14 items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-zinc-900 dark:bg-zinc-100 flex items-center justify-center">
-                <Zap className="w-4 h-4 text-white dark:text-zinc-900" />
+              <div className="of-foil-bar of-sheen grid h-8 w-8 place-items-center rounded-lg shadow-inner">
+                <Zap className="h-4 w-4 text-[#17140f]" />
               </div>
               <div>
-                <div className="font-display text-sm font-bold leading-tight tracking-tight">OMNIFORGE</div>
-                <div className="font-mono text-[10px] text-zinc-400 dark:text-zinc-500 leading-tight">Design Family Engine</div>
+                <div className="of-engrave font-display text-sm font-bold leading-tight tracking-tight">OMNIFORGE</div>
+                <div className="font-mono text-[10px] leading-tight text-zinc-400">Design Family Engine · Elite Edition</div>
               </div>
             </div>
-            <div className="hidden sm:flex items-center gap-1.5 font-mono text-[11px] text-zinc-400 dark:text-zinc-500">
-              <Layers className="w-3.5 h-3.5" />
-              <span>5 families · {totalProducts} products · {totalExamples} examples</span>
+            <div className="hidden items-center gap-1.5 font-mono text-[11px] text-zinc-400 sm:flex">
+              <Layers className="h-3.5 w-3.5" />
+              <span>5 families · {totalProducts} products · {heroCount} authored kits</span>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Top Navigation — design families are primary */}
       <TopNav view={view} onSelect={setView} />
 
-      {/* Home */}
-      {view.kind === "home" && (
-        <HomeView onSelect={setView} onPreview={handlePreview} />
-      )}
-
-      {/* Family View */}
-      {activeFamily && (
-        <FamilyView familyId={activeFamily} onPreview={handlePreview} />
-      )}
-
-      {/* Pricing View */}
+      {view.kind === "home" && <HomeView onSelect={setView} onOpen={handleOpen} />}
+      {activeFamily && <FamilyView familyId={activeFamily} onOpen={handleOpen} />}
       {view.kind === "pricing" && <PricingView />}
 
       {/* Footer */}
-      <footer className="border-t border-zinc-200/80 dark:border-zinc-800 py-7 mt-auto">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between flex-wrap gap-3">
+      <footer className="of-hairline-t mt-auto py-7">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <Zap className="w-3.5 h-3.5 text-zinc-400" />
-              <span className="font-display text-sm font-bold text-zinc-600 dark:text-zinc-400">OMNIFORGE</span>
+              <Zap className="h-3.5 w-3.5 text-brass-500" />
+              <span className="of-engrave font-display text-sm font-bold text-zinc-600 dark:text-zinc-400">OMNIFORGE</span>
             </div>
             <p className="font-mono text-[11px] text-zinc-400 dark:text-zinc-500">
-              {totalProducts} products · {totalExamples} examples · 5 design families · 4 plans · 22 modules
+              {totalProducts} products · {totalExamples} examples · 5 families · 4 plans · 22 modules
             </p>
           </div>
-          <p className="font-mono text-[10px] text-zinc-300 dark:text-zinc-600 mt-3">
-            Prices are illustrative starting hypotheses, not verified market rates.
+          <p className="mt-3 font-mono text-[10px] text-zinc-400/80 dark:text-zinc-600">
+            Ratings, sold counts and prices are labeled demo data. Manifests match archives 1:1 — every file carries its honest flag.
           </p>
         </div>
       </footer>
 
-      {/* Preview modal */}
-      {selectedConfig && (
-        <BrowserFrame
-          config={selectedConfig.config}
-          businessName={selectedConfig.businessName}
-          onClose={() => setSelectedConfig(null)}
-          example={selectedConfig.example}
+      {/* The studio — live presentation + instant delivery */}
+      {studio && (
+        <PresentationStudio
+          offer={studio.offer}
+          config={studio.config}
+          businessName={studio.businessName}
+          example={studio.example}
+          onClose={() => setStudio(null)}
         />
       )}
     </div>
