@@ -1,0 +1,542 @@
+OMNIFORGE Product Design System & Motion Implementation Plan
+Purpose: Give any capable coding agent an implementation-ready brief for turning the current OMNIFORGE design-family catalogue into a distinctive, high-quality website/product creation experience—with polished dashboards, product templates, onboarding forms, preview presentations, motion, accessibility, and consistent delivery quality at every price level.
+
+Working principle: Price tiers may change scope, depth, capacity, and service level. They must not change the minimum standard for visual craft, accessibility, responsive behavior, correctness, trust, or usability.
+
+Source reviewed: dashboard-design-improvements.zip, including the primary Next.js project and its nested reference-project.zip. This is a plan based on the supplied source, not a claim that the code has already been modified or build-verified.
+1. Product vision
+Build a unified creation environment—not merely a collection of template cards. The experience should help a user move confidently from an idea to a well-designed, explainable, launch-ready website or digital product.
+
+Every surface should communicate care: the first screen, navigation, search, product chooser, multi-step forms, loading and error states, sample previews, presentation mode, pricing comparison, generated output, SEO/GEO recommendations, and final quality report.
+Design promise
+1. Every price gets the same craft floor. All tiers receive responsive layouts, readable typography, accessible controls, coherent design tokens, reliable basic SEO, usable empty/error/loading states, and sensible reduced-motion behavior.
+2. Scope differs transparently. Lower tiers may include fewer pages, integrations, data sources, revisions, collaboration capabilities, automations, or monitoring depth. Never intentionally make the inexpensive tier look or behave careless.
+3. Distinct, not cookie-cutter. Templates should differ through information architecture, layout, typography, content composition, density, imagery, interaction model, and visual rhythm—not just hue swaps and different hero text.
+4. Trust is part of design. Demo data must be identified as illustrative. Generated SEO or GEO insights must not invent search volume, citations, competitor findings, reviews, customer counts, uptime, conversion rates, or other evidence.
+5. Motion should explain state. Animation should help people understand navigation, change, hierarchy, or feedback. Avoid animation that delays tasks, competes with content, or merely decorates every element.
+2. Supplied-project audit: current starting point
+Existing strengths to retain
+- The main project uses Next.js App Router, React 19, TypeScript, Tailwind CSS v4, lucide-react, and a small UI foundation based on Base UI / shadcn.
+- It already has a useful catalogue model: five design families, product types, product examples, tier packages, and a 22-module vocabulary.
+- app/page.tsx already contains the main browsing flow: home, family view, pricing view, and a preview handler.
+- components/BrowserFrame.tsx provides a preview modal with Preview, Services, and Comparison areas.
+- Five family-specific renderers already exist: MicroRenderer, IndustryWarmRenderer, DataDenseRenderer, SaaSProductRenderer, and EnterprisePlatformRenderer.
+- data/businessTypes.ts, data/exampleProducts.ts, data/designFamilies.ts, and data/servicePackages.ts are a starting point for separating content from presentation.
+Issues to address before large-scale styling
+1. Brand and metadata mismatch. app/page.tsx brands the app as OMNIFORGE / Design Family Engine, while app/layout.tsx metadata still says “Ledgerly — Calm accounting for modern teams.” Update title, description, theme color, and social metadata to the actual product.
+2. Stylesheet contamination. app/globals.css contains a separate accounting-dashboard visual system (.sidebar, .metric-card, plum/peach palette, etc.), while the main explorer relies heavily on Tailwind utility classes and zinc-based styles. Establish one intentional global foundation; remove or isolate obsolete selectors rather than continuing to layer styles over them.
+3. Animation vocabulary is not centralized. Page components refer to utility classes such as animate-slide-up, animate-expand, and an inline fade animation, but there is no clear project-owned motion-token layer in globals.css. Confirm which classes compile from the current Tailwind setup, replace accidental/missing behavior with an explicit motion system, and add a reduced-motion strategy.
+4. The main page owns too much. app/page.tsx is a large client component containing view state, product aggregation, metadata, cards, and page compositions. Break it into focused modules over time; avoid a risky rewrite all at once.
+5. Rendering logic is duplicated. MockupRenderer.tsx and the five family-specific renderers overlap in purpose. Agree on one renderer contract and shared primitives so improvements and bugs are not fixed in only one preview path.
+6. Aesthetic family, product archetype, business vertical, and price tier are too tightly coupled. The current getFamilyForProductType() maps each product type to one family. A product's functional needs should not dictate a single visual identity forever.
+7. Some preview metrics look real. Examples include uptime, active-user, response-time, and assessment-percentile claims embedded in renderer data. Mark all fictional metrics clearly as sample/demo data, use neutral examples where possible, and prohibit these claims from leaking into generated production content unless backed by supplied or verified data.
+8. Preview interaction completeness needs verification. Ensure modal focus management, Escape handling, focus return, scroll locking, keyboard use, responsive behavior, and URL/deep-link state work—not just clicking with a mouse.
+9. The nested reference project is a separate Vite/React 18 application. Treat it as reference material, not as an alternative source of truth. Do not merge package files, framework assumptions, or components without an explicit reason.
+10. Verify build tooling. The current package.json has dev, build, and start scripts, but no explicit lint, typecheck, or test scripts. Add the appropriate checks after confirming the actual tooling and dependencies.
+Recommended working rule
+Before changing a component, trace where it is used in the primary project, identify whether it is a live app control or a simulated preview, and check whether the same job is implemented elsewhere. Preserve current product types/examples unless the agent has documented a safe migration.
+3. The core architecture: separate four dimensions
+The system should make four independent decisions, then validate that their combination makes sense:
+A. Product archetype — what the product does
+Examples: marketing website, booking flow, CRM, analytics dashboard, creator portfolio, marketplace, client portal, calculator/tool, course or content product, mobile-first service page, inventory/operations tool, enterprise platform.
+
+Archetype determines required functionality, common page structure, interaction patterns, data model, form fields, and core components.
+B. Business vertical — whom it serves
+Examples: hospitality, professional services, healthcare, education, ecommerce, local services, B2B SaaS, nonprofit, finance, creator business.
+
+Vertical determines vocabulary, trust needs, content requirements, relevant structured data, local SEO needs, privacy/compliance prompts, and which claims require evidence. It must not be reduced to a color theme.
+C. Design family — how it feels and communicates
+Keep the existing families as a starting point, but define them by design characteristics rather than relying on other brands' names as recipes. Suggested internal descriptions:
+- Precision Minimal: compact, highly legible, typographic, direct; for focused micro-products.
+- Warm Editorial: expressive typography, rich photography, considered whitespace; for hospitality and human services.
+- Operational Intelligence: dense but ordered data, tabular numerals, strong status semantics; for analytics and monitoring.
+- Modern Product: crisp product UI, clear hierarchy, restrained gradients, strong interaction states; for SaaS and tools.
+- Enterprise Control: multi-level navigation, dense workflows, permissions and status clarity; for complex platforms.
+The visual system should not imitate a named company's distinctive layout or brand. Treat other products as broad inspiration, then create an original, consistent OMNIFORGE design language.
+
+Design family should control typography, spacing, radius, elevation, border behavior, color roles, density, section patterns, image treatment, icon style, and motion character—not only accent color.
+D. Offer tier — how much is included
+Tier determines scope and service level, not whether the product is beautifully designed. Store this separately from component styles.
+
+Combination rule: The recommendation engine chooses an archetype, vertical, design family, and tier. A validation layer then checks that all essential patterns exist and rejects unsuitable combinations (for example, a dense desktop table layout for a mobile-first booking flow).
+4. Information architecture and key user journeys
+The dashboard should make the next sensible action obvious at every stage. Use a persistent workspace shell with a compact, purposeful sidebar, command/search entry, project switcher, notification/status area, help, and user preferences. On smaller screens, replace the sidebar with an accessible drawer or bottom-level navigation that preserves priority actions.
+4.1 Home / workspace command center
+The first page should answer: “What can I do next, and what is the state of my work?”
+
+Recommended structure:
+- Top-level primary action: “Create a website or product” with a clear, short intake path.
+- Continue working: recent projects, clear status, last edited, and a real next action.
+- Start from a goal: launch a service website, validate a product, create a dashboard, improve SEO, publish a landing page, etc.
+- Recommended starting points: templates with explanations (“best for…”), not unexplained algorithmic scores.
+- Quality and growth snapshot: show genuine project status, outstanding issues, crawl coverage, SEO checks, content gaps, or launch readiness only when real data exists. Otherwise show an honest empty state or labelled demo mode.
+- Learning and help: short contextual guidance at the point of need rather than a wall of documentation.
+Avoid filling the screen with decorative KPI cards that have no meaningful user action.
+4.2 Guided project intake / “choose your form” flow
+Use a progressive multi-step flow, not one intimidating form. Ask only for information that materially changes the recommendation. Save progress and allow users to go back without losing work.
+
+Suggested steps:
+1. Goal: what should the website/product accomplish? Choose a primary action such as book, buy, capture leads, inform, publish, monitor, or manage workflows.
+2. Product type: website, store, dashboard, SaaS, portal, marketplace, micro-tool, or “help me choose.”
+3. Audience and context: industry, visitor type, geography/language, accessibility considerations, B2B/B2C, and urgency.
+4. Brand inputs: existing URL, logo, colors, fonts, imagery, reference sites, tone, and what must not be copied. Allow skipping optional assets.
+5. Content readiness: existing copy, documents, product feed, services, location details, proof points, case studies, FAQs, and required legal content.
+6. Functional requirements: lead forms, bookings, payments, accounts, search, integrations, analytics, dashboard data, content management, roles, or automations.
+7. SEO/GEO goals: target locations, seed topics, search intent, existing site/crawl, competitors supplied by the user, content sources, and current baseline. Distinguish provided facts from suggestions.
+8. Scope and delivery: required pages, timeline, tier, collaboration/revision needs, export/hosting preferences.
+9. Review: compact summary with editable assumptions, omissions, data sources, and a clear “Generate recommendations” action.
+Form behavior requirements:
+- Use visible labels, descriptions, inline errors, and concise examples.
+- Show step count and progress without falsely suggesting the work is nearly complete.
+- Use conditional questions only when the earlier answer makes them relevant.
+- Support keyboard and touch, validation, back/next, autosave with visible status, and resume.
+- Offer “I’m not sure” paths and explain why a field matters.
+- Never require a logo, paid data source, or advanced brand file to produce a high-quality result.
+4.3 Recommendation and template selection
+Show a small, reasoned shortlist rather than an unfiltered catalogue by default. Each recommendation should communicate:
+- what it is for;
+- why it fits the stated goal and audience;
+- important trade-offs or missing requirements;
+- estimated scope based on actual rules, not invented precision;
+- which parts are editable;
+- an honest indicator of evidence and confidence.
+Controls should include searchable template library, meaningful filters, industry/use-case tags, comparison, saved items, and a clear reset. Ensure product family names are explained in plain language.
+4.4 Preview / presentation studio
+This is a key sales and decision surface. Make previews feel like a polished presentation, not only a tiny screenshot in a browser frame.
+
+Required controls:
+- Desktop, tablet, and mobile previews with accurate breakpoints.
+- Full-page/section preview where practical, plus a focused viewport mode.
+- Side-by-side comparison of two or three variants, using the same content so comparison is meaningful.
+- A “why this design” summary: audience fit, hierarchy, conversion intent, content structure, and functional pattern.
+- Section navigator or outline for long previews.
+- Light/dark preview only where the chosen design supports both.
+- Toggle for illustrative demo data vs. supplied real data; demo data should be visually labelled.
+- Presentation mode with clean chrome, keyboard navigation, and optional share/export only when the implementation supports it.
+- Clear “Choose this direction,” “Customize,” and “Back to recommendations” actions.
+Do not hide important functionality behind a hover state; mobile and keyboard users must discover the same actions.
+4.5 Project studio / generated website editor
+Keep the main creation tasks visible:
+- page/sitemap outline;
+- section and component editor;
+- theme/design-system controls;
+- content editing with provenance for sourced claims;
+- forms, calls to action, integrations, and data connections;
+- SEO/GEO fields and technical settings;
+- preview, version history, undo/redo, and publish/export state.
+A change to one shared design token should update the entire site consistently. Offer controlled overrides at the component level without causing visual drift.
+4.6 SEO/GEO and growth workspace
+Treat this as a connected evidence-based workflow, not a panel that invents traffic estimates.
+- Technical health: indexability, metadata, canonical URLs, sitemaps, robots rules, redirects, schema validity, mobile usability, performance, and broken links.
+- Keyword/topic research: show the source, date, location/language, intent, and confidence for each recommendation. If actual volume data is unavailable, state that the volume is unverified instead of inventing a number.
+- Content planning: map pages to search intent, topical coverage, internal linking, entity clarity, useful FAQs, and content freshness.
+- GEO/answer visibility readiness: clear page structure, accurately sourced claims, concise answerable sections, schema where appropriate, brand/entity consistency, and source quality. Do not promise inclusion in AI answers or fabricate citations/mentions.
+- Competitor comparisons: run only when competitor URLs/data have actually been provided or retrieved. Show date and source context.
+- Recommendations: each finding gets impact, effort, confidence/evidence, affected page, and a reproducible fix.
+- Reports: separate measured metrics, estimates, and qualitative recommendations visually and semantically.
+4.7 Quality and launch center
+Before launch, show a useful report grouped by severity and action:
+- content and factual review;
+- responsive and visual quality;
+- accessibility;
+- SEO/GEO and metadata;
+- performance and technical health;
+- privacy/security and integration configuration;
+- missing/placeholder assets;
+- broken interactions and forms;
+- publishing and rollback status.
+Every issue should point to a relevant page, component, evidence, and fix. A score without explainable findings is not enough.
+5. Design system: implement the foundations before styling every page
+5.1 Tokens
+Create one source of truth for global semantic tokens and family-specific token maps. Suggested categories:
+- Color roles: page/surface/raised surface, primary text, muted text, border, interactive, focus, success, warning, danger, information, overlay, chart palette.
+- Typography: display/title/body/label/mono, sizes, line-height, weight, tracking, and maximum readable measure.
+- Spacing: a consistent scale for controls, card padding, section gaps, page margins, and density modes.
+- Radius/elevation: consistent rules per family rather than arbitrary one-off values.
+- Layout: content widths, sidebars, grids, card ratios, breakpoint behavior, density.
+- Interaction: focus ring, hover, pressed, selected, disabled, loading, error, success.
+- Motion: durations, easing, distance, stagger caps, and reduced-motion variants.
+Use semantic CSS variables so a family preset can change the look without changing component logic. Avoid hard-coding the same color independently across dozens of renderers.
+5.2 Components to standardize
+Build and document shared primitives before polishing all page variants:
+- AppShell, Sidebar, MobileNav, WorkspaceSwitcher, Topbar, Breadcrumbs, CommandMenu.
+- Button, IconButton, LinkButton, SearchInput, TextInput, Select, Combobox, Checkbox, RadioGroup, Switch, Slider, Textarea, Date/Time inputs.
+- FormField, Fieldset, ValidationMessage, Stepper, ProgressIndicator, SaveStatus.
+- Tooltip, Popover, DropdownMenu, Tabs, SegmentedControl, Dialog, Drawer, Toast, Alert, ConfirmDialog.
+- ProductCard, TemplateCard, RecommendationCard, FeatureList, ComparisonTable, FilterBar, EmptyState, Skeleton, ErrorState.
+- DataTable, chart wrapper, KPI tile, activity list, status badge, date range, filter/query controls.
+- DevicePreview, BrowserFrame, PresentationShell, SectionOutline, PreviewToolbar.
+Each component needs documented states and a story/example for default, hover, focus, active, disabled, loading, error, empty, long text, mobile, dark mode where applicable, and reduced motion.
+5.3 Visual-quality checklist per template
+A generated template should not pass merely because it compiles. It must demonstrate:
+- a clear hierarchy and one obvious primary action;
+- varied but coherent section rhythm;
+- typography with deliberate scale and readable line length;
+- adequate contrast and distinct interaction states;
+- realistic, relevant content structure—not repetitive generic filler;
+- relevant imagery/illustration or a thoughtful no-image design;
+- a responsive layout that is designed, not just squeezed;
+- meaningful empty/loading/error/success states for interactive products;
+- consistent icon stroke, size, alignment, and semantic use;
+- no overlapping elements, clipped content, dead controls, or misleading data;
+- useful title, metadata, semantic landmarks, and page-specific SEO requirements.
+5.4 Originality and variety engine
+For each generation, create a concise Design Brief before writing JSX:
+- target audience and primary task;
+- archetype and required patterns;
+- chosen design family and why it fits;
+- typography/color/layout directions;
+- page/section outline;
+- content model and image strategy;
+- interactions and motion personality;
+- responsive decisions;
+- accessibility and SEO/GEO constraints;
+- data provenance and assumptions.
+Then have a verifier compare the generated result against the brief. Variety should come from deliberate controlled choices across layout, type, density, content blocks, imagery, CTA strategy, and component composition. Do not randomize tokens blindly; use compatible combinations and keep every page within one coherent visual system.
+6. Motion implementation strategy: Motion + Anime.js + CSS
+6.1 Package responsibilities
+Use three layers, with clear boundaries:
+1. CSS transitions for low-cost, simple changes: color, border, shadow, underline, focus, and minor hover feedback.
+2. Motion for React as the default for React UI state: entering/exiting panels, menu/dialog transitions, selected layout changes, tabs, cards moving/reordering, gestures, and coordinated state-driven transitions.
+3. Anime.js for specialized, self-contained timelines: richer SVG path drawing, logo/illustration sequences, presentation-only feature sequences, or orchestrated non-React visual elements where its timeline/utilities materially help.
+Do not use both libraries to animate the same property on the same DOM element. Do not convert every icon into an animation. The libraries are tools for a design language, not the design language itself.
+6.2 Installation and framework notes
+The primary repository is a Next.js App Router project with React 19, which satisfies Motion's documented React compatibility.
+
+Use the package manager already established by the repository:
+pnpm add motion animejs
+For interactive React components, Motion's current import is:
+import { motion, AnimatePresence, MotionConfig } from "motion/react";
+Motion's docs also provide a motion/react-client entry for compatible React Server Component use cases. Use the documented import only when the component and its interaction constraints fit; keep state/event-driven animations in client components.
+
+For Anime.js, use the current v4-style documented API and import only what the implementation needs:
+import { animate, createScope, stagger } from "animejs";
+Do not copy older Anime.js v3 examples without checking the version and migration API. Use createScope({ root }) in React to scope selectors and call scope.revert() during cleanup so repeated mounts, route changes, and React Strict Mode do not leave stale animation instances behind.
+6.3 Motion foundation
+Create a small motion module (for example, lib/motion/) with named variants and timing tokens. Components should choose a named behavior instead of inventing unrelated duration/easing values everywhere.
+
+Initial token suggestions (tune visually during implementation):
+Token	Starting range	Use
+instant	0–100 ms	State confirmation where motion adds little
+micro	100–180 ms	Icon/button state, subtle feedback
+ui	160–260 ms	Tooltip, menu, popover, small panel
+layout	200–320 ms	Cards/reflow and shared layout transitions
+modal	180–300 ms	Dialog/drawer entrance and exit
+sequence	300–650 ms total	Optional, short presentation choreography
+stagger	30–60 ms between items, capped	Small sets of cards or list items
+
+
+These are initial design tokens, not hard requirements for every animation. Prefer transform and opacity when suitable; avoid animating layout-heavy properties on large portions of the page. Keep transitions interruptible and ensure they never block form submission, navigation, or data entry.
+6.4 MotionConfig and reduced motion
+At the appropriate client boundary, respect the user's system setting with Motion's MotionConfig reducedMotion="user". For custom sequences, check useReducedMotion() or Anime.js scope media-query support and offer an equivalent state that removes large movement, parallax, looping, and non-essential choreography. Keep essential feedback immediate and understandable.
+
+Also add global CSS support:
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+Audit this rule against Motion and Anime.js rather than assuming it overrides every JavaScript animation. A reduced-motion test must verify the actual rendered result.
+6.5 Where motion should appear
+Component / journey	Motion treatment	Avoid
+Main navigation	Animate active indicator; short fade/position shift on route/panel change	A long animated header that delays use
+Hamburger/menu icon	2–3 line SVG morph or rotate with clear open/closed state; preserve aria-expanded	Relying on animation alone to communicate state
+Sidebar	Smooth width/content change on desktop; drawer transition on mobile	Off-screen movement under reduced-motion preference
+Search/command palette	Fast opacity/scale or fade; return focus and support Escape	Typing lag, modal opening without focus management
+Multi-step forms	Brief progress indicator update; keep field content stable where possible	Animating the whole form so much that users lose their place
+Cards / template switching	Small entrance stagger for initial presentation; layout animation on filtering only if it improves orientation	Replaying a big cascade on every tiny filter interaction
+Preview modal	Animate overlay and panel lightly; use a clear exit state and restore focus	Unmounting before exit completes or trapping focus incorrectly
+Device preview	Immediate viewport switch; transition only if it helps continuity	Fake device loading delay
+Chart/data arrival	Use subtle line drawing/count-up only when the values are real and users can read the final value without waiting	Animating every KPI, misleading live-data appearance
+Product presentation	Optional Anime.js sequence for a specifically designed brand/illustration moment	Repeated autoplay on every route, heavy parallax
+Success/error feedback	Clear immediate feedback; subtle icon or opacity change	Color/motion-only status without text/semantics
+
+
+6.6 Icon and menu specification
+- Use lucide-react consistently for normal interface icons. Use animated SVG paths only for a small set of meaningful states (menu open, save complete, generate/publish progress, selected template).
+- All icon-only buttons need accessible labels and visible focus states.
+- Menu controls must expose aria-expanded, aria-controls where applicable, and use proper menu/dialog semantics; do not simulate a button with a clickable div.
+- Keyboard support: Enter/Space activation, Escape to close appropriate overlays, expected arrow-key behavior for true menus/tabs where implemented, and focus restoration after dismissing a dialog/drawer.
+- Hover movement must not be the only affordance; include equivalent focus-visible and touch behavior.
+6.7 Anime.js boundaries and lifecycle
+Use Anime.js in a small number of intentionally marked components. Scope selectors under a component root. Avoid global selectors such as .card that might affect other instances. Clean up scope/instances on unmount. If state changes determine the animation, keep React as the source of truth and use registered scoped methods or recreate the relevant sequence safely. Respect reduced motion and do not rely on window during server rendering.
+6.8 Performance guardrails
+- Lazy-load specialized presentation animations if they are not needed for the initial viewport.
+- Import the smallest supported entry points and avoid importing a full animation demo gallery into the shared app shell.
+- Do not add continuous requestAnimationFrame loops unless needed; stop them when not visible and clean them up.
+- Avoid layout reads/writes in repeated loops and avoid animating large images, shadows, and blur concurrently.
+- Measure the actual route bundle before and after adding libraries; use lazy loading or Motion's documented smaller-loading options when appropriate.
+- Verify low-end mobile performance, battery-conscious behavior, background tab behavior, and scrolling while animations are active.
+7. Recommended code organization
+Adapt names to the existing repository, but aim for a structure close to this over staged PRs:
+app/
+  layout.tsx                 # Correct product metadata, global providers
+  page.tsx                   # Server-first workspace entry if feasible
+  (workspace)/...
+components/
+  app-shell/
+  navigation/
+  forms/
+  design-system/
+  product-library/
+  previews/
+  presentation/
+  quality-center/
+  seo-geo/
+  motion/                    # Small reusable wrappers/patterns
+  renderers/
+    shared/
+    families/
+data/
+  product-archetypes.ts
+  business-verticals.ts
+  design-families.ts
+  service-tiers.ts
+  templates/
+lib/
+  design-system/
+    tokens.ts
+    validate-design-brief.ts
+  motion/
+    tokens.ts
+    variants.ts
+    accessibility.ts
+  validation/
+  analytics/
+  utils.ts
+Guidelines:
+- Keep static data and pure configuration separate from client state.
+- Move browser-dependent interactions into deliberate client boundaries. The entire application does not need to become a client component just because a few controls animate.
+- Establish a typed renderer interface for all five current family renderers and remove ambiguous duplicate responsibility gradually.
+- Keep business content separate from presentational markup. Avoid parsing feature text to infer important application behavior when structured fields can represent it directly.
+- Put all demo/fixture information in an explicit fixture module and include a dataMode: "demo" | "real" signal.
+- Use URL state where useful for selected family, filters, current product, presentation mode, and sharable previews.
+- Avoid adding more UI libraries unless a concrete gap exists; keep the component primitives aligned with existing Base UI/shadcn setup.
+Suggested type concepts
+type ProductArchetypeId = string;
+type BusinessVerticalId = string;
+type DesignFamilyId =
+  | "precision-minimal"
+  | "warm-editorial"
+  | "operational-intelligence"
+  | "modern-product"
+  | "enterprise-control";
+type OfferTierId = string;
+
+type DesignBrief = {
+  archetype: ProductArchetypeId;
+  vertical: BusinessVerticalId;
+  family: DesignFamilyId;
+  tier: OfferTierId;
+  audience: string[];
+  primaryGoal: string;
+  requiredPatterns: string[];
+  pageOutline: Array<{ slug: string; purpose: string; sections: string[] }>;
+  designRationale: string[];
+  assumptions: string[];
+  dataSources: Array<{ label: string; uri?: string; capturedAt?: string }>;
+  reducedMotionSafe: true;
+};
+This is a conceptual starting point: validate final fields against real product requirements before adopting it exactly.
+8. Pricing and product quality policy
+Do not let the pricing matrix tell users that inexpensive products get inferior design. Explain limits in concrete terms.
+Quality dimension	All tiers	Tier-dependent scope example
+Visual design	Coherent, professionally composed, responsive	Number of custom page types / variant rounds
+Accessibility	Same baseline target and critical checks	Advanced audit documentation or remediation hours
+SEO/GEO foundation	Correct metadata, semantics, crawl basics, honest content structure	Number of pages audited, ongoing tracking, research depth
+Performance	No avoidable regressions, optimized assets/bundles	Advanced monitoring/reporting and ongoing optimization
+Content trust	No fabricated claims; provenance and assumptions visible	Volume of research, editorial rounds, content production
+Forms and core interaction	Functional, validated, keyboard-usable	Complex workflows, integrations, role-based routing
+Responsive layouts	All target breakpoints work	Additional custom experiences / unusual device contexts
+Support/delivery	Clear instructions, honest status, usable files	Response SLA, collaboration, maintenance, dedicated support
+
+
+A tier can limit features such as number of pages, third-party integrations, seats, audit depth, custom workflows, ongoing tracking, revision scope, and advanced support. It should never disable basic keyboard navigation, use a broken mobile layout, remove focus styles, insert false data, or use visibly unfinished design.
+9. SEO/GEO, analytics, and evidence requirements
+The platform should maintain provenance for both user-facing generated pages and internal recommendations.
+- Every generated claim should be marked internally as user-provided, verified source, derived calculation, model suggestion, or placeholder/demo.
+- Never publish placeholder data as fact. Before launch, run a check for placeholder names, invented testimonials, invented logos, fake ratings, fake customer numbers, unsupported awards, uptime claims, and fake “top X%” statements.
+- Generated meta title/description, canonical, robots policy, Open Graph, sitemap, schema, and page headings must be checked against the actual page content.
+- Structured data must describe visible, factual content. Do not fabricate reviews, pricing, hours, locations, or aggregate ratings to qualify for search features.
+- Recommendations must distinguish measured observations from inferred opportunities. Show method, source, source date, locale, and uncertainty where relevant.
+- Keep human review available for medical, legal, finance, safety, regulated, and other high-impact content. Use a “needs verification” state rather than silently asserting uncertain information.
+- GEO/answer-readiness should focus on clarity, accurate sourcing, entity consistency, concise answers, strong information architecture, and valid technical structure; do not promise AI-search inclusion or cite sources not actually consulted.
+10. Implementation roadmap and acceptance gates
+Use small reviewable phases. Do not attempt to restyle and refactor every file in one speculative commit.
+Phase 0 — Baseline inventory and safety net
+Work: establish the exact source of truth, identify obsolete CSS, list all routes/views and product types, check data references, inspect current build output, capture baseline screenshots at desktop/tablet/mobile, add missing validation scripts.
+
+Deliverables: repository map, risk list, baseline visual captures, successful baseline build/typecheck (or clearly recorded pre-existing failures).
+
+Gate: no existing family, example, tier, preview tab, or product type silently disappears.
+Phase 1 — Foundation consistency
+Work: correct metadata/branding; consolidate CSS; implement semantic token names and family tokens; define button/input/card/label/focus/state standards; remove legacy styles only after confirming they are unused; standardize demo-data labels.
+
+Deliverables: design token layer, updated app metadata, reusable component/state reference, demo-data contract.
+
+Gate: no visual regression that breaks core layout; light/dark behavior is intentional; no false sample metric appears as real data.
+Phase 2 — Information architecture and flow polish
+Work: separate the page into testable sections, improve workspace home, product search/filter, category/family browsing, pricing comparison, URL state and navigation. Plan the intake flow and presentation studio, then implement the highest-priority path end-to-end.
+
+Deliverables: coherent home screen, responsive navigation, guided intake prototype, recommendation cards with rationale, preview/presentation interactions.
+
+Gate: users can complete a simple project selection using keyboard and touch, recover/backtrack, and understand why a template was suggested.
+Phase 3 — Shared preview/rendering architecture
+Work: define a renderer contract; isolate common primitives; migrate one family at a time; preserve current preview data; add demo/real distinction and device previews; eliminate duplicate layout behavior where practical.
+
+Deliverables: consistent renderers, shared device preview, visual and interaction states, migration notes.
+
+Gate: all existing examples still render and have coherent design; the same type/layout changes are consistent across preview paths.
+Phase 4 — Motion primitives
+Work: install Motion and Anime.js; create motion tokens and approved patterns; configure reduced motion; add motion to navigation, selected states, dialog/drawer, and one presentation sequence; do not broadly animate all cards at once.
+
+Deliverables: Motion wrapper/utilities, one Anime.js scoped showcase component, icon/menu state transitions, reduced-motion support, lifecycle cleanup.
+
+Gate: with reduced motion enabled there is no major spatial movement or continuous non-essential animation; no console warnings, leaked effects, or interaction delays; build passes.
+Phase 5 — Template quality expansion
+Work: refine design families to be original and meaningfully different; decouple archetype/vertical/family/tier; create design briefs, compatible combinations, vertical overlays, and representative templates across major categories.
+
+Deliverables: family/archetype/vertical definitions, validated design-brief model, example templates, quality rubric, combination tests.
+
+Gate: templates differ in composition and interaction—not merely accent color—and each meets the visual-quality checklist.
+Phase 6 — SEO/GEO and quality center
+Work: add provenance handling, technical SEO checks, evidence-based keyword/topic workflow, quality findings, launch checklist, placeholder/fabricated-claim scanner, and transparent confidence labels.
+
+Deliverables: quality dashboard, actionable findings, data-source records, launch gate.
+
+Gate: measured metrics, model suggestions, and demo values cannot be confused; no unsupported public claim slips through the launch checks unnoticed.
+Phase 7 — Hardening and release
+Work: run automated checks, browser/responsive testing, accessibility review, visual regression, bundle analysis, performance profiling, keyboard-only use, reduced-motion review, and sample workflows end to end.
+
+Deliverables: test report, before/after screenshots, build and lint/typecheck output, known limitations, prioritized follow-up list.
+
+Gate: core workflows work at target breakpoints; no critical accessibility or broken-interaction defects; actual performance and bundle measurements are documented rather than guessed.
+11. Required test matrix
+Test at least the following:
+Functional
+- Browse all families; open every product type; search/filter/sort; compare variants; open/close preview; switch tabs and device sizes; navigate back; refresh a shared/deep-linked state; submit and recover from form errors.
+- Test empty, loading, success, network failure, missing image, long content, missing optional brand assets, and a project with extensive requirements.
+- Verify every visible control has a meaningful action. Remove or label decorative controls instead of leaving dead affordances.
+Responsive
+- Narrow mobile (320–390 CSS px), large mobile, tablet portrait/landscape, laptop, wide desktop, browser zoom to 200%, long localized labels, and larger text settings.
+- No horizontal page overflow, hidden primary action, cropped modal controls, or inaccessible off-canvas content.
+Accessibility
+- Keyboard-only flow from start to finish; correct focus order; visible focus; dialog/drawer focus trap and return; Escape behavior; label/error association; accessible status announcements; color contrast; semantic headings and landmarks.
+- OS reduced-motion setting on and off. Confirm actual Motion and Anime.js effects adapt, not only CSS animations.
+- Do not encode success/error/selection only as color, motion, or an icon without accessible text/name.
+Quality / trust
+- Scan output for fake testimonials, customer logos, uptime numbers, response times, search volumes, reviews, rankings, and invented citations.
+- Confirm all demo metrics are labelled and are not included in production export by default.
+- Validate SEO metadata, canonical, schema, robots/sitemap behavior, alt text policy, and page-specific content.
+Performance
+- Capture a baseline before the animation packages are added and compare afterward.
+- Profile initial load, modal open/close, filter changes, device switching, and long preview pages on a representative mobile device profile.
+- Record actual initial JavaScript, route chunk sizes, layout shifts, and animation frame behavior. Set bundle budgets from the measured baseline and product goals; do not claim a score without running the measurement.
+12. Definition of done
+A feature is done only when all applicable conditions are met:
+- It supports desktop, tablet, mobile, keyboard, and touch.
+- It has correct loading, empty, error, disabled, selected, and success states where relevant.
+- It follows shared tokens and the selected design family.
+- Its animations are useful, short, interruptible, cleaned up, and reduced-motion-aware.
+- It has no dead controls, invented factual claims, or confusing demo data.
+- It passes typecheck/build/lint/test commands available in the repository.
+- It has been visually checked in screenshots at more than one viewport.
+- It preserves existing product/tier data or documents an intentional migration.
+- The implementation summary states what changed, what was verified, what remains, and any risks.
+13. Current official documentation to use during implementation
+Use current docs as the source of truth; do not rely on old snippets from blog posts.
+- Motion for React — getting started
+- Motion for React — installation and Next.js
+- Motion for React — layout animations
+- Motion for React — accessibility / reduced motion
+- Motion useReducedMotion
+- Anime.js documentation
+- Anime.js — using with React
+- Anime.js — Scope, cleanup, and media queries
+- W3C WCAG 2.2
+- MDN: prefers-reduced-motion
+14. Final direction
+The winning implementation is not “more animations” or “more template cards.” It is an end-to-end system where a person can state a goal, get a thoughtful recommendation, see a polished and honest presentation, customize it, understand quality and SEO/GEO trade-offs, and confidently publish a result.
+
+Use motion as a final layer over strong information architecture, coherent tokens, credible content, and reliable interactions. Deliver fewer patterns exceptionally well before expanding the library. Keep a high quality floor for every tier and let scope—not care—determine the difference between plans.
+
+Coding Agent Handoff Prompt — OMNIFORGE Dashboard, Product Templates & Motion
+You are the lead product designer and senior frontend engineer responsible for improving the supplied OMNIFORGE codebase. Read OMNIFORGE_PRODUCT_DESIGN_IMPLEMENTATION_PLAN.md completely before coding. Treat it as the project brief. Then inspect the actual repository and implement the plan in small, verifiable phases.
+Mission
+Turn the existing Next.js product/design-family explorer into a premium, coherent website and digital-product creation experience. Make the first dashboard screen, guided intake forms, template selection, previews/presentations, and product template system feel carefully designed and production-ready. Add Motion for React and Anime.js with a disciplined motion system. Maintain a high baseline of visual quality, usability, accessibility, responsive behavior, factual trust, and technical correctness at every price tier.
+Source of truth and non-negotiable rules
+1. The primary project is the Next.js App Router project in the supplied archive. The nested reference-project.zip is a separate Vite application; do not merge it blindly.
+2. Preserve existing product types, examples, five design-family concepts, pricing tiers, modules, and preview functionality while refactoring. If a field or pattern must change, add an intentional migration and verify existing references.
+3. The current app is named OMNIFORGE in the page UI, but app/layout.tsx still contains Ledgerly metadata. Fix the mismatch.
+4. app/globals.css includes older accounting-dashboard styles while the main page uses Tailwind classes. Inspect usage before removing; consolidate styling deliberately.
+5. Some renderer examples contain fictional statistics (e.g. uptime, user counts, assessment percentile). Label demo data as demo and never export it as a real claim.
+6. Do not use animation to compensate for weak layout or content. Do not animate every item. Do not make lower-priced tiers look unfinished.
+7. Do not use Motion and Anime.js to animate the same property on the same element. Use CSS for simple effects, Motion for React UI state/layout, and Anime.js only for specialized scoped sequences/SVG moments.
+8. Respect prefers-reduced-motion; avoid parallax/large spatial motion/looping for users requesting reduced motion. Verify the actual rendered state.
+9. Never invent claims, testimonials, customer counts, search volumes, performance stats, competitor findings, citations, or reviews. Make source, confidence, and demo state visible when applicable.
+10. Do not claim tests pass unless you ran them. Do not claim an interface is implemented if it is only planned or mocked.
+Implementation order
+Step 1 — Audit, baseline, and report
+- Map the project structure, components, data flow, existing views, preview renderers, and duplicate responsibilities.
+- Check current package scripts, type errors, build errors, CSS class generation, and unused styles before changing code.
+- Record baseline screenshots at desktop, tablet, and mobile sizes when the environment permits.
+- Return a short audit with top risks and an ordered work plan. Then proceed; do not ask the user to repeat information already provided.
+Step 2 — Stabilize the design foundation
+- Fix title/description/theme/social metadata for OMNIFORGE.
+- Establish semantic design tokens and a family-token layer with responsive typography/spacing/colors/elevation/focus/status.
+- Remove or isolate old unused CSS only after verifying dependencies.
+- Standardize core components and states.
+- Separate demo fixtures and apply explicit demo labels.
+- Create a shared renderer contract and progressively align existing renderers without deleting product coverage.
+Step 3 — Improve the main dashboard and selection journey
+- Make the first screen action-oriented: create project, resume work, explore by goal/use case, see honest project/quality states, find help.
+- Improve search, filter, family/product cards, comparison, and recommendation rationale.
+- Design and implement a progressive intake form with labels, inline validation, autosave/resume, conditional questions, back/next, and review summary. Skip unnecessary fields and support “not sure.”
+- Upgrade the preview into a useful presentation surface with responsive device modes, clean controls, comparison, section outline, demo-data labelling, and clear next actions.
+- Preserve existing views and deep-link/navigation behavior where practical.
+Step 4 — Install and implement motion
+Use pnpm and inspect the installed package versions/documentation before coding:
+pnpm add motion animejs
+- Motion React imports should use the current official API, normally from motion/react for client UI components.
+- Use MotionConfig with the user reduced-motion preference at a suitable client boundary and useReducedMotion where behavior needs adaptation.
+- Create named motion tokens and small reusable patterns. Start with navigation/selected state, menu icon, drawer/dialog transitions, template selection and a single optional presentation sequence.
+- Use current Anime.js API (animate, createScope, and other required exports), scope selector effects to a root ref, and clean up with scope.revert().
+- Keep reduced-motion behavior equivalent and avoid running Anime.js during server rendering.
+- Check package/bundle impact and dynamically load specialized showcase sequences when useful.
+Step 5 — Decouple product selection dimensions
+Model product archetype, business vertical, design family, and tier as distinct concepts. The combination should be validated against required patterns. Avoid mapping every product type to exactly one permanent style. Define a typed design brief that records audience, goal, design rationale, page outline, required interactions, data provenance, and accessibility constraints.
+Step 6 — Quality, SEO/GEO, and release checks
+- Improve template variation at the composition and interaction level, not only colors.
+- Create/extend quality and launch checks: responsive behavior, semantics, accessibility, valid SEO metadata/schema, content provenance, missing assets, dead controls, fake metrics, and placeholder content.
+- Separate verified/measured data from estimates and model suggestions. Show source dates, geography/language, confidence, and trade-offs when relevant.
+- Do not promise AI answer-engine placement or invent citation/visibility information.
+Technical requirements
+- Keep Server Components where useful; use client components only for state and browser interactions. Because the current main page uses client state, migrate in stages rather than rewriting everything at once.
+- Respect current versions of Next.js, React, Tailwind, Base UI/shadcn, and TypeScript. Do not add another component library without demonstrating a concrete need.
+- Make components accessible: native buttons/links, semantic headings/landmarks, labels, error association, visible focus, keyboard and touch support, correct dialog/menu behavior, Escape behavior, focus return, and status text.
+- Ensure motion is short, interruptible, does not block task completion, and does not hide information from keyboard/touch users.
+- Avoid global CSS selectors in specialized Anime.js components. Keep selectors scoped to the mounted component root.
+- Keep data separate from JSX. Avoid parsing descriptive copy to infer core logic when structured fields should express it.
+- Store selected family/filter/template/presentation state in the URL where it improves sharing and browser back/forward behavior.
+- Add or repair scripts for build/typecheck/lint/test as supported by the existing tooling; do not pretend a missing test suite ran.
+Acceptance criteria
+- All current families, products, examples, pricing tiers, and preview tabs remain available or have documented replacements.
+- Metadata and visible brand are consistent.
+- Core screens look intentionally designed at mobile, tablet, and desktop widths; no horizontal overflow or modal clipping.
+- Templates have meaningfully different composition and appropriate domain interactions.
+- Basic visual/accessibility/responsive/performance quality is not gated by tier.
+- Demo data is impossible to confuse with real data, and fabricated production claims are blocked or clearly flagged.
+- Every visible control does something meaningful.
+- Reduced-motion mode substantially removes non-essential movement in both Motion and Anime.js effects.
+- Anime.js instances are scoped and cleaned up; no animation is attached twice to the same property/element.
+- Build, typecheck, lint and applicable tests are run; any failure is reported honestly.
+- The closing report lists files changed, decisions made, checks run/results, remaining gaps, and risks. Include before/after screenshots or a visual checklist when possible.
+Working method
+Implement one phase at a time. After each phase, run the available checks and inspect the affected UI. Keep changes understandable and avoid sweeping rewrites without necessity. If time or context is limited, prioritize the design/metadata foundation, a polished home-to-preview journey, reduced-motion-safe integration, and a reusable component/motion system over superficial animation everywhere
+
+
