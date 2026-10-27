@@ -6,9 +6,12 @@
  * CSS-3D recipe: fan deck / exploded / iso stack / medal flip / tilt.
  */
 import { useRef, useState } from 'react';
-import { Star, BadgeCheck, Layers, ShieldCheck, RefreshCw, Scale } from 'lucide-react';
+import Link from 'next/link';
+import { Star, BadgeCheck, Layers, ShieldCheck, RefreshCw, Scale, Globe } from 'lucide-react';
 import { offerStats, type OfferV2 } from '@/data/product-catalog';
-import { MotionMedia, posterFrom } from '@/components/MotionMedia';
+import { DESIGN_STYLES, useStyle } from '@/lib/style-registry';
+import { siteSlugForLabel } from '@/lib/site-preview';
+import { SiteFrame } from '@/components/site/SiteFrame';
 import type { ProductExample } from '@/data/exampleProducts';
 
 export function ProductPlate({
@@ -25,6 +28,7 @@ export function ProductPlate({
   const tiltRef = useRef<HTMLDivElement>(null);
   const [hover, setHover] = useState(false);
   const arch = offer.archetype;
+  const engine = DESIGN_STYLES[useStyle()];
 
   const onTilt = (e: React.MouseEvent) => {
     if (arch !== 'website' || !tiltRef.current) return;
@@ -42,7 +46,16 @@ export function ProductPlate({
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => { setHover(false); tiltRef.current?.style.setProperty('--tx', '0deg'); tiltRef.current?.style.setProperty('--ty', '0deg'); }}
     >
-      <button onClick={onOpen} className="flex flex-1 flex-col text-left" aria-label={`Open ${offer.title} presentation`}>
+      {/* the plate is a div[role=button] (not a <button>) because the media
+          window embeds the REAL site — which legitimately contains buttons */}
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={onOpen}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpen(); } }}
+        className="flex flex-1 cursor-pointer flex-col text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brass-400"
+        aria-label={`Open ${offer.title} presentation`}
+      >
         {/* 2 · media window — with the family's 3D recipe */}
         <div className={`relative ${arch === 'website' ? '' : 'of-scene-3d'} p-2.5 pb-0`}>
           <div
@@ -74,8 +87,8 @@ export function ProductPlate({
             )}
             {arch === 'assessment' && (
               <div className={`of-medal-inner absolute inset-0 ${hover ? 'of-medal-flipped' : ''}`} style={{ transformStyle: 'preserve-3d' }}>
-                <div className="of-medal-face absolute inset-0" style={{ backfaceVisibility: 'hidden' }}>
-                  <MotionMedia asset={posterFrom(example.heroImage ?? '', [0.5, 0.4], 0.45)} className="h-full w-full !rounded-lg" />
+                <div className="of-medal-face absolute inset-0 overflow-hidden" style={{ backfaceVisibility: 'hidden' }}>
+                  <SiteFrame slug={siteSlugForLabel(example.label)} crop={800} ariaLabel={`${offer.title} — the real site, scaled`} />
                 </div>
                 <div className="of-medal-face of-medal-back absolute inset-0 grid place-items-center rounded-lg bg-gradient-to-br from-[#2b2721] to-[#17140f]" style={{ backfaceVisibility: 'hidden' }}>
                   <div className="grid h-14 w-14 place-items-center rounded-full border-2 border-brass-500/60 bg-gradient-to-br from-brass-600 to-brass-400 text-[#17140f]">
@@ -85,16 +98,18 @@ export function ProductPlate({
               </div>
             )}
             {arch !== 'assessment' && (
-              <div className="relative z-10 h-full w-full">
-                <MotionMedia asset={posterFrom(example.heroImage ?? '', [0.5, 0.4], 0.45)} className="h-full w-full !rounded-lg" />
+              <div className="relative z-10 h-full w-full overflow-hidden rounded-lg">
+                {/* the smaller frame shows the REAL site — identical to the
+                    full-size review, scaled (never a different mockup) */}
+                <SiteFrame slug={siteSlugForLabel(example.label)} crop={800} ariaLabel={`${offer.title} — the real site, scaled`} />
               </div>
             )}
-            <span className="absolute bottom-2 left-2 z-20 of-chip !bg-black/50 !text-[#f3dfa6] !border-brass-400/40">{familyShort}</span>
+            <span className="absolute bottom-2 left-2 z-20 of-chip !bg-black/50 !border-brass-400/40" style={{ color: 'var(--color-brass-300)' }}>{familyShort}</span>
             {offer.demo && (
               <span className="absolute bottom-2 right-2 z-20 of-chip !bg-black/50 !text-white !border-white/25">▶ Try it</span>
             )}
           </div>
-          <span className="of-plate-num absolute left-4 top-4 z-20 !text-[#f3dfa6]/90 drop-shadow">No. {plateNo}</span>
+          <span className="of-plate-num absolute left-4 top-4 z-20 drop-shadow" style={{ color: 'var(--color-brass-300)' }}>No. {plateNo} · {engine.short}</span>
         </div>
 
         {/* 3 · title block */}
@@ -131,7 +146,7 @@ export function ProductPlate({
             )}
           </div>
         </div>
-      </button>
+      </div>
 
       {/* 6 · policy chips */}
       <div className="flex flex-wrap gap-1.5 px-3.5 pt-2.5">
@@ -153,9 +168,20 @@ export function ProductPlate({
           )}
           <div className="of-plate-num mt-0.5">{offer.edition} · {stats.files} files</div>
         </div>
-        <button onClick={onOpen} className="of-btn shrink-0 !px-3.5 !py-2 text-[11px]">
-          <BadgeCheck className="h-3.5 w-3.5" /> {offer.demo ? 'Try & buy' : 'Open'}
-        </button>
+        <div className="flex shrink-0 items-center gap-1.5">
+          <Link
+            href={`/preview/${siteSlugForLabel(example.label)}`}
+            onClick={(e) => e.stopPropagation()}
+            title={`Open ${offer.title} as a real full-size website — /preview/${siteSlugForLabel(example.label)}`}
+            className="of-btn-ghost !px-2.5 !py-2"
+            aria-label={`Open the full website preview for ${offer.title}`}
+          >
+            <Globe className="h-3.5 w-3.5" /> Site
+          </Link>
+          <button onClick={onOpen} className="of-btn shrink-0 !px-3.5 !py-2 text-[11px]">
+            <BadgeCheck className="h-3.5 w-3.5" /> {offer.demo ? 'Try & buy' : 'Open'}
+          </button>
+        </div>
       </div>
     </article>
   );

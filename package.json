@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "db:push": "echo '[db:push] OMNIFORGE is a frontend-only showcase (no Prisma schema) — skipping database push'"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",

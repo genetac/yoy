@@ -1,0 +1,537 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   OMNIFORGE ELITE DESIGN SYSTEM
+   One intentional global foundation: tokens, motion vocabulary,
+   aurora fields, tickers, scrollbars, focus craft.
+   ════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --forge-glow: 140 82 45;          /* amber forge accent (light) */
+  --grid-line: rgba(9, 9, 11, 0.055);
+}
+.dark {
+  --forge-glow: 251 191 36;         /* amber forge accent (dark) */
+  --grid-line: rgba(255, 255, 255, 0.05);
+}
+
+.font-display { font-family: var(--font-inter-tight), var(--font-inter), sans-serif; }
+.font-serif-editorial { font-family: var(--font-cormorant), Georgia, serif; }
+.font-mono-forge { font-family: var(--font-jetbrains), ui-monospace, monospace; }
+
+/* ── Motion vocabulary (project-owned, single source of truth) ──────
+   instant 80ms · micro 140ms · ui 200ms · layout 280ms
+   modal 240ms · sequence 480ms · stagger 40ms (capped)
+   Implemented via Motion variants in src/lib/motion.ts               */
+
+/* ── Aurora / mesh background field ──────────────────────────────── */
+.forge-aurora {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.forge-aurora::before,
+.forge-aurora::after {
+  content: "";
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(90px);
+  opacity: 0.35;
+  will-change: transform;
+}
+.forge-aurora::before {
+  width: 55vw; height: 40vw;
+  left: -12vw; top: -18vw;
+  background: radial-gradient(closest-side, rgb(var(--forge-glow) / 0.5), transparent 70%);
+  animation: aurora-drift-a 22s ease-in-out infinite alternate;
+}
+.forge-aurora::after {
+  width: 45vw; height: 38vw;
+  right: -10vw; top: -8vw;
+  background: radial-gradient(closest-side, rgba(56, 189, 248, 0.35), transparent 70%);
+  animation: aurora-drift-b 26s ease-in-out infinite alternate;
+}
+.forge-grid {
+  background-image:
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, black 35%, transparent 100%);
+}
+@keyframes aurora-drift-a {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  50%  { transform: translate3d(6vw, 4vw, 0) scale(1.12); }
+  100% { transform: translate3d(-3vw, 7vw, 0) scale(0.94); }
+}
+@keyframes aurora-drift-b {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  50%  { transform: translate3d(-5vw, 5vw, 0) scale(1.08); }
+  100% { transform: translate3d(4vw, -3vw, 0) scale(1.15); }
+}
+
+/* ── Ticker / marquee (live activity strip) ──────────────────────── */
+.forge-ticker {
+  display: flex;
+  width: max-content;
+  animation: forge-ticker 46s linear infinite;
+}
+.forge-ticker:hover { animation-play-state: paused; }
+@keyframes forge-ticker {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* ── Shimmer (skeleton / loading craft) ──────────────────────────── */
+.forge-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.forge-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 20%, rgba(255,255,255,0.14) 50%, transparent 80%);
+  transform: translateX(-100%);
+  animation: forge-shimmer 2.6s ease-in-out infinite;
+}
+@keyframes forge-shimmer {
+  to { transform: translateX(100%); }
+}
+
+/* ── Live pulse dot (status semantics, not decoration) ───────────── */
+.forge-pulse {
+  position: relative;
+}
+.forge-pulse::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 9999px;
+  border: 1.5px solid currentColor;
+  opacity: 0.7;
+  animation: forge-pulse 2s ease-out infinite;
+}
+@keyframes forge-pulse {
+  0%   { transform: scale(0.6); opacity: 0.8; }
+  80%  { transform: scale(1.5); opacity: 0; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+/* ── Gradient text (display only, AA on large sizes) ─────────────── */
+.forge-gradient-text {
+  background: linear-gradient(115deg, rgb(var(--forge-glow)) 0%, #f97316 38%, #fb7185 62%, #38bdf8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ── Card craft: hairline border + inner top highlight ───────────── */
+.forge-card {
+  position: relative;
+  background: var(--card);
+  border: 1px solid var(--border);
+}
+.forge-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.18), transparent);
+  pointer-events: none;
+}
+
+/* ── Custom scrollbar ────────────────────────────────────────────── */
+* { scrollbar-width: thin; scrollbar-color: rgba(120,120,130,0.35) transparent; }
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb {
+  background: rgba(120,120,130,0.3);
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+*::-webkit-scrollbar-thumb:hover { background: rgba(120,120,130,0.55); background-clip: content-box; }
+
+/* ── Focus craft: visible, consistent ring on all interactive work ── */
+:focus-visible {
+  outline: 2px solid rgb(var(--forge-glow) / 0.9);
+  outline-offset: 2px;
+}
+
+/* ── Sparkline draw (GIF-like live charts) ───────────────────────── */
+@keyframes spark-draw {
+  from { stroke-dashoffset: var(--spark-len, 320); }
+  to   { stroke-dashoffset: 0; }
+}
+.forge-spark {
+  stroke-dasharray: var(--spark-len, 320);
+  animation: spark-draw 2.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* ── Ticker strip entrance / card rise ───────────────────────────── */
+@keyframes forge-rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.forge-rise { animation: forge-rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+/* ── Family theater: cycle progress bar (transform-only, pausable) ── */
+@keyframes forge-progress {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+.forge-progress { animation: forge-progress linear forwards; }
+
+/* ── Typewriter caret blink (SaaS theater visual) ─────────────────── */
+@keyframes forge-caret {
+  0%, 49%   { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+/* ── Reduced motion: remove non-essential movement entirely ──────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .forge-ticker { animation: none; transform: none; }
+  .forge-aurora::before,
+  .forge-aurora::after { animation: none; }
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   PRESTIGE LAYER (build plan v3 · P1 · D1 = obsidian + brass)
+   One finish system over the five family token sets. Foil only on
+   price, seal and plate number — never body text. Brass hairlines at
+   1px. Grain ≤ 4%. Every foil element has a solid fallback that
+   passes WCAG AA.
+   ════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --plate-bg: #F7F4EE;
+  --plate-edge: rgba(20, 18, 14, 0.10);
+  --plate-inner: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  --shadow-contact: 0 1px 2px rgba(10, 8, 4, 0.10);
+  --shadow-ambient: 0 18px 40px -18px rgba(10, 8, 4, 0.28);
+  --foil: linear-gradient(135deg, #8A6A2F 0%, #E7C982 38%, #B8913F 62%, #F3DFA6 100%);
+  --brass-line: #B8913F;
+  --brass-ink: #7A5E26;
+  --brass-ink-strong: #5f4a1e;
+  --engrave: 0 1px 0 rgba(255, 255, 255, 0.55), 0 -1px 0 rgba(0, 0, 0, 0.18);
+  --ease-prestige: cubic-bezier(0.2, 0.7, 0.1, 1);
+}
+.dark {
+  --plate-bg: #0E0E10;
+  --plate-edge: rgba(255, 240, 210, 0.08);
+  --plate-inner: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --shadow-contact: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-ambient: 0 18px 40px -18px rgba(0, 0, 0, 0.65);
+  --brass-line: #D4AF5E;
+  --brass-ink: #E7C982;
+  --brass-ink-strong: #F3DFA6;
+  --engrave: 0 1px 0 rgba(255, 255, 255, 0.12), 0 -1px 0 rgba(0, 0, 0, 0.4);
+}
+
+/* The plate — a finished object, not a card. */
+.plate {
+  background: var(--plate-bg);
+  border: 1px solid var(--plate-edge);
+  box-shadow: var(--shadow-contact), var(--plate-inner);
+  transition: box-shadow 180ms var(--ease-prestige), transform 180ms var(--ease-prestige);
+}
+.plate:hover,
+.plate:focus-within {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-contact), var(--shadow-ambient), var(--plate-inner);
+}
+@media (prefers-reduced-motion: reduce) {
+  .plate:hover, .plate:focus-within { transform: none; }
+}
+
+/* Foil — price, seal, plate number only. Solid fallback under it. */
+.foil-text {
+  background: var(--foil);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: var(--brass-ink-strong); /* fallback + under transparent clip */
+}
+@supports (-webkit-background-clip: text) {
+  .foil-text { color: transparent; }
+}
+
+/* Engraved text (plate numbers, policy chips) */
+.engraved {
+  text-shadow: var(--engrave);
+}
+
+/* 1px brass hairline */
+.brass-hairline { border-color: var(--brass-line); }
+.brass-inset-frame {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--brass-line) 55%, transparent);
+}
+
+/* Grain — ≤ 4% opacity, applied as an overlay layer */
+.grain-overlay {
+  position: relative;
+}
+.grain-overlay::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='120' height='120' filter='url(%23n)'/></svg>");
+  background-size: 120px 120px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .grain-overlay::after { opacity: 0.02; }
+}
+
+/* Curtain lift — studio open (600ms clip-path + rise; reduced → fade) */
+@keyframes curtain-lift {
+  from { clip-path: inset(100% 0 0 0); transform: translateY(8px); }
+  to   { clip-path: inset(0 0 0 0); transform: translateY(0); }
+}
+.curtain-lift { animation: curtain-lift 600ms var(--ease-prestige) both; }
+@media (prefers-reduced-motion: reduce) {
+  .curtain-lift { animation: forge-rise 150ms ease-out both; }
+}
+
+/* Wax seal settle (spring handled in JS; this is the static base) */
+.wax-seal {
+  background: radial-gradient(circle at 35% 30%, #c2410c 0%, #9a3412 55%, #7c2d12 100%);
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.25), inset 0 -3px 6px rgba(0, 0, 0, 0.35), 0 2px 6px rgba(124, 45, 18, 0.45);
+}
+
+/* Receipt tear line — draws left to right */
+@keyframes tear-draw {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+.tear-line {
+  transform-origin: left center;
+  animation: tear-draw 360ms linear both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tear-line { animation: none; transform: none; }
+}
+
+/* Brass sheen sweep for the seal (200ms, after settle) */
+@keyframes seal-sheen {
+  from { transform: translateX(-120%) rotate(8deg); }
+  to   { transform: translateX(220%) rotate(8deg); }
+}
+.seal-sheen {
+  overflow: hidden;
+  position: relative;
+}
+.seal-sheen::after {
+  content: "";
+  position: absolute;
+  inset: -30%;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, rgba(255, 235, 190, 0.5), transparent);
+  animation: seal-sheen 900ms var(--ease-prestige) 420ms both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .seal-sheen::after { animation: none; opacity: 0; }
+}
+
+/* Dashed receipt edge (zigzag via repeating gradient) */
+.receipt-edge {
+  --notch: 8px;
+  clip-path: polygon(
+    0 0, 100% 0, 100% calc(100% - var(--notch)),
+    calc(100% - var(--notch) / 2) 100%, calc(100% - var(--notch)) calc(100% - var(--notch)),
+    calc(100% - var(--notch) * 1.5) 100%, calc(100% - var(--notch) * 2) calc(100% - var(--notch)),
+    calc(100% - var(--notch) * 2.5) 100%, calc(100% - var(--notch) * 3) calc(100% - var(--notch)),
+    calc(100% - var(--notch) * 3.5) 100%, calc(100% - var(--notch) * 4) calc(100% - var(--notch)),
+    calc(100% - var(--notch) * 4.5) 100%, calc(100% - var(--notch) * 5) calc(100% - var(--notch)),
+    calc(100% - var(--notch) * 5.5) 100%, calc(100% - var(--notch) * 6) calc(100% - var(--notch)),
+    calc(100% - var(--notch) * 6.5) 100%, calc(100% - var(--notch) * 7) calc(100% - var(--notch)),
+    calc(100% - var(--notch) * 7.5) 100%, calc(100% - var(--notch) * 8) calc(100% - var(--notch)),
+    calc(100% - var(--notch) * 8.5) 100%, calc(100% - var(--notch) * 9) calc(100% - var(--notch)),
+    calc(100% - var(--notch) * 9.5) 100%, calc(100% - var(--notch) * 10) calc(100% - var(--notch)),
+    calc(100% - var(--notch) * 10.5) 100%, calc(100% - var(--notch) * 11) calc(100% - var(--notch)),
+    calc(100% - var(--notch) * 11.5) 100%, calc(100% - var(--notch) * 12) calc(100% - var(--notch)),
+    calc(100% - var(--notch) * 12.5) 100%, calc(100% - var(--notch) * 13) calc(100% - var(--notch)),
+    calc(100% - var(--notch) * 13.5) 100%, calc(100% - var(--notch) * 14) calc(100% - var(--notch)),
+    calc(100% - var(--notch) * 14.5) 100%, 0 calc(100% - var(--notch))
+  );
+}
+
+/* Plate 3D recipes (build plan v3 · P4/T1) — pure CSS-3D per family */
+.plate-3d { perspective: 900px; }
+.plate-3d-inner { transform-style: preserve-3d; transition: transform 220ms var(--ease-prestige); }
+/* Template Packs — fanned deck of ghost cards */
+.fan-deck .fan-ghost {
+  position: absolute; inset: 0; border-radius: inherit;
+  border: 1px solid color-mix(in srgb, var(--brass-line) 35%, transparent);
+  background: color-mix(in srgb, var(--plate-bg) 70%, transparent);
+  transition: transform 220ms var(--ease-prestige), opacity 220ms var(--ease-prestige);
+  opacity: 0; pointer-events: none;
+}
+.fan-deck:hover .fan-ghost:nth-child(1) { transform: rotate(-8deg) translateY(-6px); opacity: 0.55; }
+.fan-deck:hover .fan-ghost:nth-child(2) { transform: rotate(8deg) translateY(-6px); opacity: 0.55; }
+/* Toolkits — exploded view along Z */
+.explode-layers .explode-layer { transition: transform 240ms var(--ease-prestige); transform: translateZ(0); }
+.explode-layers:hover .explode-layer:nth-child(1) { transform: translateZ(18px); }
+.explode-layers:hover .explode-layer:nth-child(2) { transform: translateZ(36px); }
+/* Notion — isometric stack */
+.iso-stack { transform: rotateX(55deg) rotateZ(-45deg); transform-style: preserve-3d; }
+.iso-stack .iso-layer { transition: transform 220ms var(--ease-prestige); }
+.iso-stack:hover .iso-layer.is-top { transform: translateZ(12px); }
+/* Assessment — medal flip */
+.medal-flip { perspective: 800px; }
+.medal-flip-inner {
+  transform-style: preserve-3d;
+  transition: transform 500ms var(--ease-prestige);
+}
+.medal-flip.owned .medal-flip-inner { transform: rotateY(180deg); }
+.medal-face { backface-visibility: hidden; }
+.medal-back { transform: rotateY(180deg); }
+/* Website Kits — pointer tilt via --tilt-x/--tilt-y CSS vars (useTilt) */
+.tilt-pane { transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)); transition: transform 150ms var(--ease-prestige); }
+
+/* Cinemagraph poster — slow ken-burns pan for photo living-imagery */
+@keyframes ken-burns {
+  0%   { transform: scale(1.06) translate(0, 0); }
+  50%  { transform: scale(1.12) translate(-1.6%, -1.2%); }
+  100% { transform: scale(1.06) translate(0, 0); }
+}
+.animate-ken-burns { animation: ken-burns 14s var(--ease-prestige) infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .animate-ken-burns { animation: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .plate-3d-inner, .fan-deck .fan-ghost, .explode-layers .explode-layer,
+  .iso-stack .iso-layer, .medal-flip-inner, .tilt-pane { transition: none !important; transform: none !important; }
+  .iso-stack { transform: none; }
+}

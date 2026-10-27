@@ -1,0 +1,28 @@
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "**Star Rating Row Verification: 10/10**\n\nAll 5 cards in the \"Featured examples\" rail render the star rating row correctly with consistent structure:\n\n| Card | Stars | Rating | Reviews | Sold | Status |\n|------|-------|--------|---------|------|--------|\n| **SaaS Launch Page** | ★★★★☆ | 4.8 | (80) | 425 sold | ✅ Rendered |\n| **Dental Practice Kit** | ★★★★☆ | 4.9 | (269) | 768 sold | ✅ Rendered |\n| **Sales Dashboard** | ★★★★☆ | 4.9 | (64) | 395 sold | ✅ Rendered |\n| **Salon Booking System** | ★★★★☆ | 4.9 | (78) | 469 sold | ✅ Rendered |\n| **Accounting SaaS Platform** | ★★★★☆ | 4.6 | (22) | 325 sold | ✅ Rendered |\n\n**Visual Bug Check:** None detected. All rating rows display with:\n- Proper gold/yellow star icons (4 filled, 1 empty)\n- Numeric rating value in bold\n- Parenthetical review count\n- \"sold\" count suffix\n- Consistent vertical alignment across all cards\n- Correct text hierarchy (rating > reviews > sales)\n\nThe component renders identically on each card without overflow, clipping, or alignment issues.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1792946027,
+  "id": "202610260033418900adf523984586",
+  "model": "glm-5v-turbo",
+  "object": "chat.completion",
+  "request_id": "202610260033418900adf523984586",
+  "usage": {
+    "completion_tokens": 306,
+    "completion_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "prompt_tokens": 1740,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "total_tokens": 2046
+  }
+}

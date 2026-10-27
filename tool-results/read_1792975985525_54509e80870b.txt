@@ -1,0 +1,1031 @@
+     1→     1→/* ════════════════════════════════════════════════════════════════════
+     2→     2→   B-TK-2 · Designer's Toolkit
+     3→     3→   3 working single-file instruments (contrast checker, color pair
+     4→     4→   generator, grid tool), token export, 40-row font pairing bank,
+     5→     5→   WCAG 2.2 formula cheatsheet, setup guide. The Try-it demo runs
+     6→     6→   the same contrast math as 01-instruments/contrast-checker.html.
+     7→     7→   ════════════════════════════════════════════════════════════════════ */
+     8→     8→
+     9→     9→import type { DemoContent } from "../../catalog/schema";
+    10→    10→
+    11→    11→export const kitId = "B-TK-2";
+    12→    12→
+    13→    13→/* ── token-export.json is built from this verified data (ratios
+    14→    14→      computed with the exact WCAG 2.2 formula shipped above) ─────── */
+    15→    15→const tokenExport = {
+    16→    16→  name: "omniforge-designer-tokens",
+    17→    17→  version: "2026.1",
+    18→    18→  description:
+    19→    19→    "Design tokens for the Designer's Toolkit palette. Every accessiblePairs entry was verified with the WCAG 2.2 contrast formula (relative luminance + contrast ratio) at 2026.1.",
+    20→    20→  color: {
+    21→    21→    ink: { "900": "#0F172A", "700": "#334155", "500": "#64748B", "400": "#94A3B8", "300": "#CBD5E1" },
+    22→    22→    paper: { "0": "#FFFFFF", "50": "#F8FAFC", "200": "#E2E8F0" },
+    23→    23→    accent: { "100": "#DBEAFE", "600": "#2563EB", "700": "#1D4ED8" },
+    24→    24→    status: { success: "#15803D", warning: "#B45309", danger: "#B91C1C", highlight: "#FACC15" }
+    25→    25→  },
+    26→    26→  space: { base: 4, scale: [4, 8, 12, 16, 24, 32, 48, 64, 96], unit: "px" },
+    27→    27→  type: {
+    28→    28→    scale: [
+    29→    29→      { name: "caption", size: 12, lineHeight: 16 },
+    30→    30→      { name: "body-s", size: 14, lineHeight: 20 },
+    31→    31→      { name: "body", size: 16, lineHeight: 26 },
+    32→    32→      { name: "body-l", size: 18, lineHeight: 28 },
+    33→    33→      { name: "title-s", size: 20, lineHeight: 28 },
+    34→    34→      { name: "title", size: 24, lineHeight: 32 },
+    35→    35→      { name: "display-s", size: 30, lineHeight: 38 },
+    36→    36→      { name: "display", size: 36, lineHeight: 42 },
+    37→    37→      { name: "display-l", size: 48, lineHeight: 52 },
+    38→    38→      { name: "hero", size: 60, lineHeight: 64 }
+    39→    39→    ],
+    40→    40→    unit: "px",
+    41→    41→    bodyStack: "system-ui, -apple-system, 'Segoe UI', sans-serif",
+    42→    42→    monoStack: "ui-monospace, 'SF Mono', Menlo, Consolas, monospace"
+    43→    43→  },
+    44→    44→  radius: { sm: 4, md: 8, lg: 16, pill: 9999, unit: "px" },
+    45→    45→  shadow: {
+    46→    46→    low: "0 1px 2px rgba(15, 23, 42, 0.08)",
+    47→    47→    mid: "0 4px 12px rgba(15, 23, 42, 0.12)",
+    48→    48→    high: "0 12px 32px rgba(15, 23, 42, 0.18)"
+    49→    49→  },
+    50→    50→  breakpoint: { sm: 480, md: 768, lg: 1024, xl: 1280, unit: "px" },
+    51→    51→  accessiblePairs: [
+    52→    52→    { name: "body text on paper", fg: "#0F172A", bg: "#FFFFFF", ratio: 17.85, level: "AAA" },
+    53→    53→    { name: "secondary text on paper", fg: "#334155", bg: "#FFFFFF", ratio: 10.35, level: "AAA" },
+    54→    54→    { name: "muted text on paper", fg: "#64748B", bg: "#FFFFFF", ratio: 4.76, level: "AA" },
+    55→    55→    { name: "body text on surface", fg: "#0F172A", bg: "#F8FAFC", ratio: 17.06, level: "AAA" },
+    56→    56→    { name: "secondary text on surface", fg: "#334155", bg: "#F8FAFC", ratio: 9.9, level: "AAA" },
+    57→    57→    { name: "muted text on surface", fg: "#64748B", bg: "#F8FAFC", ratio: 4.55, level: "AA" },
+    58→    58→    { name: "action link on paper", fg: "#2563EB", bg: "#FFFFFF", ratio: 5.17, level: "AA" },
+    59→    59→    { name: "action link on surface", fg: "#2563EB", bg: "#F8FAFC", ratio: 4.94, level: "AA" },
+    60→    60→    { name: "button label on accent", fg: "#FFFFFF", bg: "#2563EB", ratio: 5.17, level: "AA" },
+    61→    61→    { name: "inverse text on ink", fg: "#FFFFFF", bg: "#0F172A", ratio: 17.85, level: "AAA" },
+    62→    62→    { name: "success text on paper", fg: "#15803D", bg: "#FFFFFF", ratio: 5.02, level: "AA" },
+    63→    63→    { name: "warning text on paper", fg: "#B45309", bg: "#FFFFFF", ratio: 5.02, level: "AA" },
+    64→    64→    { name: "danger text on paper", fg: "#B91C1C", bg: "#FFFFFF", ratio: 6.47, level: "AA" },
+    65→    65→    { name: "focus link on paper", fg: "#1D4ED8", bg: "#FFFFFF", ratio: 6.7, level: "AA" },
+    66→    66→    { name: "chip: accent-700 on accent-100", fg: "#1D4ED8", bg: "#DBEAFE", ratio: 5.49, level: "AA" },
+    67→    67→    { name: "highlight note: ink on amber", fg: "#0F172A", bg: "#FACC15", ratio: 11.66, level: "AAA" },
+    68→    68→    { name: "dark-mode body on ink", fg: "#CBD5E1", bg: "#0F172A", ratio: 12.02, level: "AAA" },
+    69→    69→    { name: "dark-mode muted on ink", fg: "#94A3B8", bg: "#0F172A", ratio: 6.96, level: "AA" }
+    70→    70→  ],
+    71→    71→  knownFails: [
+    72→    72→    { pair: "#777777 on #FFFFFF", ratio: 4.48, note: "One step lighter than #767676 — fails AA for normal text." },
+    73→    73→    { pair: "#2563EB on #DBEAFE", ratio: 4.24, note: "Accent-600 on accent-100 chip fails AA normal; use accent-700 (5.49:1) instead." },
+    74→    74→    { pair: "#9CA3AF on #F9FAFB", ratio: 2.43, note: "Tailwind-style gray-400 body text fails every threshold, including large text." }
+    75→    75→  ]
+    76→    76→};
+    77→    77→
+    78→    78→export const files: Record<string, string> = {
+    79→    79→  /* ── 01 Working instruments ─────────────────────────────────────── */
+    80→    80→
+    81→    81→  "01-instruments/contrast-checker.html": `<!doctype html>
+    82→    82→<html lang="en">
+    83→    83→<head>
+    84→    84→<meta charset="utf-8">
+    85→    85→<meta name="viewport" content="width=device-width, initial-scale=1">
+    86→    86→<title>Contrast Checker — Designer's Toolkit</title>
+    87→    87→<style>
+    88→    88→  :root {
+    89→    89→    color-scheme: light dark;
+    90→    90→    --bg: #f8fafc; --card: #ffffff; --fg: #0f172a; --muted: #64748b;
+    91→    91→    --line: #e2e8f0; --accent: #2563eb; --ok: #15803d; --bad: #b91c1c;
+    92→    92→  }
+    93→    93→  @media (prefers-color-scheme: dark) {
+    94→    94→    :root { --bg: #0f172a; --card: #1e293b; --fg: #e2e8f0; --muted: #94a3b8;
+    95→    95→            --line: #334155; --accent: #60a5fa; --ok: #4ade80; --bad: #f87171; }
+    96→    96→  }
+    97→    97→  * { box-sizing: border-box; }
+    98→    98→  body { margin: 0; font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif;
+    99→    99→         background: var(--bg); color: var(--fg); }
+   100→   100→  main { max-width: 58rem; margin: 0 auto; padding: 1.5rem 1.25rem 3rem; }
+   101→   101→  h1 { font-size: 1.55rem; margin: 0 0 .3rem; }
+   102→   102→  .tagline { margin: 0 0 1.4rem; color: var(--muted); }
+   103→   103→  .controls { display: grid; grid-template-columns: 1fr 1fr auto; gap: 1rem; align-items: start; }
+   104→   104→  fieldset { border: 1px solid var(--line); border-radius: .6rem; padding: .8rem 1rem 1rem; margin: 0; }
+   105→   105→  legend { font-weight: 700; font-size: .8rem; letter-spacing: .04em; text-transform: uppercase; padding: 0 .35rem; }
+   106→   106→  .hexrow { display: flex; gap: .6rem; }
+   107→   107→  input[type="color"] { width: 3rem; height: 2.4rem; border: 1px solid var(--line); border-radius: .4rem;
+   108→   108→                        background: none; padding: 2px; cursor: pointer; }
+   109→   109→  input[type="text"] { flex: 1; min-width: 0; font: 1rem/1.4 ui-monospace, Menlo, Consolas, monospace;
+   110→   110→                       padding: .5rem .6rem; border: 1px solid var(--line); border-radius: .4rem;
+   111→   111→                       background: var(--card); color: var(--fg); }
+   112→   112→  .hint { margin: .45rem 0 0; font-size: .82rem; color: var(--muted); min-height: 1.2em; }
+   113→   113→  .hint.err { color: var(--bad); }
+   114→   114→  button.swap { height: 2.4rem; padding: 0 1rem; font: 600 .95rem/1 system-ui, sans-serif;
+   115→   115→                border: 1px solid var(--line); border-radius: .4rem; background: var(--card);
+   116→   116→                color: var(--fg); cursor: pointer; }
+   117→   117→  button.swap:hover { border-color: var(--accent); color: var(--accent); }
+   118→   118→  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+   119→   119→  .readout { display: flex; flex-wrap: wrap; align-items: baseline; gap: 1rem; margin: 1.4rem 0 .4rem; }
+   120→   120→  .ratio { font-size: 3rem; font-weight: 800; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+   121→   121→  .ratio small { font-size: 1.1rem; font-weight: 600; color: var(--muted); }
+   122→   122→  .verdictline { font-weight: 600; }
+   123→   123→  .verdictline.pass { color: var(--ok); } .verdictline.fail { color: var(--bad); }
+   124→   124→  .grid2 { display: grid; grid-template-columns: 1.1fr 1fr; gap: 1rem; margin-top: 1rem; }
+   125→   125→  .panel { background: var(--card); border: 1px solid var(--line); border-radius: .6rem; padding: 1rem 1.1rem; }
+   126→   126→  .panel h2 { font-size: .95rem; margin: 0 0 .7rem; letter-spacing: .03em; text-transform: uppercase; color: var(--muted); }
+   127→   127→  .badges { display: grid; gap: .45rem; }
+   128→   128→  .badge { display: flex; justify-content: space-between; gap: .8rem; padding: .45rem .7rem;
+   129→   129→           border: 1px solid var(--line); border-radius: .4rem; font-size: .95rem; }
+   130→   130→  .badge b { font-weight: 700; }
+   131→   131→  .badge .r { color: var(--muted); font-variant-numeric: tabular-nums; }
+   132→   132→  .badge.pass { border-color: var(--ok); } .badge.pass b { color: var(--ok); }
+   133→   133→  .badge.fail { border-color: var(--bad); } .badge.fail b { color: var(--bad); }
+   134→   134→  .swatch { border-radius: .6rem; padding: 1.4rem 1.4rem 1.2rem; border: 1px solid var(--line); }
+   135→   135→  .swatch p { margin: 0 0 .8rem; }
+   136→   136→  .sample-normal { font-size: 16px; }
+   137→   137→  .sample-large { font-size: 24px; line-height: 1.35; }
+   138→   138→  .sample-bold { font-size: 19px; font-weight: 700; }
+   139→   139→  .sample-ui { display: inline-block; border: 2px solid currentColor; border-radius: .35rem;
+   140→   140→               padding: .3rem .8rem; font-weight: 600; font-size: .95rem; }
+   141→   141→  .sample-labels { margin-top: 1rem; font-size: .78rem; color: var(--muted); }
+   142→   142→  details { margin-top: 1rem; }
+   143→   143→  details summary { cursor: pointer; font-weight: 600; }
+   144→   144→  pre.math { background: var(--card); border: 1px solid var(--line); border-radius: .6rem;
+   145→   145→             padding: .9rem 1rem; overflow-x: auto; font-size: .85rem; line-height: 1.7; }
+   146→   146→  table { border-collapse: collapse; width: 100%; font-size: .9rem; }
+   147→   147→  th, td { text-align: left; padding: .35rem .5rem; border-bottom: 1px solid var(--line); }
+   148→   148→  th { color: var(--muted); font-weight: 600; }
+   149→   149→  footer { margin-top: 2rem; font-size: .82rem; color: var(--muted); }
+   150→   150→  @media (max-width: 720px) { .controls { grid-template-columns: 1fr; } .grid2 { grid-template-columns: 1fr; } }
+   151→   151→</style>
+   152→   152→</head>
+   153→   153→<body>
+   154→   154→<main>
+   155→   155→  <h1>Contrast Checker</h1>
+   156→   156→  <p class="tagline">WCAG 2.2 math, live in your browser — C&nbsp;=&nbsp;(L1&nbsp;+&nbsp;0.05)&nbsp;/&nbsp;(L2&nbsp;+&nbsp;0.05). Works offline.</p>
+   157→   157→
+   158→   158→  <div class="controls">
+   159→   159→    <fieldset>
+   160→   160→      <legend>Text color (foreground)</legend>
+   161→   161→      <div class="hexrow">
+   162→   162→        <input type="color" id="fgPick" value="#2563eb" aria-label="Foreground color picker">
+   163→   163→        <input type="text" id="fgHex" value="#2563EB" autocomplete="off" spellcheck="false" aria-describedby="fgHint">
+   164→   164→      </div>
+   165→   165→      <p class="hint" id="fgHint">Hex like #2563EB or #25F</p>
+   166→   166→    </fieldset>
+   167→   167→    <fieldset>
+   168→   168→      <legend>Background</legend>
+   169→   169→      <div class="hexrow">
+   170→   170→        <input type="color" id="bgPick" value="#ffffff" aria-label="Background color picker">
+   171→   171→        <input type="text" id="bgHex" value="#FFFFFF" autocomplete="off" spellcheck="false" aria-describedby="bgHint">
+   172→   172→      </div>
+   173→   173→      <p class="hint" id="bgHint">Both fields stay in sync</p>
+   174→   174→    </fieldset>
+   175→   175→    <button type="button" class="swap" id="swap" title="Swap foreground and background">⇄ Swap</button>
+   176→   176→  </div>
+   177→   177→
+   178→   178→  <div class="readout" role="status" aria-live="polite">
+   179→   179→    <span class="ratio" id="ratio">–<small>:1</small></span>
+   180→   180→    <span class="verdictline" id="verdictline">Type a hex pair above.</span>
+   181→   181→  </div>
+   182→   182→
+   183→   183→  <div class="grid2">
+   184→   184→    <section class="panel" aria-label="Verdicts">
+   185→   185→      <h2>Verdicts (WCAG 2.2)</h2>
+   186→   186→      <div class="badges" id="badges"></div>
+   187→   187→    </section>
+   188→   188→    <section class="panel" aria-label="Live swatches">
+   189→   189→      <h2>Live swatches</h2>
+   190→   190→      <div class="swatch" id="swatch">
+   191→   191→        <p class="sample-normal">The quick brown fox — body text, 16px.</p>
+   192→   192→        <p class="sample-large">Large text — 24px regular.</p>
+   193→   193→        <p class="sample-bold">Bold text — 19px / 700.</p>
+   194→   194→        <p><span class="sample-ui" id="uiSample">Button · 3:1 for UI</span></p>
+   195→   195→        <p class="sample-labels">Large text = ≥24px regular, or ≥18.66px bold. UI parts (borders, icons, focus rings) need 3:1 (§1.4.11).</p>
+   196→   196→      </div>
+   197→   197→    </section>
+   198→   198→  </div>
+   199→   199→
+   200→   200→  <details>
+   201→   201→    <summary>The math for this pair</summary>
+   202→   202→    <pre class="math" id="math">…</pre>
+   203→   203→  </details>
+   204→   204→
+   205→   205→  <details>
+   206→   206→    <summary>Thresholds and worked example</summary>
+   207→   207→    <table>
+   208→   208→      <tr><th>Check</th><th>Ratio needed</th></tr>
+   209→   209→      <tr><td>AA, normal text (§1.4.3)</td><td>≥ 4.5:1</td></tr>
+   210→   210→      <tr><td>AA, large text (§1.4.3)</td><td>≥ 3:1</td></tr>
+   211→   211→      <tr><td>AAA, normal text (§1.4.6)</td><td>≥ 7:1</td></tr>
+   212→   212→      <tr><td>AAA, large text (§1.4.6)</td><td>≥ 4.5:1</td></tr>
+   213→   213→      <tr><td>Non-text UI (§1.4.11)</td><td>≥ 3:1</td></tr>
+   214→   214→    </table>
+   215→   215→    <p>Worked example — #2563EB on #FFFFFF: linearized channels R&nbsp;0.018500, G&nbsp;0.124772, B&nbsp;0.830770 → L&nbsp;=&nbsp;0.2126·0.018500&nbsp;+&nbsp;0.7152·0.124772&nbsp;+&nbsp;0.0722·0.830770&nbsp;=&nbsp;0.153152 → C&nbsp;=&nbsp;(1.000000&nbsp;+&nbsp;0.05)&nbsp;/&nbsp;(0.153152&nbsp;+&nbsp;0.05)&nbsp;=&nbsp;5.17:1 → passes AA for normal text.</p>
+   216→   216→  </details>
+   217→   217→
+   218→   218→  <footer>Designer's Toolkit · B-TK-2 · no network calls, no tracking — save this file and it keeps working. Support: support@omniforge.example</footer>
+   219→   219→</main>
+   220→   220→<script>
+   221→   221→/* ===== formulas (pure) — WCAG 2.2 relative luminance + contrast ===== */
+   222→   222→function hexToRgb(hex) {
+   223→   223→  var m = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(String(hex).trim());
+   224→   224→  if (!m) return null;
+   225→   225→  var s = m[1];
+   226→   226→  if (s.length === 3) s = s.charAt(0) + s.charAt(0) + s.charAt(1) + s.charAt(1) + s.charAt(2) + s.charAt(2);
+   227→   227→  return [parseInt(s.slice(0, 2), 16), parseInt(s.slice(2, 4), 16), parseInt(s.slice(4, 6), 16)];
+   228→   228→}
+   229→   229→function normalizeHex(hex) {
+   230→   230→  var rgb = hexToRgb(hex);
+   231→   231→  if (!rgb) return null;
+   232→   232→  return "#" + rgb.map(function (v) { var h = v.toString(16); return h.length === 1 ? "0" + h : h; }).join("").toUpperCase();
+   233→   233→}
+   234→   234→function linChannel(c8) {
+   235→   235→  var c = c8 / 255;
+   236→   236→  return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+   237→   237→}
+   238→   238→function luminance(hex) {
+   239→   239→  var rgb = hexToRgb(hex);
+   240→   240→  if (!rgb) return null;
+   241→   241→  return 0.2126 * linChannel(rgb[0]) + 0.7152 * linChannel(rgb[1]) + 0.0722 * linChannel(rgb[2]);
+   242→   242→}
+   243→   243→function contrastRatio(a, b) {
+   244→   244→  var la = luminance(a), lb = luminance(b);
+   245→   245→  if (la === null || lb === null) return null;
+   246→   246→  var hi = Math.max(la, lb), lo = Math.min(la, lb);
+   247→   247→  return (hi + 0.05) / (lo + 0.05);
+   248→   248→}
+   249→   249→function verdicts(r) {
+   250→   250→  return {
+   251→   251→    aaNormal: r >= 4.5, aaLarge: r >= 3,
+   252→   252→    aaaNormal: r >= 7, aaaLarge: r >= 4.5,
+   253→   253→    ui: r >= 3
+   254→   254→  };
+   255→   255→}
+   256→   256→/* ===== app (dom) ===== */
+   257→   257→var fgPick = document.getElementById("fgPick"), fgHex = document.getElementById("fgHex");
+   258→   258→var bgPick = document.getElementById("bgPick"), bgHex = document.getElementById("bgHex");
+   259→   259→var fgHint = document.getElementById("fgHint"), bgHint = document.getElementById("bgHint");
+   260→   260→var CHECKS = [
+   261→   261→  ["aaNormal", "AA · normal text", "4.5:1"],
+   262→   262→  ["aaLarge", "AA · large text", "3:1"],
+   263→   263→  ["aaaNormal", "AAA · normal text", "7:1"],
+   264→   264→  ["aaaLarge", "AAA · large text", "4.5:1"],
+   265→   265→  ["ui", "UI components · §1.4.11", "3:1"]
+   266→   266→];
+   267→   267→function esc(s) {
+   268→   268→  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+   269→   269→}
+   270→   270→function syncPick(pick, text, hint, label) {
+   271→   271→  var norm = normalizeHex(text.value);
+   272→   272→  if (norm) { pick.value = norm.toLowerCase(); hint.textContent = "L = " + (luminance(norm) === null ? "—" : luminance(norm).toFixed(6)); hint.classList.remove("err"); }
+   273→   273→  else { hint.textContent = "Not a hex color — showing last valid pair"; hint.classList.add("err"); }
+   274→   274→  render();
+   275→   275→}
+   276→   276→function render() {
+   277→   277→  var fg = normalizeHex(fgHex.value), bg = normalizeHex(bgHex.value);
+   278→   278→  if (!fg || !bg) return;
+   279→   279→  var r = contrastRatio(fg, bg), v = verdicts(r), shown = r.toFixed(2);
+   280→   280→  document.getElementById("ratio").innerHTML = shown + "<small>:1</small>";
+   281→   281→  var vl = document.getElementById("verdictline");
+   282→   282→  if (v.aaaNormal) { vl.textContent = "Passes AAA for normal text — excellent."; vl.className = "verdictline pass"; }
+   283→   283→  else if (v.aaNormal) { vl.textContent = "Passes AA for normal text (the legal baseline)."; vl.className = "verdictline pass"; }
+   284→   284→  else if (v.aaLarge) { vl.textContent = "Fails AA for normal text — large text only."; vl.className = "verdictline fail"; }
+   285→   285→  else { vl.textContent = "Fails every threshold — do not ship this pair."; vl.className = "verdictline fail"; }
+   286→   286→  var html = "";
+   287→   287→  for (var i = 0; i < CHECKS.length; i++) {
+   288→   288→    var c = CHECKS[i], ok = v[c[0]];
+   289→   289→    html += '<div class="badge ' + (ok ? "pass" : "fail") + '"><b>' + (ok ? "PASS" : "FAIL") + "</b><span>" + c[1] + '</span><span class="r">' + c[2] + "</span></div>";
+   290→   290→  }
+   291→   291→  document.getElementById("badges").innerHTML = html;
+   292→   292→  var sw = document.getElementById("swatch");
+   293→   293→  sw.style.background = bg.toLowerCase();
+   294→   294→  sw.style.color = fg.toLowerCase();
+   295→   295→  document.getElementById("uiSample").style.borderColor = fg.toLowerCase();
+   296→   296→  var lf = luminance(fg).toFixed(6), lb = luminance(bg).toFixed(6);
+   297→   297→  var rgbf = hexToRgb(fg), rgbb = hexToRgb(bg);
+   298→   298→  var lines = [
+   299→   299→    "FG  " + fg + "  →  R' " + linChannel(rgbf[0]).toFixed(6) + "  G' " + linChannel(rgbf[1]).toFixed(6) + "  B' " + linChannel(rgbf[2]).toFixed(6),
+   300→   300→    "    L = 0.2126·R' + 0.7152·G' + 0.0722·B' = " + lf,
+   301→   301→    "BG  " + bg + "  →  R' " + linChannel(rgbb[0]).toFixed(6) + "  G' " + linChannel(rgbb[1]).toFixed(6) + "  B' " + linChannel(rgbb[2]).toFixed(6),
+   302→   302→    "    L = 0.2126·R' + 0.7152·G' + 0.0722·B' = " + lb,
+   303→   303→    "C  = (L1 + 0.05) / (L2 + 0.05) = (" + Math.max(lf, lb) + " + 0.05) / (" + Math.min(lf, lb) + " + 0.05) = " + r.toFixed(2) + ":1",
+   304→   304→    "Channel linearization: c/12.92 if c ≤ 0.03928 else ((c + 0.055)/1.055)^2.4  (c = 8-bit value / 255)"
+   305→   305→  ];
+   306→   306→  document.getElementById("math").textContent = lines.join("\\n");
+   307→   307→}
+   308→   308→fgPick.addEventListener("input", function () { fgHex.value = fgPick.value.toUpperCase(); syncPick(fgPick, fgHex, fgHint); });
+   309→   309→bgPick.addEventListener("input", function () { bgHex.value = bgPick.value.toUpperCase(); syncPick(bgPick, bgHex, bgHint); });
+   310→   310→fgHex.addEventListener("input", function () { syncPick(fgPick, fgHex, fgHint); });
+   311→   311→bgHex.addEventListener("input", function () { syncPick(bgPick, bgHex, bgHint); });
+   312→   312→document.getElementById("swap").addEventListener("click", function () {
+   313→   313→  var t = fgHex.value; fgHex.value = bgHex.value; bgHex.value = t; render();
+   314→   314→});
+   315→   315→render();
+   316→   316→</script>
+   317→   317→</body>
+   318→   318→</html>
+   319→   319→`,
+   320→   320→
+   321→   321→  "01-instruments/color-pair-generator.html": `<!doctype html>
+   322→   322→<html lang="en">
+   323→   323→<head>
+   324→   324→<meta charset="utf-8">
+   325→   325→<meta name="viewport" content="width=device-width, initial-scale=1">
+   326→   326→<title>Color Pair Generator — Designer's Toolkit</title>
+   327→   327→<style>
+   328→   328→  :root {
+   329→   329→    color-scheme: light dark;
+   330→   330→    --bg: #f8fafc; --card: #ffffff; --fg: #0f172a; --muted: #64748b;
+   331→   331→    --line: #e2e8f0; --accent: #2563eb; --ok: #15803d;
+   332→   332→  }
+   333→   333→  @media (prefers-color-scheme: dark) {
+   334→   334→    :root { --bg: #0f172a; --card: #1e293b; --fg: #e2e8f0; --muted: #94a3b8;
+   335→   335→            --line: #334155; --accent: #60a5fa; --ok: #4ade80; }
+   336→   336→  }
+   337→   337→  * { box-sizing: border-box; }
+   338→   338→  body { margin: 0; font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--fg); }
+   339→   339→  main { max-width: 62rem; margin: 0 auto; padding: 1.5rem 1.25rem 3rem; }
+   340→   340→  h1 { font-size: 1.55rem; margin: 0 0 .3rem; }
+   341→   341→  .tagline { margin: 0 0 1.4rem; color: var(--muted); }
+   342→   342→  .controls { display: flex; flex-wrap: wrap; gap: 1rem; align-items: end; }
+   343→   343→  fieldset { border: 1px solid var(--line); border-radius: .6rem; padding: .8rem 1rem 1rem; margin: 0; }
+   344→   344→  legend { font-weight: 700; font-size: .8rem; letter-spacing: .04em; text-transform: uppercase; padding: 0 .35rem; }
+   345→   345→  .hexrow { display: flex; gap: .6rem; }
+   346→   346→  input[type="color"] { width: 3rem; height: 2.4rem; border: 1px solid var(--line); border-radius: .4rem; background: none; padding: 2px; cursor: pointer; }
+   347→   347→  input[type="text"] { font: 1rem/1.4 ui-monospace, Menlo, Consolas, monospace; padding: .5rem .6rem;
+   348→   348→                       border: 1px solid var(--line); border-radius: .4rem; background: var(--card); color: var(--fg); width: 8.5rem; }
+   349→   349→  .radios { display: flex; gap: 1rem; flex-wrap: wrap; }
+   350→   350→  .radios label { display: flex; gap: .4rem; align-items: center; font-weight: 600; }
+   351→   351→  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+   352→   352→  .summary { margin: 1.2rem 0 .6rem; font-weight: 600; }
+   353→   353→  .pairs { display: grid; grid-template-columns: repeat(auto-fill, minmax(272px, 1fr)); gap: 1rem; }
+   354→   354→  .pair { background: var(--card); border: 1px solid var(--line); border-radius: .6rem; overflow: hidden; }
+   355→   355→  .pair .demo { padding: 1.2rem 1rem; font-size: 1.5rem; font-weight: 700; letter-spacing: -.01em; }
+   356→   356→  .pair .demo small { display: block; font-size: .85rem; font-weight: 400; margin-top: .3rem; }
+   357→   357→  .pair .meta { padding: .7rem .9rem .9rem; border-top: 1px solid var(--line); }
+   358→   358→  .pair .hexes { display: flex; justify-content: space-between; font: .82rem/1.5 ui-monospace, Menlo, Consolas, monospace; color: var(--muted); }
+   359→   359→  .pair .r { font-weight: 800; font-size: 1.15rem; font-variant-numeric: tabular-nums; margin: .3rem 0; }
+   360→   360→  .pair .chips { display: flex; gap: .4rem; flex-wrap: wrap; margin-bottom: .7rem; }
+   361→   361→  .chip { font-size: .72rem; font-weight: 700; letter-spacing: .03em; padding: .15rem .5rem; border-radius: 999px; border: 1px solid var(--ok); color: var(--ok); }
+   362→   362→  .chip.dim { border-color: var(--line); color: var(--muted); }
+   363→   363→  .copy { width: 100%; padding: .45rem; font: 600 .85rem/1 system-ui, sans-serif; border: 1px solid var(--line);
+   364→   364→          border-radius: .4rem; background: var(--card); color: var(--fg); cursor: pointer; }
+   365→   365→  .copy:hover { border-color: var(--accent); color: var(--accent); }
+   366→   366→  .copy.done { border-color: var(--ok); color: var(--ok); }
+   367→   367→  .empty { color: var(--muted); padding: 1rem; border: 1px dashed var(--line); border-radius: .6rem; }
+   368→   368→  footer { margin-top: 2rem; font-size: .82rem; color: var(--muted); }
+   369→   369→</style>
+   370→   370→</head>
+   371→   371→<body>
+   372→   372→<main>
+   373→   373→  <h1>Color Pair Generator</h1>
+   374→   374→  <p class="tagline">Give it one base color — it builds fg/bg pairings that actually pass WCAG AA (4.5:1) and flags AAA (7:1). Same math as the contrast checker.</p>
+   375→   375→
+   376→   376→  <div class="controls">
+   377→   377→    <fieldset>
+   378→   378→      <legend>Base color</legend>
+   379→   379→      <div class="hexrow">
+   380→   380→        <input type="color" id="pick" value="#2563eb" aria-label="Base color picker">
+   381→   381→        <input type="text" id="hex" value="#2563EB" autocomplete="off" spellcheck="false" aria-label="Base color hex">
+   382→   382→      </div>
+   383→   383→    </fieldset>
+   384→   384→    <fieldset>
+   385→   385→      <legend>Base is the…</legend>
+   386→   386→      <div class="radios">
+   387→   387→        <label><input type="radio" name="mode" value="bg" checked> Background</label>
+   388→   388→        <label><input type="radio" name="mode" value="fg"> Text color</label>
+   389→   389→      </div>
+   390→   390→    </fieldset>
+   391→   391→  </div>
+   392→   392→
+   393→   393→  <p class="summary" id="summary" role="status" aria-live="polite">Generating…</p>
+   394→   394→  <div class="pairs" id="pairs"></div>
+   395→   395→
+   396→   396→  <footer>Designer's Toolkit · B-TK-2 · runs entirely offline. Support: support@omniforge.example</footer>
+   397→   397→</main>
+   398→   398→<script>
+   399→   399→/* ===== formulas (pure) ===== */
+   400→   400→function hexToRgb(hex) {
+   401→   401→  var m = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(String(hex).trim());
+   402→   402→  if (!m) return null;
+   403→   403→  var s = m[1];
+   404→   404→  if (s.length === 3) s = s.charAt(0) + s.charAt(0) + s.charAt(1) + s.charAt(1) + s.charAt(2) + s.charAt(2);
+   405→   405→  return [parseInt(s.slice(0, 2), 16), parseInt(s.slice(2, 4), 16), parseInt(s.slice(4, 6), 16)];
+   406→   406→}
+   407→   407→function rgbToHex(r, g, b) {
+   408→   408→  var f = function (v) { var h = Math.max(0, Math.min(255, Math.round(v))).toString(16); return h.length === 1 ? "0" + h : h; };
+   409→   409→  return ("#" + f(r) + f(g) + f(b)).toUpperCase();
+   410→   410→}
+   411→   411→function normalizeHex(hex) {
+   412→   412→  var rgb = hexToRgb(hex);
+   413→   413→  return rgb ? rgbToHex(rgb[0], rgb[1], rgb[2]) : null;
+   414→   414→}
+   415→   415→function mix(a, b, t) {
+   416→   416→  var x = hexToRgb(a), y = hexToRgb(b);
+   417→   417→  if (!x || !y) return null;
+   418→   418→  return rgbToHex(x[0] + (y[0] - x[0]) * t, x[1] + (y[1] - x[1]) * t, x[2] + (y[2] - x[2]) * t);
+   419→   419→}
+   420→   420→function linChannel(c8) {
+   421→   421→  var c = c8 / 255;
+   422→   422→  return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+   423→   423→}
+   424→   424→function luminance(hex) {
+   425→   425→  var rgb = hexToRgb(hex);
+   426→   426→  if (!rgb) return null;
+   427→   427→  return 0.2126 * linChannel(rgb[0]) + 0.7152 * linChannel(rgb[1]) + 0.0722 * linChannel(rgb[2]);
+   428→   428→}
+   429→   429→function contrastRatio(a, b) {
+   430→   430→  var la = luminance(a), lb = luminance(b);
+   431→   431→  if (la === null || lb === null) return null;
+   432→   432→  return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+   433→   433→}
+   434→   434→function buildPairs(base, mode) {
+   435→   435→  var WHITE = "#FFFFFF", BLACK = "#000000", INK = "#0F172A";
+   436→   436→  var candidates = [], i, c;
+   437→   437→  if (mode === "bg") {
+   438→   438→    candidates.push({ fg: BLACK, bg: base, label: "Black text on base" });
+   439→   439→    candidates.push({ fg: WHITE, bg: base, label: "White text on base" });
+   440→   440→    var darks = [0.4, 0.5, 0.6, 0.72, 0.85];
+   441→   441→    var lights = [0.55, 0.68, 0.8, 0.9];
+   442→   442→    for (i = 0; i < darks.length; i++) { c = mix(base, BLACK, darks[i]); candidates.push({ fg: c, bg: base, label: "Shaded base " + Math.round(darks[i] * 100) + "% on base" }); }
+   443→   443→    for (i = 0; i < lights.length; i++) { c = mix(base, WHITE, lights[i]); candidates.push({ fg: c, bg: base, label: "Tinted base " + Math.round(lights[i] * 100) + "% on base" }); }
+   444→   444→    var tintsForSurface = [0.8, 0.88, 0.95];
+   445→   445→    for (i = 0; i < tintsForSurface.length; i++) {
+   446→   446→      c = mix(base, WHITE, tintsForSurface[i]);
+   447→   447→      candidates.push({ fg: INK, bg: c, label: "Ink text on " + Math.round((1 - tintsForSurface[i]) * 100) + "% tint of base" });
+   448→   448→    }
+   449→   449→    var surface = mix(base, WHITE, 0.95), deep = mix(base, BLACK, 0.6);
+   450→   450→    candidates.push({ fg: deep, bg: surface, label: "Card pattern: deep base on 5% tint" });
+   451→   451→  } else {
+   452→   452→    candidates.push({ fg: base, bg: WHITE, label: "Base on white" });
+   453→   453→    candidates.push({ fg: base, bg: INK, label: "Base on near-black ink" });
+   454→   454→    var tints = [0.7, 0.78, 0.86, 0.92, 0.96];
+   455→   455→    var shades = [0.82, 0.9, 0.95];
+   456→   456→    for (i = 0; i < tints.length; i++) { c = mix(base, WHITE, tints[i]); candidates.push({ fg: base, bg: c, label: "Base on " + Math.round((1 - tints[i]) * 100) + "% tint of itself" }); }
+   457→   457→    for (i = 0; i < shades.length; i++) { c = mix(base, BLACK, shades[i]); candidates.push({ fg: base, bg: c, label: "Base on " + Math.round(shades[i] * 100) + "% shade of itself" }); }
+   458→   458→  }
+   459→   459→  var seen = {}, out = [];
+   460→   460→  for (i = 0; i < candidates.length; i++) {
+   461→   461→    var p = candidates[i];
+   462→   462→    if (!p.fg || !p.bg) continue;
+   463→   463→    var r = contrastRatio(p.fg, p.bg);
+   464→   464→    if (r === null || r < 4.5) continue;
+   465→   465→    var key = p.fg + "/" + p.bg;
+   466→   466→    if (seen[key]) continue;
+   467→   467→    seen[key] = true;
+   468→   468→    out.push({ fg: p.fg, bg: p.bg, label: p.label, ratio: r });
+   469→   469→  }
+   470→   470→  out.sort(function (a, b) { return b.ratio - a.ratio; });
+   471→   471→  return out.slice(0, 9);
+   472→   472→}
+   473→   473→/* ===== app (dom) ===== */
+   474→   474→var pick = document.getElementById("pick"), hex = document.getElementById("hex");
+   475→   475→function esc(s) {
+   476→   476→  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+   477→   477→}
+   478→   478→function mode() {
+   479→   479→  var r = document.querySelector('input[name="mode"]:checked');
+   480→   480→  return r ? r.value : "bg";
+   481→   481→}
+   482→   482→function render() {
+   483→   483→  var base = normalizeHex(hex.value);
+   484→   484→  var box = document.getElementById("pairs"), sum = document.getElementById("summary");
+   485→   485→  if (!base) { box.innerHTML = '<p class="empty">That is not a hex color. Try #2563EB or #25F.</p>'; sum.textContent = "Waiting for a valid base color…"; return; }
+   486→   486→  var pairs = buildPairs(base, mode());
+   487→   487→  var aaa = pairs.filter(function (p) { return p.ratio >= 7; }).length;
+   488→   488→  sum.textContent = pairs.length + " AA-safe pairings from " + base + " · " + aaa + " of them also clear AAA (7:1)";
+   489→   489→  var html = "";
+   490→   490→  for (var i = 0; i < pairs.length; i++) {
+   491→   491→    var p = pairs[i];
+   492→   492→    var chips = '<span class="chip">AA normal ' + p.ratio.toFixed(2) + ":1</span>" +
+   493→   493→      (p.ratio >= 7 ? '<span class="chip">AAA normal</span>' : '<span class="chip dim">AAA needs 7:1</span>');
+   494→   494→    html += '<div class="pair"><div class="demo" style="background:' + p.bg.toLowerCase() + ";color:" + p.fg.toLowerCase() + '">Aa — headline sample<small>' + esc(p.label) + "</small></div>" +
+   495→   495→      '<div class="meta"><div class="hexes"><span>text ' + p.fg + "</span><span>bg " + p.bg + "</span></div>" +
+   496→   496→      '<div class="r">' + p.ratio.toFixed(2) + ":1</div>" +
+   497→   497→      '<div class="chips">' + chips + "</div>" +
+   498→   498→      '<button type="button" class="copy" data-css="color: ' + p.fg.toLowerCase() + "; background-color: " + p.bg.toLowerCase() + "; /* " + p.ratio.toFixed(2) + ':1 AA */">Copy CSS</button></div></div>';
+   499→   499→  }
+   500→   500→  if (!pairs.length) html = '<p class="empty">No AA-safe pairing found from this base. Math fact: black and white text can never both fail 4.5:1 on the same color, so if you see this the hex was almost white or almost black — use the base as a surface and generate text pairs from a darker base instead.</p>';
+   501→   501→  box.innerHTML = html;
+   502→   502→  var btns = box.querySelectorAll(".copy");
+   503→   503→  for (var j = 0; j < btns.length; j++) btns[j].addEventListener("click", onCopy);
+   504→   504→}
+   505→   505→function onCopy(ev) {
+   506→   506→  var btn = ev.currentTarget, css = btn.getAttribute("data-css");
+   507→   507→  function flash() { btn.textContent = "Copied"; btn.classList.add("done"); setTimeout(function () { btn.textContent = "Copy CSS"; btn.classList.remove("done"); }, 1400); }
+   508→   508→  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(css).then(flash, flash);
+   509→   509→  else flash();
+   510→   510→}
+   511→   511→pick.addEventListener("input", function () { hex.value = pick.value.toUpperCase(); render(); });
+   512→   512→hex.addEventListener("input", render);
+   513→   513→var radios = document.querySelectorAll('input[name="mode"]');
+   514→   514→for (var k = 0; k < radios.length; k++) radios[k].addEventListener("change", render);
+   515→   515→render();
+   516→   516→</script>
+   517→   517→</body>
+   518→   518→</html>
+   519→   519→`,
+   520→   520→
+   521→   521→  "01-instruments/grid-tool.html": `<!doctype html>
+   522→   522→<html lang="en">
+   523→   523→<head>
+   524→   524→<meta charset="utf-8">
+   525→   525→<meta name="viewport" content="width=device-width, initial-scale=1">
+   526→   526→<title>Grid Tool — Designer's Toolkit</title>
+   527→   527→<style>
+   528→   528→  :root {
+   529→   529→    color-scheme: light dark;
+   530→   530→    --bg: #f8fafc; --card: #ffffff; --fg: #0f172a; --muted: #64748b;
+   531→   531→    --line: #e2e8f0; --accent: #2563eb;
+   532→   532→  }
+   533→   533→  @media (prefers-color-scheme: dark) {
+   534→   534→    :root { --bg: #0f172a; --card: #1e293b; --fg: #e2e8f0; --muted: #94a3b8; --line: #334155; --accent: #60a5fa; }
+   535→   535→  }
+   536→   536→  * { box-sizing: border-box; }
+   537→   537→  body { margin: 0; font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--fg); }
+   538→   538→  main { max-width: 58rem; margin: 0 auto; padding: 1.5rem 1.25rem 3rem; }
+   539→   539→  h1 { font-size: 1.55rem; margin: 0 0 .3rem; }
+   540→   540→  .tagline { margin: 0 0 1.4rem; color: var(--muted); }
+   541→   541→  .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: .8rem; }
+   542→   542→  .field label { display: block; font-size: .8rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); margin-bottom: .3rem; }
+   543→   543→  .field input { width: 100%; padding: .5rem .6rem; font: 1rem/1.4 ui-monospace, Menlo, Consolas, monospace;
+   544→   544→                 border: 1px solid var(--line); border-radius: .4rem; background: var(--card); color: var(--fg); }
+   545→   545→  .presets { display: flex; gap: .5rem; flex-wrap: wrap; margin: 1rem 0 0; }
+   546→   546→  .presets button, .copy { padding: .45rem .8rem; font: 600 .85rem/1 system-ui, sans-serif; border: 1px solid var(--line);
+   547→   547→                           border-radius: .4rem; background: var(--card); color: var(--fg); cursor: pointer; }
+   548→   548→  .presets button:hover, .copy:hover { border-color: var(--accent); color: var(--accent); }
+   549→   549→  .copy.done { border-color: var(--ok, #15803d); color: var(--ok, #15803d); }
+   550→   550→  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+   551→   551→  .grid2 { display: grid; grid-template-columns: 1.25fr 1fr; gap: 1rem; margin-top: 1.2rem; }
+   552→   552→  .panel { background: var(--card); border: 1px solid var(--line); border-radius: .6rem; padding: 1rem 1.1rem; }
+   553→   553→  .panel h2 { font-size: .95rem; margin: 0 0 .7rem; letter-spacing: .03em; text-transform: uppercase; color: var(--muted); }
+   554→   554→  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+   555→   555→  .stat { border: 1px solid var(--line); border-radius: .4rem; padding: .5rem .7rem; }
+   556→   556→  .stat b { display: block; font-size: 1.25rem; font-variant-numeric: tabular-nums; }
+   557→   557→  .stat span { font-size: .78rem; color: var(--muted); }
+   558→   558→  .preview { background: repeating-conic-gradient(var(--bg) 0% 25%, transparent 0% 50%) 50% / 18px 18px;
+   559→   559→             border: 1px solid var(--line); border-radius: .4rem; }
+   560→   560→  .margin-box { border: 1px dashed var(--muted); margin: 0 auto; }
+   561→   561→  .cols { display: flex; width: 100%; }
+   562→   562→  .col { background: color-mix(in srgb, var(--accent) 22%, transparent); border: 1px solid var(--accent);
+   563→   563→         border-radius: 2px; align-self: stretch; min-height: 72px; }
+   564→   564→  .col em { font-style: normal; font-size: .68rem; color: var(--muted); text-align: center; display: block; padding-top: 4px; }
+   565→   565→  pre { background: var(--bg); border: 1px solid var(--line); border-radius: .6rem; padding: .9rem 1rem;
+   566→   566→        overflow-x: auto; font: .85rem/1.65 ui-monospace, Menlo, Consolas, monospace; margin: 0; }
+   567→   567→  .scale { display: flex; flex-wrap: wrap; gap: .5rem; }
+   568→   568→  .scale span { font: .78rem/1 ui-monospace, Menlo, Consolas, monospace; border: 1px solid var(--line);
+   569→   569→                border-radius: .3rem; padding: .3rem .5rem; color: var(--muted); }
+   570→   570→  .warn { color: var(--bad, #b91c1c); font-weight: 600; }
+   571→   571→  footer { margin-top: 2rem; font-size: .82rem; color: var(--muted); }
+   572→   572→  @media (max-width: 780px) { .grid2 { grid-template-columns: 1fr; } }
+   573→   573→</style>
+   574→   574→</head>
+   575→   575→<body>
+   576→   576→<main>
+   577→   577→  <h1>Grid Tool</h1>
+   578→   578→  <p class="tagline">Column and spacing calculator with a to-scale preview — column&nbsp;=&nbsp;(content&nbsp;−&nbsp;gap·(cols−1))&nbsp;/&nbsp;cols.</p>
+   579→   579→
+   580→   580→  <div class="controls">
+   581→   581→    <div class="field"><label for="width">Container (px)</label><input id="width" type="number" min="200" max="3840" step="10" value="1200"></div>
+   582→   582→    <div class="field"><label for="margin">Outer margin (px)</label><input id="margin" type="number" min="0" max="400" step="1" value="24"></div>
+   583→   583→    <div class="field"><label for="cols">Columns</label><input id="cols" type="number" min="1" max="36" step="1" value="12"></div>
+   584→   584→    <div class="field"><label for="gap">Gap (px)</label><input id="gap" type="number" min="0" max="200" step="1" value="24"></div>
+   585→   585→    <div class="field"><label for="base">Spacing base (px)</label><input id="base" type="number" min="1" max="16" step="1" value="4"></div>
+   586→   586→  </div>
+   587→   587→  <div class="presets" role="group" aria-label="Grid presets">
+   588→   588→    <button type="button" data-p="1200,24,12,24,4">Desktop 12-col</button>
+   589→   589→    <button type="button" data-p="720,24,6,24,4">Blog 720</button>
+   590→   590→    <button type="button" data-p="360,16,4,16,4">Mobile 360</button>
+   591→   591→  </div>
+   592→   592→
+   593→   593→  <div class="grid2">
+   594→   594→    <section class="panel" aria-label="Visual preview">
+   595→   595→      <h2>Preview — to scale</h2>
+   596→   596→      <div class="preview"><div class="margin-box" id="marginBox"><div class="cols" id="colsRow"></div></div></div>
+   597→   597→      <p style="font-size:.78rem;color:var(--muted);margin:.6rem 0 0">Dashed border = page margin. Shaded boxes = columns; gap renders between them.</p>
+   598→   598→    </section>
+   599→   599→    <section class="panel" aria-label="Measurements">
+   600→   600→      <h2>Measurements</h2>
+   601→   601→      <div class="stats" id="stats"></div>
+   602→   602→      <h2 style="margin-top:1.1rem">Spacing scale</h2>
+   603→   603→      <div class="scale" id="scale"></div>
+   604→   604→    </section>
+   605→   605→  </div>
+   606→   606→
+   607→   607→  <section class="panel" style="margin-top:1rem" aria-label="CSS output">
+   608→   608→    <h2>CSS — ready to paste <button type="button" class="copy" id="copyCss" style="float:right">Copy</button></h2>
+   609→   609→    <pre id="css"></pre>
+   610→   610→  </section>
+   611→   611→
+   612→   612→  <footer>Designer's Toolkit · B-TK-2 · no install, no network. Support: support@omniforge.example</footer>
+   613→   613→</main>
+   614→   614→<script>
+   615→   615→/* ===== formulas (pure) ===== */
+   616→   616→function gridMath(width, margin, cols, gap) {
+   617→   617→  var content = width - margin * 2;
+   618→   618→  var gutters = cols - 1;
+   619→   619→  var gutterTotal = gutters * gap;
+   620→   620→  var column = (content - gutterTotal) / cols;
+   621→   621→  return {
+   622→   622→    content: content, gutters: gutters, gutterTotal: gutterTotal,
+   623→   623→    column: column, total: cols * column + gutterTotal,
+   624→   624→    valid: content > 0 && column > 0
+   625→   625→  };
+   626→   626→}
+   627→   627→function spacingScale(base) {
+   628→   628→  var steps = [1, 2, 3, 4, 6, 8, 12, 16, 24], out = [], i;
+   629→   629→  for (i = 0; i < steps.length; i++) out.push({ step: steps[i], px: steps[i] * base });
+   630→   630→  return out;
+   631→   631→}
+   632→   632→function gridCss(width, margin, cols, gap, base, m) {
+   633→   633→  var l = [];
+   634→   634→  l.push(":root {");
+   635→   635→  l.push("  --container: " + width + "px;");
+   636→   636→  l.push("  --margin: " + margin + "px;");
+   637→   637→  l.push("  --columns: " + cols + ";");
+   638→   638→  l.push("  --gap: " + gap + "px;");
+   639→   639→  l.push("  --column: " + (Math.round(m.column * 100) / 100) + "px; /* (" + m.content + " - " + m.gutterTotal + ") / " + cols + " */");
+   640→   640→  l.push("  --space-1: " + base + "px;");
+   641→   641→  l.push("}");
+   642→   642→  l.push("");
+   643→   643→  l.push(".layout {");
+   644→   644→  l.push("  max-width: var(--container);");
+   645→   645→  l.push("  margin-inline: auto;");
+   646→   646→  l.push("  padding-inline: var(--margin);");
+   647→   647→  l.push("}");
+   648→   648→  l.push("");
+   649→   649→  l.push(".grid {");
+   650→   650→  l.push("  display: grid;");
+   651→   651→  l.push("  grid-template-columns: repeat(var(--columns), minmax(0, 1fr));");
+   652→   652→  l.push("  column-gap: var(--gap);");
+   653→   653→  l.push("}");
+   654→   654→  return l.join("\\n");
+   655→   655→}
+   656→   656→/* ===== app (dom) ===== */
+   657→   657→var ids = ["width", "margin", "cols", "gap", "base"];
+   658→   658→function vals() {
+   659→   659→  var o = {};
+   660→   660→  for (var i = 0; i < ids.length; i++) o[ids[i]] = parseFloat(document.getElementById(ids[i]).value);
+   661→   661→  return o;
+   662→   662→}
+   663→   663→function render() {
+   664→   664→  var v = vals(), m = gridMath(v.width, v.margin, v.cols, v.gap);
+   665→   665→  var stats = document.getElementById("stats");
+   666→   666→  if (!m.valid) {
+   667→   667→    stats.innerHTML = '<p class="warn">Margins and gaps eat the whole container — no room for columns. Widen the container or shrink margin/gap.</p>';
+   668→   668→    return;
+   669→   669→  }
+   670→   670→  var colR = Math.round(m.column * 100) / 100;
+   671→   671→  stats.innerHTML =
+   672→   672→    stat(colR + "px", "Column width") + stat(m.content + "px", "Content width") +
+   673→   673→    stat(m.gutters + " × " + v.gap + "px", "Gutters") + stat(m.total + "px", "Grid total") +
+   674→   674→    stat((v.margin * 2) + "px", "Total margin") + stat(m.column * 2 + "px", "2-col span") +
+   675→   675→    stat(m.column * 6 + "px", "6-col span") + stat((m.column * 12 + v.gap * 11) + "px", "12-col full row");
+   676→   676→  var box = document.getElementById("marginBox");
+   677→   677→  var mp = (v.margin / v.width) * 100, gp = (v.gap / v.width) * 100, cp = (colR / v.width) * 100;
+   678→   678→  box.style.width = (100 - mp * 2) + "%";
+   679→   679→  box.style.paddingLeft = "0"; box.style.paddingRight = "0";
+   680→   680→  var colsRow = document.getElementById("colsRow");
+   681→   681→  colsRow.style.gap = gp + "%";
+   682→   682→  var html = "";
+   683→   683→  for (var c = 0; c < v.cols; c++) {
+   684→   684→    html += '<div class="col" style="flex: 0 0 ' + cp + '%"><em>' + (c + 1) + "</em></div>";
+   685→   685→  }
+   686→   686→  colsRow.innerHTML = html;
+   687→   687→  document.getElementById("css").textContent = gridCss(v.width, v.margin, v.cols, v.gap, v.base, m);
+   688→   688→  var scale = spacingScale(v.base), chips = "";
+   689→   689→  for (var s = 0; s < scale.length; s++) chips += "<span>--space-" + scale[s].step + ": " + scale[s].px + "px</span>";
+   690→   690→  document.getElementById("scale").innerHTML = chips;
+   691→   691→}
+   692→   692→function stat(b, label) {
+   693→   693→  return '<div class="stat"><b>' + b + "</b><span>" + label + "</span></div>";
+   694→   694→}
+   695→   695→for (var i = 0; i < ids.length; i++) document.getElementById(ids[i]).addEventListener("input", render);
+   696→   696→var presets = document.querySelectorAll(".presets button");
+   697→   697→for (var p = 0; p < presets.length; p++) presets[p].addEventListener("click", function (ev) {
+   698→   698→  var parts = ev.currentTarget.getAttribute("data-p").split(",");
+   699→   699→  for (var j = 0; j < ids.length; j++) document.getElementById(ids[j]).value = parts[j];
+   700→   700→  render();
+   701→   701→});
+   702→   702→document.getElementById("copyCss").addEventListener("click", function (ev) {
+   703→   703→  var btn = ev.currentTarget;
+   704→   704→  function flash() { btn.textContent = "Copied"; setTimeout(function () { btn.textContent = "Copy"; }, 1400); }
+   705→   705→  var text = document.getElementById("css").textContent;
+   706→   706→  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(flash, flash);
+   707→   707→  else flash();
+   708→   708→});
+   709→   709→render();
+   710→   710→</script>
+   711→   711→</body>
+   712→   712→</html>
+   713→   713→`,
+   714→   714→
+   715→   715→  /* ── 02 Token exports ───────────────────────────────────────────── */
+   716→   716→
+   717→   717→  "02-tokens/token-export.json": JSON.stringify(tokenExport, null, 2) + "\n",
+   718→   718→
+   719→   719→  "02-tokens/font-pairing-bank.csv": `pairing,display_font,display_weight,body_font,body_weight,pairing_type,mood,best_for,notes
+   720→   720→Editorial Classic,Playfair Display,700,Source Sans 3,400,serif+sans,editorial,long-form blogs,Use display 700 for H1 and H2; keep body at 1.6 line height
+   721→   721→Neo-Grotesque System,Inter Tight,700,Inter,400,sans+sans,minimal,SaaS marketing,One family two cuts: tight for headlines and regular for body
+   722→   722→Technical Modern,Space Grotesk,500,Inter,400,sans+sans,technical,dev tools and docs,Space Grotesk excels in code-adjacent interfaces
+   723→   723→Humanist Warm,DM Serif Display,400,DM Sans,400,serif+sans,friendly,small business sites,DM Serif Display ships at 400 only; scale size instead of weight
+   724→   724→Soft Contrast,Fraunces,600,Work Sans,400,serif+sans,playful,creative portfolios,Fraunces variable axes SOFT and WONK tune the mood per project
+   725→   725→Academic Calm,Libre Baskerville,700,Montserrat,400,serif+sans,academic,research and education,Both run wide; pair with generous margins
+   726→   726→Geometric Confident,Sora,700,Karla,400,sans+sans,modern,startup landing pages,Sora 700 reads best at 32px and above
+   727→   727→Unified Quiet,Manrope,800,Manrope,400,sans+sans,minimal,product and design sites,Weight contrast 800 vs 400 does all the work
+   728→   728→Storyteller,Lora,600,Open Sans,400,serif+sans,warm,newsletters,Lora italic 400 makes an excellent pull quote
+   729→   729→Bold Statement,Archivo Black,400,Archivo,400,sans+sans,bold,event and campaign pages,Set Archivo Black with -1% letter spacing for posters
+   730→   730→Craft Report,Bitter,700,Lato,400,serif+sans,sturdy,case studies,Slab display gives reports gravitas without feeling legal
+   731→   731→Refined Luxury,Cormorant Garamond,600,Proza Libre,400,serif+sans,luxury,beauty and hospitality,Keep Cormorant at 500 or heavier below 36px
+   732→   732→Art Direction,Syne,700,IBM Plex Sans,400,sans+sans,avant-garde,studios and galleries,Syne is a statement font; one headline per page
+   733→   733→Tech Editorial,Epilogue,800,Epilogue,400,sans+sans,confident,B2B marketing,Variable font: interpolate any weight between 400 and 800
+   734→   734→Art Deco Echo,Prata,400,Jost,400,serif+sans,elegant,fashion lookbooks,Prata at 400 large; avoid sizes under 28px
+   735→   735→Friendly Bold,Abril Fatface,400,Poppins,400,display+sans,cheerful,food and lifestyle,Abril Fatface once per page (H1 only)
+   736→   736→Poster Energy,Bebas Neue,400,Roboto,400,display+sans,loud,sports and promotions,Pair Bebas all-caps with 1.05 letter spacing
+   737→   737→Accessible Default,Zilla Slab,600,Atkinson Hyperlegible,400,slab+sans,legible,government and health,Atkinson letterforms were designed for low vision
+   738→   738→All-Access,Atkinson Hyperlegible,700,Atkinson Hyperlegible,400,sans+sans,legible,accessibility-first sites,Distinct letter shapes survive small sizes and glare
+   739→   739→Civic Modern,Public Sans,800,Public Sans,400,sans+sans,institutional,public sector,The United States government design system family
+   740→   740→Friendly Rounded,Red Hat Display,700,Red Hat Text,400,sans+sans,approachable,education and kids,Rounded terminals read warm without reading childish
+   741→   741→Soft Serve,Cabin,700,Nunito,400,sans+sans,friendly,community platforms,Nunito 400 at 17px feels generous on long pages
+   742→   742→Long Read,Newsreader,600,Source Sans 3,400,serif+sans,editorial,magazines,Newsreader optical sizes tune it for body or display
+   743→   743→Indie Publishing,Vollkorn,700,Mulish,400,serif+sans,literary,essays and journals,Vollkorn bold carries long headlines without tiring
+   744→   744→Bookish,Cardo,700,Karla,400,serif+sans,classic,book excerpts and libraries,Cardo ships Greek and Hebrew subsets for classicists
+   745→   745→Future Retro,Unbounded,600,Manrope,400,display+sans,futuristic,web3 and gaming,Unbounded 600 maximum one hero line per page
+   746→   746→Mono Header,Space Mono,700,Space Grotesk,400,mono+sans,technical,developer blogs,Mono headlines signal engineering culture instantly
+   747→   747→Dev Docs,JetBrains Mono,700,Inter,400,mono+sans,technical,documentation,Disable ligatures in headings for clean search results
+   748→   748→IBM Legacy,IBM Plex Mono,600,IBM Plex Sans,400,mono+sans,technical,enterprise dashboards,Plex families share metrics so alignment holds in mixed tables
+   749→   749→Elegant Standard,Crimson Pro,600,Karla,400,serif+sans,refined,law and finance,Crimson Pro 600 also works for subheads
+   750→   750→Vintage Shop,EB Garamond,600,Raleway,400,serif+sans,vintage,artisan and craft,Raleway numerals look sharp in prices and specs
+   751→   751→Boutique,Josefin Sans,600,Lora,400,sans+serif,boutique,beauty salons,Inverted pairing: sans display over serif body
+   752→   752→Street Smart,Chivo,700,Chivo,400,sans+sans,utilitarian,news and civic tech,Chivo covers 92 languages including Vietnamese
+   753→   753→Clean Commerce,Outfit,700,Outfit,400,sans+sans,minimal,ecommerce,Geometric Outfit keeps product grids calm
+   754→   754→Jakarta Fresh,Plus Jakarta Sans,700,Plus Jakarta Sans,400,sans+sans,modern,fintech,Originally commissioned for the Jakarta city brand
+   755→   755→Hebrew-Aware,Frank Ruhl Libre,700,Assistant,400,serif+sans,multilingual,bilingual sites,Both cover Hebrew; test RTL layouts early
+   756→   756→Roman Quiet,Marcellus,400,Karla,400,serif+sans,calm,wellness and spa,Marcellus is single weight; vary scale not weight
+   757→   757→Franklin Grid,Libre Franklin,700,Libre Franklin,400,sans+sans,newsy,media sites,Nine weights available for dense editorial UI
+   758→   758→Publisher,Alegreya,700,Alegreya Sans,400,serif+sans,literary,blogs,Designed as a paired superfamily; metrics align
+   759→   759→Instrument Pair,Instrument Serif,400,Instrument Sans,400,serif+sans,contemporary,portfolios and studios,Matched x-height; swap display for body without reflow
+   760→   760→`,
+   761→   761→
+   762→   762→  /* ── 03 Formula cheatsheet ───────────────────────────────────────── */
+   763→   763→
+   764→   764→  "03-formulas/wcag-contrast-cheatsheet.md": `# WCAG 2.2 contrast — the actual math
+   765→   765→
+   766→   766→Every verdict in this kit comes from two formulas. No lookup tables, no
+   767→   767→"eye-balling it" — this is the whole computation.
+   768→   768→
+   769→   769→## Formula 1 — relative luminance
+   770→   770→
+   771→   771→For each color, convert each sRGB channel (0–255) to a fraction
+   772→   772→c = value / 255, linearize it, then take a weighted sum:
+   773→   773→
+   774→   774→    L = 0.2126 · R + 0.7152 · G + 0.0722 · B
+   775→   775→
+   776→   776→with each channel linearized as:
+   777→   777→
+   778→   778→    c' = c / 12.92                 if c ≤ 0.03928
+   779→   779→    c' = ((c + 0.055) / 1.055)^2.4 otherwise
+   780→   780→
+   781→   781→The weights are the reciprocal of the sRGB primaries' contribution to
+   782→   782→perceived lightness. Pure black → L = 0; pure white → L = 1.
+   783→   783→
+   784→   784→## Formula 2 — contrast ratio
+   785→   785→
+   786→   786→    C = (L1 + 0.05) / (L2 + 0.05)
+   787→   787→
+   788→   788→where L1 is the lighter of the two colors. The 0.05 floor accounts for
+   789→   789→display flare — it is why contrast never reaches infinity and why black
+   790→   790→on white tops out at exactly 21:1 (1.05 / 0.05).
+   791→   791→
+   792→   792→## Worked example — #2563EB (link blue) on #FFFFFF
+   793→   793→
+   794→   794→1. Channels: R = 0x25 = 37, G = 0x63 = 99, B = 0xEB = 235.
+   795→   795→2. Fractions: 0.145098, 0.388235, 0.921569 — all above 0.03928, so
+   796→   796→   each takes the power branch.
+   797→   797→3. Linearized: R' = 0.018500, G' = 0.124772, B' = 0.830770.
+   798→   798→4. L = 0.2126 · 0.018500 + 0.7152 · 0.124772 + 0.0722 · 0.830770
+   799→   799→     = 0.153152
+   800→   800→5. White: L = 1.000000.
+   801→   801→6. C = (1.000000 + 0.05) / (0.153152 + 0.05) = 1.05 / 0.203152
+   802→   802→     = 5.17:1 → **passes AA for normal text** (4.5), fails AAA (7).
+   803→   803→
+   804→   804→## Second example — the gray that quietly fails
+   805→   805→
+   806→   806→#777777 on white: L = 0.184475 → C = 1.05 / 0.234475 = 4.48:1 —
+   807→   807→**fails AA for normal text by 0.02**. One step darker, #767676
+   808→   808→(L = 0.181164), gives 4.54:1 and passes. #767676 is the lightest
+   809→   809→single gray that passes AA on white; memorize it as your floor for
+   810→   810→muted body text.
+   811→   811→
+   812→   812→## The thresholds
+   813→   813→
+   814→   814→| Check | Ratio | Applies to |
+   815→   815→| --- | --- | --- |
+   816→   816→| AA · normal text (§1.4.3) | ≥ 4.5:1 | under 24px, or under 18.66px bold |
+   817→   817→| AA · large text (§1.4.3) | ≥ 3:1 | ≥ 24px, or ≥ 18.66px at 700 |
+   818→   818→| AAA · normal text (§1.4.6) | ≥ 7:1 | same as AA normal |
+   819→   819→| AAA · large text (§1.4.6) | ≥ 4.5:1 | same as AA large |
+   820→   820→| Non-text contrast (§1.4.11) | ≥ 3:1 | borders, icons, focus rings, chart strokes |
+   821→   821→
+   822→   822→"Large text" means ≥ 24px regular or ≥ 18.66px (14pt) bold. The
+   823→   823→non-text rule (new-ish in 2.x, clarified in 2.2) is the one teams
+   824→   824→forget: a 1px gray input border must still clear 3:1 against both the
+   825→   825→field background and the page behind it.
+   826→   826→
+   827→   827→## Reference pairs (all verified with the formulas above)
+   828→   828→
+   829→   829→| Pair | Ratio | Verdict |
+   830→   830→| --- | --- | --- |
+   831→   831→| #000000 on #FFFFFF | 21.00:1 | everything passes |
+   832→   832→| #0F172A on #FFFFFF | 17.85:1 | AAA |
+   833→   833→| #334155 on #FFFFFF | 10.35:1 | AAA |
+   834→   834→| #CBD5E1 on #0F172A | 12.02:1 | AAA (dark mode body) |
+   835→   835→| #FACC15 on #111827 | 11.58:1 | AAA (highlight on dark) |
+   836→   836→| #1D4ED8 on #FFFFFF | 6.70:1 | AA normal |
+   837→   837→| #B91C1C on #FFFFFF | 6.47:1 | AA normal |
+   838→   838→| #2563EB on #FFFFFF | 5.17:1 | AA normal |
+   839→   839→| #15803D on #FFFFFF | 5.02:1 | AA normal |
+   840→   840→| #64748B on #FFFFFF | 4.76:1 | AA normal — muted-text floor |
+   841→   841→| #767676 on #FFFFFF | 4.54:1 | AA normal — the lightest passing gray |
+   842→   842→| #777777 on #FFFFFF | 4.48:1 | fail (classic off-by-one) |
+   843→   843→| #FF0000 on #FFFFFF | 4.00:1 | fails AA normal, passes large |
+   844→   844→| #2563EB on #DBEAFE | 4.24:1 | fails AA normal — chip needs #1D4ED8 (5.49:1) |
+   845→   845→
+   846→   846→## Five pitfalls the formulas catch
+   847→   847→
+   848→   848→1. **Opacity is not contrast.** gray-500 at 60% opacity over white is a
+   849→   849→   *blend*, not gray-500. The checker needs the blended hex — the color
+   850→   850→   pair generator's tint function computes these blends for you.
+   851→   851→2. **Gradients.** Measure contrast at the lightest and darkest stops,
+   852→   852→   then the midpoints where text actually sits. One ratio per band.
+   853→   853→3. **Dark mode is a separate audit.** Inverting colors does not invert
+   854→   854→   the ratio. #94A3B8 on #0F172A = 6.96:1 (AA) — but the same gray on
+   855→   855→   #1E293B drops below 4.5.
+   856→   856→4. **Focus rings.** A blue ring on a blue button fails §1.4.11 even
+   857→   857→   when the button's text passes. Check ring vs button AND ring vs
+   858→   858→   page, take the worse one.
+   859→   859→5. **Same-hue pairs lie to the eye.** Red on black can *look* vivid at
+   860→   860→   2.9:1. The formula does not care how it looks.
+   861→   861→
+   862→   862→## Verify it yourself
+   863→   863→
+   864→   864→Open \`01-instruments/contrast-checker.html\`, paste any pair, and open
+   865→   865→"The math for this pair" — it prints the linearized channels, both
+   866→   866→luminance values, and the substituted ratio expression, so you can
+   867→   867→check every number against this sheet.
+   868→   868→`,
+   869→   869→
+   870→   870→  /* ── 04 Setup guide ──────────────────────────────────────────────── */
+   871→   871→
+   872→   872→  "04-setup/setup-guide.md": `# Setup guide — Designer's Toolkit
+   873→   873→
+   874→   874→Everything here runs by double-click. No install, no build step, no
+   875→   875→account, no network. This guide is the 30-minute path from download
+   876→   876→to a design system with verified contrast.
+   877→   877→
+   878→   878→## What's in the pack
+   879→   879→
+   880→   880→- \`01-instruments/contrast-checker.html\` — WCAG 2.2 contrast math with
+   881→   881→  live swatches, verdicts for AA/AAA normal + large text and UI
+   882→   882→  components (§1.4.11), and a per-pair math readout
+   883→   883→- \`01-instruments/color-pair-generator.html\` — feed it one base color,
+   884→   884→  get AA-safe fg/bg pairings with copy-ready CSS
+   885→   885→- \`01-instruments/grid-tool.html\` — column/spacing calculator with a
+   886→   886→  to-scale visual preview and paste-ready CSS custom properties
+   887→   887→- \`02-tokens/token-export.json\` — the palette as design tokens: 18
+   888→   888→  pre-verified accessible pairs, spacing scale, type scale, radii,
+   889→   889→  shadows, breakpoints
+   890→   890→- \`02-tokens/font-pairing-bank.csv\` — 40 font pairings (display +
+   891→   891→  body) with weights, moods and best-use notes
+   892→   892→- \`03-formulas/wcag-contrast-cheatsheet.md\` — the actual formulas with
+   893→   893→  two worked examples and 14 verified reference pairs
+   894→   894→
+   895→   895→## The 30-minute setup
+   896→   896→
+   897→   897→### 1. Open the instruments (5 min)
+   898→   898→
+   899→   899→Double-click each file in \`01-instruments/\`. They open in any modern
+   900→   900→browser. Try the presets in the grid tool ("Desktop 12-col", "Blog
+   901→   901→720", "Mobile 360") to see the live preview react.
+   902→   902→
+   903→   903→### 2. Audit your current palette (10 min)
+   904→   904→
+   905→   905→Open the contrast checker. Paste your text color and background —
+   906→   906→copy the hex values straight from your CSS. The ratio and the five
+   907→   907→verdicts update as you type. Anything failing AA normal for body
+   908→   908→text goes on the fix list.
+   909→   909→
+   910→   910→Repeat for: body text, secondary text, links, buttons, borders and
+   911→   911→focus rings (the UI row, §1.4.11 — 3:1). Most palettes fail on
+   912→   912→muted text and borders, not on body copy.
+   913→   913→
+   914→   914→### 3. Fix the failures (10 min)
+   915→   915→
+   916→   916→Open the color-pair-generator and paste the failing base color.
+   917→   917→Pick the mode (base as background, or base as text color) and it
+   918→   918→builds pairings that clear 4.5:1, ranked by ratio, each with a
+   919→   919→Copy CSS button. Use the "Card pattern" pairing for surfaces.
+   920→   920→
+   921→   921→### 4. Wire the tokens and fonts (5 min)
+   922→   922→
+   923→   923→Import the values from \`token-export.json\` as CSS custom properties
+   924→   924→(\`--color-text: #0F172A\` …) or tokens in Figma/Tailwind. Every pair
+   925→   925→in \`accessiblePairs\` already passes; the three entries in
+   926→   926→\`knownFails\` document the traps they replace.
+   927→   927→
+   928→   928→Pick one pairing from \`font-pairing-bank.csv\` — filter the \`mood\`
+   929→   929→and \`best_for\` columns to your project type. Every font listed is
+   930→   930→on Google Fonts, so prototyping is free.
+   931→   931→
+   932→   932→## Rules that make the tools work
+   933→   933→
+   934→   934→1. **4.5 for body, 3 for large and UI, 7 if you want AAA.** The
+   935→   935→   thresholds are not stylistic — they are in the cheatsheet with the
+   936→   936→   math that produces them.
+   937→   937→2. **Check both modes.** A pair that passes in light mode has no
+   938→   938→   dark-mode guarantee. Run the checker twice with your dark palette
+   939→   939→   (the token file ships a verified dark pair set).
+   940→   940→3. **Test with real content.** "Aa" swatches hide kerning and stroke
+   941→   941→   issues — paste a real sentence into the live swatch panel.
+   942→   942→4. **#767676 is your floor.** The lightest gray that passes AA on
+   943→   943→   white. If your muted text is lighter, it fails.
+   944→   944→5. **Grids: content first.** Column width = (content − gap·(cols−1))
+   945→   945→   / cols. Set container, margin, columns and gap in the grid tool
+   946→   946→   and read the exact column width before you design a single
+   947→   947→   component.
+   948→   948→
+   949→   949→## Troubleshooting
+   950→   950→
+   951→   951→- **"The generator only offers black or white text for my color"** —
+   952→   952→  your base sits near the middle of the luminance range, where shaded
+   953→   953→  and tinted text variants fall under 4.5:1. That is correct math, not
+   954→   954→  a bug: black and white are the only survivors. Use the tint-surface
+   955→   955→  pairings (ink text on a tint of the base) or shift the base.
+   956→   956→- **"My hex shows 3-digit form (#25F)"** — the checker accepts both;
+   957→   957→  it normalizes to 6-digit and prints the expanded value.
+   958→   958→- **"Do these work on mobile?"** — yes; all three instruments are
+   959→   959→  plain HTML with a viewport meta tag and reflow under 720px.
+   960→   960→- **"Can I check alpha colors?"** — blend them onto the background
+   961→   961→  first (the cheatsheet's pitfall #1); the color pair generator's
+   962→   962→  tint function does the blend for its own candidates.
+   963→   963→
+   964→   964→## Files reference
+   965→   965→
+   966→   966→| Path | What it is |
+   967→   967→| --- | --- |
+   968→   968→| \`01-instruments/*.html\` | 3 working instruments (offline) |
+   969→   969→| \`02-tokens/token-export.json\` | tokens + 18 verified pairs + 3 documented fails |
+   970→   970→| \`02-tokens/font-pairing-bank.csv\` | 40 font pairings |
+   971→   971→| \`03-formulas/wcag-contrast-cheatsheet.md\` | formulas, worked examples, reference table |
+   972→   972→| \`04-setup/*\` | this guide + walkthrough link |
+   973→   973→`,
+   974→   974→
+   975→   975→  "04-setup/walkthrough-link.md": `# Walkthrough
+   976→   976→
+   977→   977→An 8-minute video walkthrough of this kit — every instrument shown
+   978→   978→end-to-end on a real (failing) palette:
+   979→   979→
+   980→   980→**→ https://omniforge.example/walkthroughs/B-TK-2**
+   981→   981→
+   982→   982→Contents:
+   983→   983→- 00:00 — What's in the download; the 30-minute plan
+   984→   984→- 00:45 — Contrast checker: the formula, verdicts, live swatches
+   985→   985→- 02:40 — Auditing a real palette; the muted-text trap
+   986→   986→- 04:10 — Color pair generator: fixing a failing brand blue
+   987→   987→- 05:30 — Grid tool: 12-col desktop, 6-col blog, 4-col mobile
+   988→   988→- 06:45 — Token export into CSS custom properties
+   989→   989→- 07:30 — Picking a font pairing from the bank
+   990→   990→
+   991→   991→The video is hosted (not bundled) so the pack stays under 5 MB.
+   992→   992→`,
+   993→   993→
+   994→   994→  /* kit stub note for the extended pack */
+   995→   995→  "EXTENDED-PACK/figma-plugin-starter.md": `# Figma plugin starter — in production
+   996→   996→
+   997→   997→Status: **in production** — not in this archive.
+   998→   998→
+   999→   999→What the finished file will contain: a Figma plugin starter wired to
+  1000→  1000→the same token export format as \`02-tokens/token-export.json\` — a
+  1001→  1001→\`manifest.json\`, a UI that imports the token file, and handlers that
+  1002→  1002→rebuild Figma color and text styles from the \`accessiblePairs\`
+  1003→  1003→entries, so every AA-safe pairing in this kit syncs straight into
+  1004→  1004→your library. Ships with a one-command build and a 3-minute setup
+  1005→  1005→video.
+  1006→  1006→`,
+  1007→  1007→};
+  1008→  1008→
+  1009→  1009→/* ── Try-it demo — the flagship instrument, same math ─────────────── */
+  1010→  1010→
+  1011→  1011→export const demo: DemoContent = {
+  1012→  1012→  kind: "tool",
+  1013→  1013→  tool: "contrast",
+  1014→  1014→  intro:
+  1015→  1015→    "This is the contrast checker from 01-instruments, running with the exact WCAG 2.2 formula that ships in the download: L = 0.2126R + 0.7152G + 0.0722B, C = (L1 + 0.05) / (L2 + 0.05). Pick a preset or paste a hex pair — presets carry {fg, bg} payloads.",
+  1016→  1016→  presets: [
+  1017→  1017→    {
+  1018→  1018→      label: "Link blue on white — 5.17:1, AA for normal text",
+  1019→  1019→      payload: { fg: "#2563EB", bg: "#FFFFFF" },
+  1020→  1020→    },
+  1021→  1021→    {
+  1022→  1022→      label: "Faded gray on gray — 2.43:1, fails every threshold",
+  1023→  1023→      payload: { fg: "#9CA3AF", bg: "#F9FAFB" },
+  1024→  1024→    },
+  1025→  1025→    {
+  1026→  1026→      label: "Amber on near-black — 11.58:1, AAA everywhere",
+  1027→  1027→      payload: { fg: "#FACC15", bg: "#111827" },
+  1028→  1028→    },
+  1029→  1029→  ],
+  1030→  1030→};
+  1031→  1031→

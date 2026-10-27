@@ -1,0 +1,593 @@
+     1→"use client";
+     2→
+     3→import { useMemo, useState } from "react";
+     4→import {
+     5→  Zap, ArrowRight, ArrowUpRight, Eye, Check, Layers, ChevronDown, Tag,
+     6→  LayoutGrid, Boxes, Flame, type LucideIcon,
+     7→} from "lucide-react";
+     8→import type { MockupConfig } from "@/data/businessTypes";
+     9→import {
+    10→  productTierCategories, subscriptionSection, type ProductType, type ProductExample,
+    11→} from "@/data/exampleProducts";
+    12→import { tierOrder, tierDisplay, getPackage } from "@/data/servicePackages";
+    13→import { familyTokens, getFamilyForProductType, type DesignFamilyId } from "@/data/designFamilies";
+    14→import { deriveOffer, heroCount, type OfferV2 } from "@/data/product-catalog";
+    15→import { ProductPlate } from "@/components/plate/ProductPlate";
+    16→import { PresentationStudio } from "@/components/studio/PresentationStudio";
+    17→import { MotionMedia, posterFrom } from "@/components/MotionMedia";
+    18→
+    19→/* ─── Family metadata (prestige: shared finish, family identity) ── */
+    20→
+    21→const familyMeta: Record<DesignFamilyId, {
+    22→  label: string; short: string; recipe: string; blurb: string;
+    23→  chip: string; text: string; border: string; bg: string; icon: LucideIcon;
+    24→}> = {
+    25→  micro: {
+    26→    label: "Micro Products", short: "Micro", recipe: "Pentagram + Raycast",
+    27→    blurb: "Small, focused digital products — landing templates, calculators, resume kits, checklists. Bold typographic heroes, numbered feature lists, instant-buy CTAs.",
+    28→    chip: "text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800",
+    29→    text: "text-zinc-700 dark:text-zinc-300", border: "border-zinc-300 dark:border-zinc-700",
+    30→    bg: "bg-zinc-50 dark:bg-zinc-900", icon: Zap,
+    31→  },
+    32→  "industry-warm": {
+    33→    label: "Industry & Hospitality", short: "Industry", recipe: "Aesop + Stripe Press",
+    34→    blurb: "Website kits for dental clinics, gyms, law firms, restaurants. Serif body copy, editorial layouts, full-bleed photography, small-caps section labels.",
+    35→    chip: "text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40",
+    36→    text: "text-amber-700 dark:text-amber-400", border: "border-amber-300 dark:border-amber-800",
+    37→    bg: "bg-amber-50 dark:bg-amber-950/30", icon: LayoutGrid,
+    38→  },
+    39→  "data-dense": {
+    40→    label: "Data Dashboards", short: "Data", recipe: "Bloomberg Terminal",
+    41→    blurb: "Dashboards, design systems, inventory tools, monitoring platforms. Monospaced type, tabular data, hairline panels, ticker strips, zero radius.",
+    42→    chip: "text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40",
+    43→    text: "text-emerald-700 dark:text-emerald-400", border: "border-emerald-300 dark:border-emerald-800",
+    44→    bg: "bg-emerald-50 dark:bg-emerald-950/30", icon: Boxes,
+    45→  },
+    46→  "saas-product": {
+    47→    label: "SaaS Products", short: "SaaS", recipe: "Linear",
+    48→    blurb: "Appointment systems, client portals, CRMs, booking platforms, SaaS tools. Hairline borders, gradient-mesh heroes, feature grids, keyboard-chip UI.",
+    49→    chip: "text-sky-700 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/40",
+    50→    text: "text-sky-700 dark:text-sky-400", border: "border-sky-300 dark:border-sky-800",
+    51→    bg: "bg-sky-50 dark:bg-sky-950/30", icon: Layers,
+    52→  },
+    53→  "enterprise-platform": {
+    54→    label: "Enterprise Platforms", short: "Enterprise", recipe: "Bloomberg + Linear",
+    55→    blurb: "Custom SaaS, marketplaces, multi-tenant apps, enterprise systems. Dashboard interfaces with sidebar rails, KPI panels, activity feeds, and request-demo funnels.",
+    56→    chip: "text-violet-700 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/40",
+    57→    text: "text-violet-700 dark:text-violet-400", border: "border-violet-300 dark:border-violet-800",
+    58→    bg: "bg-violet-50 dark:bg-violet-950/30", icon: Eye,
+    59→  },
+    60→};
+    61→
+    62→const familyOrder: DesignFamilyId[] = ["micro", "industry-warm", "data-dense", "saas-product", "enterprise-platform"];
+    63→
+    64→const tierColorMap: Record<string, { text: string; chip: string; badge: string; dot: string }> = {
+    65→  amber: { text: "text-amber-600 dark:text-amber-400", chip: "text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40", badge: "bg-amber-500", dot: "bg-amber-400" },
+    66→  sky: { text: "text-sky-600 dark:text-sky-400", chip: "text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/40", badge: "bg-sky-500", dot: "bg-sky-400" },
+    67→  emerald: { text: "text-emerald-600 dark:text-emerald-400", chip: "text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40", badge: "bg-emerald-500", dot: "bg-emerald-400" },
+    68→  violet: { text: "text-violet-600 dark:text-violet-400", chip: "text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/40", badge: "bg-violet-600", dot: "bg-violet-400" },
+    69→};
+    70→
+    71→/* ─── Aggregate: products by family with tier info + plate numbers ── */
+    72→
+    73→type FamilyProduct = {
+    74→  product: ProductType; tierLetter: string; tierName: string; tierColor: string; priceRange: string;
+    75→};
+    76→
+    77→const allTierSections = [
+    78→  ...productTierCategories.map((c) => ({ letter: c.letter, name: c.name, priceRange: c.priceRange, color: c.color, products: c.products })),
+    79→  { letter: "S", name: subscriptionSection.name, priceRange: subscriptionSection.priceRange, color: "emerald", products: subscriptionSection.products },
+    80→];
+    81→
+    82→const familyProductMap: Record<DesignFamilyId, FamilyProduct[]> = {
+    83→  micro: [], "industry-warm": [], "data-dense": [], "saas-product": [], "enterprise-platform": [],
+    84→};
+    85→for (const section of allTierSections) {
+    86→  for (const product of section.products) {
+    87→    familyProductMap[getFamilyForProductType(product.id)].push({
+    88→      product, tierLetter: section.letter, tierName: section.name, tierColor: section.color, priceRange: section.priceRange,
+    89→    });
+    90→  }
+    91→}
+    92→
+    93→const totalProducts = familyOrder.reduce((n, f) => n + familyProductMap[f].length, 0);
+    94→const totalExamples = familyOrder.reduce((n, f) => n + familyProductMap[f].reduce((m, fp) => m + fp.product.examples.length, 0), 0);
+    95→
+    96→/* label → productId + engraved plate numbers (deterministic) */
+    97→const labelToProductId: Record<string, string> = {};
+    98→const plateNumbers: Record<string, string> = {};
+    99→let plateCounter = 0;
+   100→for (const section of allTierSections) {
+   101→  for (const product of section.products) {
+   102→    for (const ex of product.examples) {
+   103→      labelToProductId[ex.label] = product.id;
+   104→      plateCounter += 1;
+   105→      plateNumbers[ex.label] = String(plateCounter).padStart(3, "0");
+   106→    }
+   107→  }
+   108→}
+   109→function productIdFor(example: ProductExample): string {
+   110→  return labelToProductId[example.label] ?? "landing-template";
+   111→}
+   112→
+   113→/* ─── Studio state ─────────────────────────────────────────────── */
+   114→
+   115→type View = { kind: "home" } | { kind: "family"; familyId: DesignFamilyId } | { kind: "pricing" };
+   116→type StudioState = { offer: OfferV2; config: MockupConfig; businessName: string; example?: ProductExample } | null;
+   117→
+   118→/* ─── TopNav: design families are the primary axis ─────────────── */
+   119→
+   120→function TopNav({ view, onSelect }: { view: View; onSelect: (v: View) => void }) {
+   121→  return (
+   122→    <div className="of-hairline-b sticky top-14 z-20 bg-[var(--of-plate-bg)]/95 backdrop-blur-md">
+   123→      <div className="mx-auto max-w-7xl px-4 py-2.5 sm:px-6 lg:px-8">
+   124→        <div className="flex items-center gap-1.5 overflow-x-auto">
+   125→          <button
+   126→            onClick={() => onSelect({ kind: "home" })}
+   127→            className={`group flex shrink-0 items-center gap-2 rounded-lg border px-2.5 py-2 transition-all duration-150 ${
+   128→              view.kind === "home"
+   129→                ? "border-brass-500/60 bg-brass-500/15"
+   130→                : "border-zinc-200/70 bg-[var(--of-plate-bg-2)] hover:border-brass-500/40 dark:border-zinc-800"
+   131→            }`}
+   132→          >
+   133→            <Zap className={`h-4 w-4 ${view.kind === "home" ? "text-brass-600 dark:text-brass-400" : "text-zinc-400"}`} />
+   134→            <div className="hidden min-w-0 text-left sm:block">
+   135→              <div className="text-[11px] font-semibold leading-tight">Home</div>
+   136→              <div className="mt-0.5 font-mono text-[9px] text-zinc-400">All families</div>
+   137→            </div>
+   138→          </button>
+   139→          <div className="of-hairline-b h-8 w-px shrink-0 !border-0 border-l border-brass-500/25" />
+   140→          {familyOrder.map((fid) => {
+   141→            const fm = familyMeta[fid];
+   142→            const isActive = view.kind === "family" && view.familyId === fid;
+   143→            const count = familyProductMap[fid].length;
+   144→            return (
+   145→              <button
+   146→                key={fid}
+   147→                onClick={() => onSelect({ kind: "family", familyId: fid })}
+   148→                className={`group flex shrink-0 items-center gap-2 rounded-lg border px-2.5 py-2 transition-all duration-150 ${
+   149→                  isActive ? `${fm.bg} ${fm.border}` : "border-zinc-200/70 bg-[var(--of-plate-bg-2)] hover:border-brass-500/40 dark:border-zinc-800"
+   150→                }`}
+   151→              >
+   152→                <fm.icon className={`h-4 w-4 ${isActive ? fm.text : "text-zinc-400"}`} />
+   153→                <div className="hidden min-w-0 text-left sm:block">
+   154→                  <div className="text-[11px] font-semibold leading-tight">{fm.short}</div>
+   155→                  <div className="mt-0.5 font-mono text-[9px] text-zinc-400">{count} products</div>
+   156→                </div>
+   157→              </button>
+   158→            );
+   159→          })}
+   160→          <div className="h-8 w-px shrink-0 border-l border-brass-500/25" />
+   161→          <button
+   162→            onClick={() => onSelect({ kind: "pricing" })}
+   163→            className={`group flex shrink-0 items-center gap-2 rounded-lg border px-2.5 py-2 transition-all duration-150 ${
+   164→              view.kind === "pricing"
+   165→                ? "border-brass-500/60 bg-brass-500/15"
+   166→                : "border-zinc-200/70 bg-[var(--of-plate-bg-2)] hover:border-brass-500/40 dark:border-zinc-800"
+   167→            }`}
+   168→          >
+   169→            <Tag className={`h-4 w-4 ${view.kind === "pricing" ? "text-brass-600 dark:text-brass-400" : "text-zinc-400"}`} />
+   170→            <div className="hidden min-w-0 text-left sm:block">
+   171→              <div className="text-[11px] font-semibold leading-tight">Pricing</div>
+   172→              <div className="mt-0.5 font-mono text-[9px] text-zinc-400">4 plans</div>
+   173→            </div>
+   174→          </button>
+   175→        </div>
+   176→      </div>
+   177→    </div>
+   178→  );
+   179→}
+   180→
+   181→/* ─── ProductSection: COLLAPSED BY DEFAULT (user rule) ─────────── */
+   182→
+   183→function ProductSection({
+   184→  fp, familyShort, onOpen, index,
+   185→}: {
+   186→  fp: FamilyProduct;
+   187→  familyShort: string;
+   188→  onOpen: (example: ProductExample, productName: string) => void;
+   189→  index: number;
+   190→}) {
+   191→  const [expanded, setExpanded] = useState(false); // ← minimized until clicked
+   192→  const tc = tierColorMap[fp.tierColor] ?? tierColorMap.amber;
+   193→  const offer = deriveOffer(fp.product.id, fp.product.examples[0]);
+   194→  return (
+   195→    <div className="of-plate of-slide-up overflow-hidden" style={{ animationDelay: `${index * 60}ms` }}>
+   196→      <button
+   197→        onClick={() => setExpanded(!expanded)}
+   198→        aria-expanded={expanded}
+   199→        className="flex w-full items-center justify-between gap-3 p-3.5 text-left transition-colors hover:bg-brass-500/5 sm:p-4"
+   200→      >
+   201→        <div className="flex min-w-0 items-center gap-3">
+   202→          <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded font-mono text-[10px] font-bold ${tc.chip}`}>
+   203→            {fp.tierLetter}
+   204→          </span>
+   205→          <div className="min-w-0">
+   206→            <h3 className="font-display text-[15px] font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">{fp.product.name}</h3>
+   207→            <p className="mt-0.5 line-clamp-1 text-[11.5px] text-zinc-500 dark:text-zinc-400">{fp.product.description}</p>
+   208→          </div>
+   209→        </div>
+   210→        <div className="flex shrink-0 items-center gap-3">
+   211→          <span className="hidden font-mono text-[9px] text-zinc-400 sm:inline">{fp.product.examples.length} examples · {offer.price.amount !== null ? `from $${Math.min(...fp.product.examples.map((e) => deriveOffer(fp.product.id, e).price.amount ?? 999))}` : "quote"}</span>
+   212→          <ChevronDown className={`h-4 w-4 text-zinc-400 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`} />
+   213→        </div>
+   214→      </button>
+   215→      {expanded && (
+   216→        <div className="of-expand border-t border-brass-500/15 px-3.5 pb-4 pt-3 sm:px-4">
+   217→          <div className="mt-1 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+   218→            {fp.product.examples.map((ex, i) => (
+   219→              <ProductPlate
+   220→                key={ex.label}
+   221→                offer={deriveOffer(fp.product.id, ex)}
+   222→                example={ex}
+   223→                familyShort={familyShort}
+   224→                plateNo={plateNumbers[ex.label] ?? "001"}
+   225→                index={i}
+   226→                onOpen={() => onOpen(ex, fp.product.name)}
+   227→              />
+   228→            ))}
+   229→          </div>
+   230→        </div>
+   231→      )}
+   232→    </div>
+   233→  );
+   234→}
+   235→
+   236→/* ─── FamilyView: all products in a family, grouped by tier ────── */
+   237→
+   238→function FamilyView({ familyId, onOpen }: { familyId: DesignFamilyId; onOpen: (example: ProductExample, productName: string) => void }) {
+   239→  const fm = familyMeta[familyId];
+   240→  const tokens = familyTokens[familyId];
+   241→  const items = familyProductMap[familyId];
+   242→  const exampleCount = items.reduce((n, fp) => n + fp.product.examples.length, 0);
+   243→
+   244→  const byTier = useMemo(() => {
+   245→    const groups: Record<string, FamilyProduct[]> = {};
+   246→    for (const fp of items) {
+   247→      (groups[fp.tierLetter] ??= []).push(fp);
+   248→    }
+   249→    return Object.entries(groups).sort(([a], [b]) => a.localeCompare(b));
+   250→  }, [items]);
+   251→
+   252→  return (
+   253→    <main className="mx-auto max-w-7xl space-y-5 px-4 py-6 sm:px-6 lg:px-8">
+   254→      {/* family header — prestige plate */}
+   255→      <div className={`of-plate of-slide-up ${fm.bg} ${fm.border} p-4 sm:p-5`}>
+   256→        <div className="mb-2 flex flex-wrap items-start justify-between gap-3">
+   257→          <div className="flex items-center gap-3">
+   258→            <fm.icon className={`h-5 w-5 ${fm.text}`} />
+   259→            <h2 className="font-display text-xl font-semibold tracking-tight sm:text-2xl">{fm.label}</h2>
+   260→          </div>
+   261→          <span className={`rounded font-mono text-[10px] font-semibold px-2 py-1 ${fm.chip}`}>
+   262→            {items.length} products · {exampleCount} examples
+   263→          </span>
+   264→        </div>
+   265→        <p className="mb-3 max-w-2xl text-[13px] leading-relaxed text-zinc-600 dark:text-zinc-400">{fm.blurb}</p>
+   266→        <div className="flex flex-wrap items-center gap-3 font-mono text-[10px] text-zinc-500 dark:text-zinc-400">
+   267→          <span>Recipe: {fm.recipe}</span><span>·</span>
+   268→          <span>{tokens.radius.md}px radius</span><span>·</span>
+   269→          <span>{tokens.sectionStyle}</span><span>·</span>
+   270→          <span className="of-engrave">Obsidian + brass finish</span>
+   271→        </div>
+   272→      </div>
+   273→
+   274→      {byTier.map(([tierLetter, tierProducts]) => {
+   275→        const tc = tierColorMap[tierProducts[0].tierColor] ?? tierColorMap.amber;
+   276→        return (
+   277→          <div key={tierLetter} className="space-y-2.5">
+   278→            <div className="mb-1 flex items-center gap-2">
+   279→              <span className={`flex h-6 w-6 items-center justify-center rounded font-mono text-[10px] font-bold ${tc.chip}`}>{tierLetter}</span>
+   280→              <h3 className="font-display text-base font-semibold tracking-tight">{tierProducts[0].tierName}</h3>
+   281→              <span className="font-mono text-[11px] text-zinc-400">{tierProducts[0].priceRange}</span>
+   282→              <span className="font-mono text-[10px] text-zinc-400">· {tierProducts.length} products</span>
+   283→            </div>
+   284→            <div className="space-y-2.5">
+   285→              {tierProducts.map((fp, i) => (
+   286→                <ProductSection key={fp.product.id} fp={fp} familyShort={fm.short} onOpen={onOpen} index={i} />
+   287→              ))}
+   288→            </div>
+   289→          </div>
+   290→        );
+   291→      })}
+   292→    </main>
+   293→  );
+   294→}
+   295→
+   296→/* ─── PricingView (prestige) ───────────────────────────────────── */
+   297→
+   298→function PricingView() {
+   299→  return (
+   300→    <main className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
+   301→      <div className="of-slide-up">
+   302→        <div className="mb-4 flex items-center gap-3">
+   303→          <Tag className="h-5 w-5 text-brass-600 dark:text-brass-400" />
+   304→          <h2 className="font-display text-xl font-semibold tracking-tight sm:text-2xl">Pricing Plans</h2>
+   305→        </div>
+   306→        <p className="max-w-2xl text-[13px] text-zinc-600 dark:text-zinc-400">
+   307→          Four service tiers from a single-page Starter to a full Enterprise platform. Every product example maps to one of these tiers — and every tier gets the same craft floor.
+   308→        </p>
+   309→      </div>
+   310→      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+   311→        {tierOrder.map((tier, i) => {
+   312→          const pkg = getPackage(tier);
+   313→          const td = tierDisplay[tier];
+   314→          const tc = tierColorMap[td.color];
+   315→          return (
+   316→            <div key={tier} className="of-plate of-lift of-slide-up p-4" style={{ animationDelay: `${i * 50}ms` }}>
+   317→              <div className="mb-3 flex items-center justify-between">
+   318→                <div className="flex items-center gap-2">
+   319→                  <div className={`h-1.5 w-1.5 rounded-full ${tc.dot}`} />
+   320→                  <span className={`text-xs font-bold ${tc.text}`}>{td.label}</span>
+   321→                </div>
+   322→                <span className="of-plate-num">{td.short}</span>
+   323→              </div>
+   324→              <div className="of-foil-text mb-0.5 font-display text-lg font-bold">{pkg.priceRange}</div>
+   325→              <div className="mb-3 text-[11px] text-zinc-500 dark:text-zinc-400">{pkg.deliveryWeeks}</div>
+   326→              <div className="mb-3 space-y-1.5">
+   327→                {pkg.features.slice(0, 4).map((f, j) => (
+   328→                  <div key={j} className="flex items-start gap-1.5">
+   329→                    <Check className={`mt-0.5 h-3 w-3 shrink-0 ${tc.text}`} strokeWidth={3} />
+   330→                    <span className="text-[10.5px] leading-tight text-zinc-600 dark:text-zinc-400">{f}</span>
+   331→                  </div>
+   332→                ))}
+   333→                <div className="pt-0.5 text-[10px] text-zinc-400">+{pkg.features.length - 4} more</div>
+   334→              </div>
+   335→              <div className="of-hairline-t flex items-center justify-between pt-2.5">
+   336→                <span className="of-plate-num">Modules</span>
+   337→                <span className={`font-mono text-[10px] font-bold ${tc.text}`}>{pkg.modules.length}/22</span>
+   338→              </div>
+   339→            </div>
+   340→          );
+   341→        })}
+   342→      </div>
+   343→    </main>
+   344→  );
+   345→}
+   346→
+   347→/* ─── HomeView: prestige hero + family picker + living showcase ─── */
+   348→
+   349→function HomeView({ onSelect, onOpen }: { onSelect: (v: View) => void; onOpen: (example: ProductExample, productName: string) => void }) {
+   350→  const featured = useMemo(() => {
+   351→    return familyOrder
+   352→      .map((fid) => {
+   353→        const items = familyProductMap[fid];
+   354→        if (!items.length) return null;
+   355→        // pick the example that has a hero offer (authored) — else the first
+   356→        for (const fp of items) {
+   357→          const heroEx = fp.product.examples.find((ex) => deriveOffer(fp.product.id, ex).authored);
+   358→          if (heroEx) return { fid, fp, example: heroEx };
+   359→        }
+   360→        const fp0 = items[0];
+   361→        return { fid, fp: fp0, example: fp0.product.examples[0] };
+   362→      })
+   363→      .filter(Boolean) as { fid: DesignFamilyId; fp: FamilyProduct; example: ProductExample }[];
+   364→  }, []);
+   365→
+   366→  return (
+   367→    <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+   368→      {/* ── Hero ────────────────────────────────────────────────── */}
+   369→      <section className="pb-8 pt-8 of-slide-up">
+   370→        <div className="of-plate relative overflow-hidden p-6 sm:p-10">
+   371→          <MotionMedia
+   372→            asset={posterFrom(featured[0]?.example.heroImage ?? "", [0.62, 0.5], 0.82)}
+   373→            eager
+   374→            className="absolute inset-0 !rounded-none"
+   375→          />
+   376→          <div className="relative max-w-3xl">
+   377→            <div className="of-plate-num mb-3 !text-[#f3dfa6]/90">/ The forge · Edition 2026</div>
+   378→            <h1 className="font-display text-3xl font-semibold leading-[1.06] tracking-tight text-white drop-shadow-sm sm:text-5xl">
+   379→              Every template,{" "}
+   380→              <span className="of-foil-text of-sheen inline-block rounded">finished</span>
+   381→              <br className="hidden sm:block" /> before you buy it.
+   382→            </h1>
+   383→            <p className="mt-4 max-w-2xl text-[13.5px] leading-relaxed text-white/85 sm:text-[15px]">
+   384→              {totalProducts} product types · {totalExamples} live examples · {heroCount} hand-authored kits. Open any plate: play the working demo,
+   385→              read the real files, buy, and download the ZIP — in one sitting, from this page.
+   386→            </p>
+   387→            <div className="mt-5 flex flex-wrap items-center gap-2.5">
+   388→              <button onClick={() => onSelect({ kind: "family", familyId: "industry-warm" })} className="of-btn">
+   389→                <Flame className="h-4 w-4" /> Browse the showcase kits
+   390→              </button>
+   391→              <button onClick={() => onSelect({ kind: "pricing" })} className="of-btn-ghost !border-white/30 !text-white">
+   392→                Compare plans <ArrowRight className="h-3.5 w-3.5" />
+   393→              </button>
+   394→            </div>
+   395→          </div>
+   396→        </div>
+   397→
+   398→        {/* stat plates */}
+   399→        <div className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+   400→          {[
+   401→            { label: "Design families", value: "5", sub: "Distinct visual languages" },
+   402→            { label: "Product types", value: String(totalProducts), sub: "Across all tiers" },
+   403→            { label: "Live examples", value: String(totalExamples), sub: "Previewable now" },
+   404→            { label: "Authored kits", value: String(heroCount), sub: "Real files, real ZIPs" },
+   405→          ].map((s, i) => (
+   406→            <div key={s.label} className="of-plate of-slide-up p-3" style={{ animationDelay: `${i * 40}ms` }}>
+   407→              <div className="of-plate-num mb-1">{s.label}</div>
+   408→              <div className="of-foil-text font-display text-xl font-bold leading-none">{s.value}</div>
+   409→              <div className="mt-1 text-[10px] text-zinc-500 dark:text-zinc-400">{s.sub}</div>
+   410→            </div>
+   411→          ))}
+   412→        </div>
+   413→      </section>
+   414→
+   415→      {/* ── Family picker ───────────────────────────────────────── */}
+   416→      <section className="pb-6">
+   417→        <div className="mb-4 flex items-center gap-2">
+   418→          <LayoutGrid className="h-4 w-4 text-brass-600 dark:text-brass-400" />
+   419→          <h2 className="font-display text-lg font-semibold tracking-tight">Design families</h2>
+   420→          <span className="font-mono text-[11px] text-zinc-400">click to browse — sections open collapsed, by design</span>
+   421→        </div>
+   422→        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+   423→          {familyOrder.map((fid, i) => {
+   424→            const fm = familyMeta[fid];
+   425→            const items = familyProductMap[fid];
+   426→            const exampleCount = items.reduce((n, fp) => n + fp.product.examples.length, 0);
+   427→            const tierLetters = [...new Set(items.map((fp) => fp.tierLetter))].sort();
+   428→            return (
+   429→              <button
+   430→                key={fid}
+   431→                onClick={() => onSelect({ kind: "family", familyId: fid })}
+   432→                className={`of-plate of-lift group of-slide-up p-4 text-left ${fm.border}`}
+   433→                style={{ animationDelay: `${i * 50}ms` }}
+   434→              >
+   435→                <div className="mb-3 flex items-center justify-between">
+   436→                  <div className="flex items-center gap-2">
+   437→                    <fm.icon className={`h-4 w-4 ${fm.text}`} />
+   438→                    <span className={`font-mono text-[9px] font-semibold ${fm.text}`}>FAMILY</span>
+   439→                  </div>
+   440→                  <ArrowUpRight className="h-4 w-4 text-zinc-400 transition-colors group-hover:text-brass-600 dark:group-hover:text-brass-400" />
+   441→                </div>
+   442→                <h3 className="mb-1 font-display text-base font-semibold tracking-tight">{fm.label}</h3>
+   443→                <p className="mb-3 line-clamp-2 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">{fm.blurb}</p>
+   444→                <div className="mb-3 flex flex-wrap items-center gap-1.5">
+   445→                  {tierLetters.map((l) => {
+   446→                    const fp = items.find((fp) => fp.tierLetter === l)!;
+   447→                    const tc = tierColorMap[fp.tierColor] ?? tierColorMap.amber;
+   448→                    return <span key={l} className={`rounded font-mono text-[8px] font-bold px-1.5 py-0.5 ${tc.chip}`}>{l}</span>;
+   449→                  })}
+   450→                </div>
+   451→                <div className="of-hairline-t flex items-center justify-between pt-2.5">
+   452→                  <span className="text-[11px] font-medium text-zinc-600 dark:text-zinc-400">{items.length} products · {exampleCount} examples</span>
+   453→                  <span className="of-plate-num">{fm.recipe}</span>
+   454→                </div>
+   455→              </button>
+   456→            );
+   457→          })}
+   458→          {/* pricing card */}
+   459→          <button
+   460→            onClick={() => onSelect({ kind: "pricing" })}
+   461→            className="of-plate of-lift group of-slide-up border-0 bg-gradient-to-br from-[#2b2721] to-[#17140f] p-4 text-left"
+   462→            style={{ animationDelay: `${familyOrder.length * 50}ms` }}
+   463→          >
+   464→            <div className="mb-3 flex items-center justify-between">
+   465→              <div className="flex items-center gap-2">
+   466→                <Tag className="h-4 w-4 text-brass-400" />
+   467→                <span className="font-mono text-[9px] font-semibold text-brass-400">PLANS</span>
+   468→              </div>
+   469→              <ArrowUpRight className="h-4 w-4 text-zinc-500 transition-colors group-hover:text-[#f3dfa6]" />
+   470→            </div>
+   471→            <h3 className="mb-1 font-display text-base font-semibold tracking-tight text-white">Pricing Plans</h3>
+   472→            <p className="mb-3 line-clamp-2 text-xs leading-relaxed text-zinc-400">
+   473→              Starter, Growth, Professional, Enterprise — compare modules, deliverables, and support.
+   474→            </p>
+   475→            <div className="mb-3 flex flex-wrap items-center gap-1.5">
+   476→              {tierOrder.map((t) => (
+   477→                <span key={t} className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-[8px] font-bold text-white/70">
+   478→                  {tierDisplay[t].short}
+   479→                </span>
+   480→              ))}
+   481→            </div>
+   482→            <div className="flex items-center justify-between border-t border-white/10 pt-2.5">
+   483→              <span className="text-[11px] font-medium text-zinc-300">Compare all plans</span>
+   484→              <ArrowRight className="h-3 w-3 text-zinc-400 transition-transform group-hover:translate-x-0.5" />
+   485→            </div>
+   486→          </button>
+   487→        </div>
+   488→      </section>
+   489→
+   490→      {/* ── Featured showcase — one authored kit per family ─────── */}
+   491→      <section className="pb-12">
+   492→        <div className="mb-4 flex items-center gap-2">
+   493→          <Eye className="h-4 w-4 text-brass-600 dark:text-brass-400" />
+   494→          <h2 className="font-display text-lg font-semibold tracking-tight">The showcase wall</h2>
+   495→          <span className="font-mono text-[11px] text-zinc-400">hand-authored kits — try, read, buy, download</span>
+   496→        </div>
+   497→        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+   498→          {featured.map(({ fid, fp, example }, i) => {
+   499→            const offer = deriveOffer(fp.product.id, example);
+   500→            return (
+   501→              <ProductPlate
+   502→                key={fid}
+   503→                offer={offer}
+   504→                example={example}
+   505→                familyShort={familyMeta[fid].short}
+   506→                plateNo={plateNumbers[example.label] ?? "001"}
+   507→                index={i}
+   508→                onOpen={() => onOpen(example, fp.product.name)}
+   509→              />
+   510→            );
+   511→          })}
+   512→        </div>
+   513→      </section>
+   514→    </main>
+   515→  );
+   516→}
+   517→
+   518→/* ─── App ────────────────────────────────────────────────────────── */
+   519→
+   520→function App() {
+   521→  const [view, setView] = useState<View>({ kind: "home" });
+   522→  const [studio, setStudio] = useState<StudioState>(null);
+   523→
+   524→  const handleOpen = (example: ProductExample, productName: string) => {
+   525→    const productId = productIdFor(example);
+   526→    setStudio({ offer: deriveOffer(productId, example), config: example, businessName: productName, example });
+   527→  };
+   528→
+   529→  const activeFamily = view.kind === "family" ? view.familyId : null;
+   530→
+   531→  return (
+   532→    <div className="min-h-screen text-zinc-900 dark:text-zinc-50">
+   533→      {/* Header — engraved brand, brass hairline */}
+   534→      <header className="of-hairline-b sticky top-0 z-30 bg-[var(--of-plate-bg)]/90 backdrop-blur-lg">
+   535→        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+   536→          <div className="flex h-14 items-center justify-between">
+   537→            <div className="flex items-center gap-2.5">
+   538→              <div className="of-foil-bar of-sheen grid h-8 w-8 place-items-center rounded-lg shadow-inner">
+   539→                <Zap className="h-4 w-4 text-[#17140f]" />
+   540→              </div>
+   541→              <div>
+   542→                <div className="of-engrave font-display text-sm font-bold leading-tight tracking-tight">OMNIFORGE</div>
+   543→                <div className="font-mono text-[10px] leading-tight text-zinc-400">Design Family Engine · Elite Edition</div>
+   544→              </div>
+   545→            </div>
+   546→            <div className="hidden items-center gap-1.5 font-mono text-[11px] text-zinc-400 sm:flex">
+   547→              <Layers className="h-3.5 w-3.5" />
+   548→              <span>5 families · {totalProducts} products · {heroCount} authored kits</span>
+   549→            </div>
+   550→          </div>
+   551→        </div>
+   552→      </header>
+   553→
+   554→      <TopNav view={view} onSelect={setView} />
+   555→
+   556→      {view.kind === "home" && <HomeView onSelect={setView} onOpen={handleOpen} />}
+   557→      {activeFamily && <FamilyView familyId={activeFamily} onOpen={handleOpen} />}
+   558→      {view.kind === "pricing" && <PricingView />}
+   559→
+   560→      {/* Footer */}
+   561→      <footer className="of-hairline-t mt-auto py-7">
+   562→        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+   563→          <div className="flex flex-wrap items-center justify-between gap-3">
+   564→            <div className="flex items-center gap-2">
+   565→              <Zap className="h-3.5 w-3.5 text-brass-500" />
+   566→              <span className="of-engrave font-display text-sm font-bold text-zinc-600 dark:text-zinc-400">OMNIFORGE</span>
+   567→            </div>
+   568→            <p className="font-mono text-[11px] text-zinc-400 dark:text-zinc-500">
+   569→              {totalProducts} products · {totalExamples} examples · 5 families · 4 plans · 22 modules
+   570→            </p>
+   571→          </div>
+   572→          <p className="mt-3 font-mono text-[10px] text-zinc-400/80 dark:text-zinc-600">
+   573→            Ratings, sold counts and prices are labeled demo data. Manifests match archives 1:1 — every file carries its honest flag.
+   574→          </p>
+   575→        </div>
+   576→      </footer>
+   577→
+   578→      {/* The studio — live presentation + instant delivery */}
+   579→      {studio && (
+   580→        <PresentationStudio
+   581→          offer={studio.offer}
+   582→          config={studio.config}
+   583→          businessName={studio.businessName}
+   584→          example={studio.example}
+   585→          onClose={() => setStudio(null)}
+   586→        />
+   587→      )}
+   588→    </div>
+   589→  );
+   590→}
+   591→
+   592→export default App;
+   593→

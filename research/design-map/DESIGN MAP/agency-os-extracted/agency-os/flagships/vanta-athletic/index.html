@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>VANTA — Athletic Systems / Performance Apparel & Equipment</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="VANTA Athletic Systems — privately engineered performance apparel and sporting equipment."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js"}}</script>
+<style>
+  :root {
+    --bg:#0a0a0a; --bg-2:#131313; --bg-3:#1a1a1a; --fg:#f5f1e8; --fg-dim:#b8b3a8; --muted:#6b6760;
+    --accent:#d4ff3a; --accent-dim:#a8cc2e; --accent-2:#ff4d1a;
+    --border:rgba(245,241,232,.1); --border-strong:rgba(245,241,232,.22); --card:rgba(255,255,255,.025);
+  }
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { margin:0; background:var(--bg); color:var(--fg); font-family:'DM Sans',sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; line-height:1.5; }
+  ::selection { background:var(--accent); color:var(--bg); }
+  .font-display { font-family:'Syne',sans-serif; letter-spacing:-.03em; }
+  .font-mono { font-family:'JetBrains Mono',monospace; }
+  ::-webkit-scrollbar { width:8px; }
+  ::-webkit-scrollbar-track { background:var(--bg); }
+  ::-webkit-scrollbar-thumb { background:var(--bg-3); }
+  ::-webkit-scrollbar-thumb:hover { background:var(--accent-dim); }
+  .hero-canvas { position:absolute; top:0; left:0; width:100% !important; height:100% !important; z-index:1; display:block; }
+  .hero-overlay {
+    position:absolute; inset:0; z-index:2; pointer-events:none;
+    background:
+      radial-gradient(ellipse at 30% 50%, rgba(10,10,10,.88) 0%, rgba(10,10,10,.45) 38%, transparent 70%),
+      linear-gradient(180deg, rgba(10,10,10,.35) 0%, transparent 30%, transparent 60%, rgba(10,10,10,.75) 100%);
+  }
+  .marquee { overflow:hidden; white-space:nowrap; background:var(--accent); color:var(--bg); }
+  .marquee-track { display:inline-flex; animation:mq 32s linear infinite; gap:3rem; padding:.95rem 1.5rem; }
+  @keyframes mq { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+  .marquee-item { font-family:'Syne',sans-serif; font-weight:700; font-size:1.05rem; text-transform:uppercase; display:inline-flex; align-items:center; gap:3rem; }
+  .marquee-item::after { content:''; width:8px; height:8px; background:var(--bg); border-radius:50%; }
+  .btn { display:inline-flex; align-items:center; gap:.6rem; padding:1rem 1.75rem; font-weight:600; font-size:.85rem; letter-spacing:.04em; text-transform:uppercase; border:1px solid transparent; cursor:pointer; transition:all .25s ease; }
+  .btn-primary { background:var(--accent); color:var(--bg); }
+  .btn-primary:hover { background:var(--fg); transform:translateY(-2px); }
+  .btn-ghost { background:transparent; color:var(--fg); border-color:var(--border-strong); }
+  .btn-ghost:hover { border-color:var(--accent); color:var(--accent); }
+  .product-card { position:relative; background:var(--card); border:1px solid var(--border); transition:all .3s ease; cursor:pointer; }
+  .product-card:hover { border-color:var(--accent); background:rgba(212,255,58,.025); }
+  .product-image { position:relative; overflow:hidden; aspect-ratio:4/5; background:var(--bg-2); }
+  .product-image img { width:100%; height:100%; object-fit:cover; transition:transform .7s cubic-bezier(.16,1,.3,1), filter .5s ease; filter:grayscale(.35) contrast(1.08) brightness(.85); }
+  .product-card:hover .product-image img { transform:scale(1.07); filter:grayscale(0) contrast(1.1) brightness(.95); }
+  .quick-add { position:absolute; bottom:1rem; left:1rem; right:1rem; background:var(--accent); color:var(--bg); padding:.85rem; text-align:center; font-weight:700; font-size:.78rem; text-transform:uppercase; letter-spacing:.06em; transform:translateY(160%); transition:transform .35s cubic-bezier(.16,1,.3,1); border:none; cursor:pointer; z-index:3; }
+  .product-card:hover .quick-add { transform:translateY(0); }
+  .filter-btn { padding:.6rem 1.2rem; border:1px solid var(--border-strong); background:transparent; color:var(--fg); font-weight:600; font-size:.78rem; text-transform:uppercase; letter-spacing:.06em; cursor:pointer; transition:all .2s ease; }
+  .filter-btn:hover { border-color:var(--fg); }
+  .filter-btn.active { background:var(--accent); color:var(--bg); border-color:var(--accent); }
+  .hero-h1 { font-family:'Syne',sans-serif; font-weight:800; font-size:clamp(3.5rem,9vw,9rem); line-height:.88; letter-spacing:-.04em; }
+  .section-h2 { font-family:'Syne',sans-serif; font-weight:700; font-size:clamp(2.5rem,6vw,5.5rem); line-height:.95; letter-spacing:-.03em; }
+  .eyebrow { font-family:'JetBrains Mono',monospace; font-size:.72rem; text-transform:uppercase; letter-spacing:.18em; color:var(--muted); display:inline-flex; align-items:center; gap:.6rem; }
+  .eyebrow::before { content:''; width:24px; height:1px; background:var(--accent); }
+  .stat-num { font-family:'Syne',sans-serif; font-weight:800; font-size:clamp(2.5rem,5vw,4.5rem); line-height:1; letter-spacing:-.03em; }
+  .text-volt { color:var(--accent); }
+  .reveal { opacity:0; transform:translateY(40px); transition:opacity .9s ease, transform .9s ease; }
+  .reveal.in { opacity:1; transform:translateY(0); }
+  .bento-cell { background:var(--card); border:1px solid var(--border); padding:2rem; position:relative; overflow:hidden; transition:all .3s ease; }
+  .bento-cell:hover { border-color:var(--accent); }
+  .bento-cell::before { content:''; position:absolute; top:0; left:0; width:0; height:2px; background:var(--accent); transition:width .45s ease; }
+  .bento-cell:hover::before { width:100%; }
+  .toast { position:fixed; bottom:2rem; right:2rem; background:var(--accent); color:var(--bg); padding:1rem 1.5rem; font-weight:700; font-size:.75rem; text-transform:uppercase; letter-spacing:.06em; transform:translateY(160%); opacity:0; transition:all .4s cubic-bezier(.16,1,.3,1); z-index:1000; }
+  .toast.show { transform:translateY(0); opacity:1; }
+  .link-underline { position:relative; display:inline-block; }
+  .link-underline::after { content:''; position:absolute; bottom:-2px; left:0; width:0; height:1px; background:var(--accent); transition:width .3s ease; }
+  .link-underline:hover::after { width:100%; }
+  @keyframes countPulse { 0%{transform:scale(1)} 50%{transform:scale(1.5)} 100%{transform:scale(1)} }
+  footer a { color:var(--fg-dim); transition:color .2s ease; }
+  footer a:hover { color:var(--accent); }
+</style>
+</head>
+<body>
+<div class="scroll-progress" id="scroll-progress" style="position:fixed;top:0;left:0;height:2px;width:0;background:var(--accent);z-index:200;"></div>
+
+<nav class="nav" id="nav" style="position:fixed;top:0;left:0;right:0;z-index:100;transition:all .35s ease;">
+  <div class="max-w-[1600px] mx-auto px-6 lg:px-10 py-5 flex items-center justify-between">
+    <a href="#" class="flex items-center gap-2 group">
+      <div class="w-3 h-3 bg-[var(--accent)] group-hover:rotate-45 transition-transform duration-300"></div>
+      <span class="font-display font-extrabold text-2xl tracking-tight">VANTA</span>
+      <span class="font-mono text-[10px] text-[var(--muted)] uppercase tracking-widest hidden sm:inline ml-1">Athletic Systems</span>
+    </a>
+    <div class="hidden lg:flex items-center gap-9 text-sm font-medium">
+      <a href="#bestsellers" class="link-underline">Shop</a>
+      <a href="#lab" class="link-underline">The Lab</a>
+      <a href="#athletes" class="link-underline">Athletes</a>
+      <a href="#membership" class="link-underline">Members</a>
+    </div>
+    <div class="flex items-center gap-5">
+      <button aria-label="Search" class="hover:text-[var(--accent)] transition"><i class="fas fa-search"></i></button>
+      <button id="cart-btn" aria-label="Cart" class="relative hover:text-[var(--accent)] transition">
+        <i class="fas fa-shopping-bag"></i>
+        <span id="cart-count" class="absolute -top-2 -right-2 bg-[var(--accent)] text-[var(--bg)] text-[10px] font-bold w-[18px] h-[18px] rounded-full flex items-center justify-center font-mono">0</span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<section id="hero" class="relative min-h-screen flex items-center overflow-hidden">
+  <canvas id="hero-canvas" class="hero-canvas"></canvas>
+  <div class="hero-overlay"></div>
+  <div class="relative z-10 max-w-[1600px] mx-auto px-6 lg:px-10 pt-32 pb-24 w-full">
+    <div class="grid grid-cols-12 gap-6 items-end">
+      <div class="col-span-12 lg:col-span-8">
+        <div class="eyebrow mb-8">FW25 / DROP 01 — LIVE NOW</div>
+        <h1 class="hero-h1">Engineered<br/><span class="text-[var(--muted)]">for the</span><br/><span class="text-volt italic">unrelenting.</span></h1>
+      </div>
+      <div class="col-span-12 lg:col-span-4 lg:pb-3">
+        <p class="text-[var(--fg-dim)] text-lg leading-relaxed mb-8 max-w-md">Performance apparel and sporting equipment, privately crafted for athletes who refuse the ordinary. Every fiber considered. Every gram accounted for.</p>
+        <div class="flex flex-wrap gap-3">
+          <button class="btn btn-primary" onclick="document.getElementById('bestsellers').scrollIntoView({behavior:'smooth'})">Shop the Drop <i class="fas fa-arrow-right text-xs"></i></button>
+          <button class="btn btn-ghost" onclick="showToast('FW25 lookbook — coming soon')"><i class="fas fa-book text-xs"></i> Lookbook</button>
+        </div>
+      </div>
+    </div>
+    <div class="mt-20 grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-10 pt-8 border-t border-[var(--border)]">
+      <div><div class="stat-num text-volt"><span class="count-num" data-target="47">0</span></div><div class="font-mono text-xs text-[var(--muted)] uppercase tracking-widest mt-2">Pro Athletes</div></div>
+      <div><div class="stat-num"><span class="count-num" data-target="12">0</span></div><div class="font-mono text-xs text-[var(--muted)] uppercase tracking-widest mt-2">Disciplines</div></div>
+      <div><div class="stat-num"><span class="count-num" data-target="2017">0</span></div><div class="font-mono text-xs text-[var(--muted)] uppercase tracking-widest mt-2">Privately Held</div></div>
+      <div><div class="stat-num"><span class="count-num" data-target="100">0</span><span class="text-volt">k+</span></div><div class="font-mono text-xs text-[var(--muted)] uppercase tracking-widest mt-2">Orders Shipped</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="marquee">
+  <div class="marquee-track">
+    <span class="marquee-item">Free shipping over $200</span><span class="marquee-item">30-day returns</span><span class="marquee-item">Members get early access</span><span class="marquee-item">FW25 / Drop 01 live now</span><span class="marquee-item">Engineered in Portland</span>
+    <span class="marquee-item">Free shipping over $200</span><span class="marquee-item">30-day returns</span><span class="marquee-item">Members get early access</span><span class="marquee-item">FW25 / Drop 01 live now</span><span class="marquee-item">Engineered in Portland</span>
+  </div>
+</div>
+
+<section id="bestsellers" class="py-24 lg:py-32">
+  <div class="max-w-[1600px] mx-auto px-6">
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6 reveal">
+      <div>
+        <div class="eyebrow mb-6">01 — Best Sellers</div>
+        <h2 class="section-h2">Field-tested.<br/><span class="text-volt italic">Athlete-approved.</span></h2>
+      </div>
+      <div class="flex gap-2 flex-wrap">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="apparel">Apparel</button>
+        <button class="filter-btn" data-filter="footwear">Footwear</button>
+        <button class="filter-btn" data-filter="equipment">Equipment</button>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6" id="products-grid"></div>
+  </div>
+</section>
+
+<section id="lab" class="py-24 lg:py-32 border-t border-[var(--border)]">
+  <div class="max-w-[1600px] mx-auto px-6">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-16 reveal">
+      <div class="lg:col-span-2">
+        <div class="eyebrow mb-6">02 — The Lab</div>
+        <h2 class="section-h2">Technology,<br/><span class="text-volt italic">uncompromised.</span></h2>
+      </div>
+      <div class="lg:pt-8"><p class="text-[var(--fg-dim)] text-lg">Every VANTA product passes through our Portland lab — 14,000 sq ft of testing, prototyping, and refusal. We engineer for athletes who notice the 2% difference.</p></div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 reveal">
+      <div class="bento-cell"><div class="font-mono text-xs text-volt uppercase tracking-widest mb-4">/ 01</div><h3 class="font-display font-bold text-xl mb-3">V-FORM 4-Way Stretch</h3><p class="text-[var(--fg-dim)] text-sm">Proprietary knit architecture that moves with the body in every direction.</p></div>
+      <div class="bento-cell"><div class="font-mono text-xs text-volt uppercase tracking-widest mb-4">/ 02</div><h3 class="font-display font-bold text-xl mb-3">ThermoCore</h3><p class="text-[var(--fg-dim)] text-sm">Lightweight insulation trapping heat without bulk. Rated to −10°C.</p></div>
+      <div class="bento-cell"><div class="font-mono text-xs text-volt uppercase tracking-widest mb-4">/ 03</div><h3 class="font-display font-bold text-xl mb-3">GripX Outsole</h3><p class="text-[var(--fg-dim)] text-sm">Multi-surface traction tested on wet rock, dry trail, gym floor.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="membership" class="py-24 lg:py-32 border-t border-[var(--border)]">
+  <div class="max-w-[800px] mx-auto px-6 text-center reveal">
+    <div class="eyebrow mb-6 justify-center" style="display:inline-flex">03 — Membership</div>
+    <h2 class="section-h2 mb-6">Join <span class="text-volt italic">VANTA</span> Members.</h2>
+    <p class="text-[var(--fg-dim)] text-lg mb-10 max-w-lg mx-auto">Early access to drops. Private athlete events. Member-only colorways. No fee, no catch.</p>
+    <form class="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto" onsubmit="event.preventDefault(); showToast('Welcome to VANTA Members'); this.reset();">
+      <input required type="email" placeholder="you@domain.com" class="flex-1 bg-transparent border-b border-[var(--border-strong)] py-3 text-lg focus:outline-none focus:border-[var(--accent)]"/>
+      <button type="submit" class="btn btn-primary">Join <i class="fas fa-arrow-right text-xs"></i></button>
+    </form>
+  </div>
+</section>
+
+<footer class="border-t border-[var(--border)] py-16">
+  <div class="max-w-[1600px] mx-auto px-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+    <div class="flex items-center gap-2"><div class="w-3 h-3 bg-[var(--accent)]"></div><span class="font-display font-extrabold text-2xl">VANTA</span></div>
+    <div class="font-mono text-xs text-[var(--muted)] uppercase tracking-widest">© 2025 VANTA Athletic Systems / Portland, OR</div>
+  </div>
+</footer>
+
+<script type="module">
+import * as THREE from 'three';
+/* Hero 3D kinetic core */
+const heroCanvas = document.getElementById('hero-canvas');
+const renderer = new THREE.WebGLRenderer({ canvas: heroCanvas, antialias:true, alpha:true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(40,1,.1,100);
+camera.position.set(0,0,7);
+const group = new THREE.Group(); scene.add(group);
+
+const core = new THREE.Mesh(new THREE.IcosahedronGeometry(1.5,1), new THREE.MeshStandardMaterial({ color:0x161616, metalness:1, roughness:.22, flatShading:true }));
+group.add(core);
+const wire = new THREE.Mesh(new THREE.IcosahedronGeometry(1.535,1), new THREE.MeshBasicMaterial({ color:0xd4ff3a, wireframe:true, transparent:true, opacity:.55 }));
+group.add(wire);
+
+const orbiters = [];
+[ {geo:new THREE.TorusGeometry(.42,.04,16,64), r:2.7, s:.35, o:0, c:0xd4ff3a},
+  {geo:new THREE.OctahedronGeometry(.24,0), r:2.95, s:.52, o:Math.PI*.5, c:0xff4d1a},
+  {geo:new THREE.BoxGeometry(.3,.3,.3), r:2.5, s:.42, o:Math.PI, c:0xd4ff3a},
+  {geo:new THREE.TetrahedronGeometry(.3,0), r:3.05, s:.28, o:Math.PI*1.5, c:0xff4d1a}
+].forEach(cfg=>{
+  const m = new THREE.Mesh(cfg.geo, new THREE.MeshStandardMaterial({ color:cfg.c, metalness:.7, roughness:.32, emissive:cfg.c, emissiveIntensity:.28 }));
+  m.userData=cfg; group.add(m); orbiters.push(m);
+});
+
+const pCount = 800, pGeo = new THREE.BufferGeometry(), pPos = new Float32Array(pCount*3);
+for (let i=0;i<pCount;i++){ pPos[i*3]=(Math.random()-.5)*22; pPos[i*3+1]=(Math.random()-.5)*22; pPos[i*3+2]=(Math.random()-.5)*22; }
+pGeo.setAttribute('position', new THREE.BufferAttribute(pPos,3));
+scene.add(new THREE.Points(pGeo, new THREE.PointsMaterial({ color:0xf5f1e8, size:.025, transparent:true, opacity:.5 })));
+
+scene.add(new THREE.AmbientLight(0xffffff,.25));
+const key = new THREE.DirectionalLight(0xffffff,1); key.position.set(3,4,5); scene.add(key);
+const volt = new THREE.PointLight(0xd4ff3a,3,12); volt.position.set(-4,2,2); scene.add(volt);
+const org = new THREE.PointLight(0xff4d1a,2,12); org.position.set(4,-2,1); scene.add(org);
+
+let mx=0,my=0,tx=0,ty=0;
+window.addEventListener('mousemove',e=>{ mx=(e.clientX/innerWidth-.5)*2; my=(e.clientY/innerHeight-.5)*2; });
+function sizeHero(){ const s=document.getElementById('hero'); renderer.setSize(s.offsetWidth,s.offsetHeight,false); camera.aspect=s.offsetWidth/s.offsetHeight; camera.updateProjectionMatrix(); }
+addEventListener('resize',sizeHero); sizeHero();
+
+const clock = new THREE.Clock();
+(function animate(){
+  const t = clock.getElapsedTime();
+  tx += (mx-tx)*.05; ty += (my-ty)*.05;
+  group.rotation.y = t*.12 + tx*.4;
+  group.rotation.x = ty*.25;
+  const s = 1 + Math.sin(t*1.3)*.04;
+  core.scale.setScalar(s); wire.scale.setScalar(s);
+  orbiters.forEach(o=>{ const c=o.userData, a=t*c.s+c.o;
+    o.position.set(Math.cos(a)*c.r, Math.sin(a*1.5)*.6, Math.sin(a)*c.r);
+    o.rotation.x = t*.6; o.rotation.y = t*.8; });
+  renderer.render(scene,camera);
+  requestAnimationFrame(animate);
+})();
+
+/* UI */
+const products = [
+  { id:1, name:'VANTA Stride 01', category:'footwear', catLabel:'Footwear', price:185, color:'Carbon / Volt', seed:'vanta-stride-01' },
+  { id:2, name:'ThermoCore Hoodie', category:'apparel', catLabel:'Apparel', price:145, color:'Bone', seed:'vanta-hoodie-thermo' },
+  { id:3, name:'V-Form Tee', category:'apparel', catLabel:'Apparel', price:65, color:'Carbon', seed:'vanta-tee-vform' },
+  { id:4, name:'Apex Training Short', category:'apparel', catLabel:'Apparel', price:85, color:'Carbon', seed:'vanta-short-apex' },
+  { id:5, name:'GripX Trainer', category:'footwear', catLabel:'Footwear', price:165, color:'Volt', seed:'vanta-trainer-gripx' },
+  { id:6, name:'Compression Tight', category:'apparel', catLabel:'Apparel', price:95, color:'Carbon', seed:'vanta-tight-comp' },
+  { id:7, name:'Aero Wind Shell', category:'apparel', catLabel:'Apparel', price:220, color:'Bone', seed:'vanta-jacket-aero' },
+  { id:8, name:'Kettlebell 24kg', category:'equipment', catLabel:'Equipment', price:145, color:'Matte Black', seed:'vanta-kettlebell-24' }
+];
+const grid = document.getElementById('products-grid');
+function renderProducts(filter='all'){
+  grid.innerHTML = '';
+  const list = filter==='all' ? products : products.filter(p=>p.category===filter);
+  list.forEach(p=>{
+    const c = document.createElement('div');
+    c.className = 'product-card';
+    c.innerHTML = `
+      <div class="product-image">
+        <img src="https://picsum.photos/seed/${p.seed}/600/750" alt="${p.name}" loading="lazy"/>
+        <button class="quick-add" data-id="${p.id}">Add to Bag — $${p.price}</button>
+      </div>
+      <div class="p-4">
+        <div class="flex justify-between gap-3 mb-1"><h3 class="font-display font-bold text-base lg:text-lg leading-tight">${p.name}</h3><span class="font-mono text-[10px] text-[var(--muted)] uppercase tracking-widest">${p.catLabel}</span></div>
+        <div class="text-xs text-[var(--fg-dim)] mb-3">${p.color}</div>
+        <div class="flex justify-between"><span class="font-display font-bold text-lg">$${p.price}</span><span class="font-mono text-[10px] text-[var(--muted)]">★ 4.9</span></div>
+      </div>`;
+    grid.appendChild(c);
+  });
+  document.querySelectorAll('.quick-add').forEach(btn=>btn.addEventListener('click',e=>{
+    e.stopPropagation();
+    const p = products.find(x=>x.id===parseInt(btn.dataset.id));
+    cartCount++;
+    document.getElementById('cart-count').textContent = cartCount;
+    document.getElementById('cart-count').style.animation = 'countPulse .5s ease';
+    showToast(`Added ${p.name} — $${p.price}`);
+  }));
+}
+let cartCount = 0;
+renderProducts();
+document.querySelectorAll('[data-filter]').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('[data-filter]').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active'); renderProducts(b.dataset.filter);
+}));
+document.getElementById('cart-btn').addEventListener('click',()=>showToast(cartCount===0?'Your bag is empty':`${cartCount} item${cartCount>1?'s':''} in bag`));
+function showToast(msg){
+  const t = document.createElement('div');
+  t.className='toast'; t.textContent=msg; document.body.appendChild(t);
+  requestAnimationFrame(()=>t.classList.add('show'));
+  setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(),400); },2600);
+}
+window.showToast = showToast;
+const nav = document.getElementById('nav');
+const prog = document.getElementById('scroll-progress');
+addEventListener('scroll',()=>{
+  nav.style.background = scrollY>50 ? 'rgba(10,10,10,.85)' : '';
+  nav.style.backdropFilter = scrollY>50 ? 'blur(20px)' : '';
+  nav.style.borderBottom = scrollY>50 ? '1px solid var(--border)' : '';
+  prog.style.width = (scrollY/(document.body.scrollHeight-innerHeight))*100+'%';
+});
+const obs = new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){e.target.classList.add('in');obs.unobserve(e.target);} }),{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+function animateCount(span,target,dur=1800){
+  const s = performance.now();
+  (function tick(now){
+    const t = Math.min(1,(now-s)/dur);
+    span.textContent = Math.floor(target*(1-Math.pow(1-t,3)));
+    if (t<1) requestAnimationFrame(tick); else span.textContent = target;
+  })(s);
+}
+const statObs = new IntersectionObserver(es=>es.forEach(e=>{
+  if (e.isIntersecting){ animateCount(e.target,parseInt(e.target.dataset.target)); statObs.unobserve(e.target); }
+}),{threshold:.5});
+document.querySelectorAll('.count-num').forEach(el=>statObs.observe(el));
+</script>
+</body>
+</html>

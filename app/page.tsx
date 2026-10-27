@@ -1,9 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   Zap, ArrowRight, ArrowUpRight, Eye, Check, Layers, ChevronDown, Tag,
-  LayoutGrid, Boxes, Flame, type LucideIcon,
+  LayoutGrid, Boxes, Flame, Globe, Sparkles, type LucideIcon,
 } from "lucide-react";
 import type { MockupConfig } from "@/data/businessTypes";
 import {
@@ -15,6 +15,17 @@ import { deriveOffer, heroCount, type OfferV2 } from "@/data/product-catalog";
 import { ProductPlate } from "@/components/plate/ProductPlate";
 import { PresentationStudio } from "@/components/studio/PresentationStudio";
 import { MotionMedia, posterFrom } from "@/components/MotionMedia";
+import { StyleSwitcher } from "@/components/style/StyleSwitcher";
+import { EngineSignature, KineticBand, ModeToggle } from "@/components/style/EngineSignature";
+import { ModuleLibrary } from "@/components/home/ModuleLibrary";
+import { ShowcaseRooms } from "@/components/home/ShowcaseRooms";
+import { TemplateAtelier } from "@/components/home/TemplateAtelier";
+import { GenomeBand } from "@/components/home/GenomeBand";
+import { initGenomeClient } from "@/lib/genome/store";
+import { FamilyGrammar, GrammarInfo } from "@/components/home/FamilyGrammar";
+import { SYSTEM_TICKER, MODULE_COUNT } from "@/data/system-contract";
+import { siteSlugFor, findExampleByOfferId } from "@/lib/site-preview";
+import { DESIGN_STYLES, STYLE_ORDER, initStyleClient, setStyle, useStyle } from "@/lib/style-registry";
 
 /* ─── Family metadata (prestige: shared finish, family identity) ── */
 
@@ -237,6 +248,7 @@ function ProductSection({
 
 function FamilyView({ familyId, onOpen }: { familyId: DesignFamilyId; onOpen: (example: ProductExample, productName: string) => void }) {
   const fm = familyMeta[familyId];
+  const engine = DESIGN_STYLES[useStyle()];
   const tokens = familyTokens[familyId];
   const items = familyProductMap[familyId];
   const exampleCount = items.reduce((n, fp) => n + fp.product.examples.length, 0);
@@ -263,11 +275,15 @@ function FamilyView({ familyId, onOpen }: { familyId: DesignFamilyId; onOpen: (e
           </span>
         </div>
         <p className="mb-3 max-w-2xl text-[13px] leading-relaxed text-zinc-600 dark:text-zinc-400">{fm.blurb}</p>
+        <div className="of-hairline mb-3 rounded-lg bg-[var(--of-plate-bg-2)]/50 p-3">
+          <GrammarInfo fid={familyId} />
+        </div>
         <div className="flex flex-wrap items-center gap-3 font-mono text-[10px] text-zinc-500 dark:text-zinc-400">
           <span>Recipe: {fm.recipe}</span><span>·</span>
           <span>{tokens.radius.md}px radius</span><span>·</span>
           <span>{tokens.sectionStyle}</span><span>·</span>
-          <span className="of-engrave">Obsidian + brass finish</span>
+          <span className="of-engrave">{engine.label} engine · {engine.fonts}</span>
+          <span className="of-chip">{engine.short} · every example renders in all 6 engines</span>
         </div>
       </div>
 
@@ -334,7 +350,7 @@ function PricingView() {
               </div>
               <div className="of-hairline-t flex items-center justify-between pt-2.5">
                 <span className="of-plate-num">Modules</span>
-                <span className={`font-mono text-[10px] font-bold ${tc.text}`}>{pkg.modules.length}/22</span>
+                <span className={`font-mono text-[10px] font-bold ${tc.text}`}>{pkg.modules.length}/{MODULE_COUNT}</span>
               </div>
             </div>
           );
@@ -344,9 +360,84 @@ function PricingView() {
   );
 }
 
+/* ─── DesignMatrix: one structure × six engines (press to re-skin) ─ */
+
+function DesignMatrix({ totalExamples, liveSiteSlug }: { totalExamples: number; liveSiteSlug: string }) {
+  const active = useStyle();
+  return (
+    <section className="pb-6">
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        <Boxes className="h-4 w-4 text-brass-600 dark:text-brass-400" />
+        <h2 className="font-display text-lg font-semibold tracking-tight">The design matrix</h2>
+        <span className="font-mono text-[11px] text-zinc-400">
+          same words, same files, same prices — press an engine and the whole forge re-skins
+        </span>
+      </div>
+      <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-6">
+        {STYLE_ORDER.map((id, i) => {
+          const s = DESIGN_STYLES[id];
+          const on = id === active;
+          return (
+            <button
+              key={id}
+              onClick={() => setStyle(id)}
+              aria-pressed={on}
+              className={`of-plate of-lift of-slide-up group overflow-hidden text-left ${on ? "!border-brass-500/70 ring-1 ring-brass-500/50" : ""}`}
+              style={{ animationDelay: `${i * 45}ms` }}
+            >
+              {/* material strip — each engine's own surface */}
+              <div
+                aria-hidden
+                className="relative h-14 w-full"
+                style={{ background: `linear-gradient(120deg, ${s.swatch.bg} 0%, ${s.swatch.bg} 58%, ${s.swatch.accent} 130%)` }}
+              >
+                <span
+                  className="absolute bottom-1.5 left-2 font-mono text-[9px] font-bold uppercase tracking-[0.14em]"
+                  style={{ color: s.swatch.ink }}
+                >
+                  {s.reference.split("·")[0].trim()}
+                </span>
+                {on && (
+                  <span className="absolute right-1.5 top-1.5 rounded bg-black/35 px-1.5 py-0.5 font-mono text-[8px] font-bold text-white backdrop-blur">
+                    ACTIVE
+                  </span>
+                )}
+              </div>
+              <div className="p-3">
+                <div className="mb-1 flex items-center justify-between gap-2">
+                  <span className="font-mono text-[9px] font-bold tracking-[0.12em] text-brass-600 dark:text-brass-400">{s.short}</span>
+                  <span className="font-mono text-[8px] text-zinc-400">engine {i + 1}/6</span>
+                </div>
+                <div className="truncate text-[13px] font-semibold leading-tight">{s.label}</div>
+                <p className="mt-1 line-clamp-2 text-[10px] leading-snug text-zinc-500 dark:text-zinc-400">{s.tagline}</p>
+                <div className="mt-2 flex items-start gap-1 border-t border-zinc-500/10 pt-1.5 font-mono text-[8px] leading-snug text-brass-600 dark:text-brass-400">
+                  <Sparkles className="mt-px h-2.5 w-2.5 shrink-0" />
+                  <span className="line-clamp-2">{s.signature}</span>
+                </div>
+                <div className="mt-1.5 truncate font-mono text-[8px] text-zinc-400">{s.fonts}</div>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+      <div className="mt-2.5 flex flex-wrap items-center justify-center gap-3">
+        <p className="font-mono text-[10px] text-zinc-400">
+          {totalExamples} examples × 6 engines · every plate, studio, receipt, mockup AND full website preview renders in every engine — content identical, material different.
+        </p>
+        {liveSiteSlug && (
+          <a href={`/preview/${liveSiteSlug}`} className="of-btn-ghost !px-3 !py-1.5 text-[10.5px]">
+            <Globe className="h-3 w-3" /> Open the live site — full size
+          </a>
+        )}
+      </div>
+    </section>
+  );
+}
+
 /* ─── HomeView: prestige hero + family picker + living showcase ─── */
 
 function HomeView({ onSelect, onOpen }: { onSelect: (v: View) => void; onOpen: (example: ProductExample, productName: string) => void }) {
+  const style = useStyle();
   const featured = useMemo(() => {
     return familyOrder
       .map((fid) => {
@@ -363,6 +454,10 @@ function HomeView({ onSelect, onOpen }: { onSelect: (v: View) => void; onOpen: (
       .filter(Boolean) as { fid: DesignFamilyId; fp: FamilyProduct; example: ProductExample }[];
   }, []);
 
+  const liveSiteSlug = featured[0]
+    ? siteSlugFor(productIdFor(featured[0].example), featured[0].example.label)
+    : "";
+
   return (
     <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       {/* ── Hero ────────────────────────────────────────────────── */}
@@ -374,15 +469,18 @@ function HomeView({ onSelect, onOpen }: { onSelect: (v: View) => void; onOpen: (
             className="absolute inset-0 !rounded-none"
           />
           <div className="relative max-w-3xl">
-            <div className="of-plate-num mb-3 !text-[#f3dfa6]/90">/ The forge · Edition 2026</div>
-            <h1 className="font-display text-3xl font-semibold leading-[1.06] tracking-tight text-white drop-shadow-sm sm:text-5xl">
+            <div className="of-plate-num mb-3 flex items-center gap-2" style={{ color: 'var(--color-brass-300)' }}>
+              {style === 'studioos' && <span className="of-pulse" />}
+              / The forge · Edition 2026
+            </div>
+            <h1 className={`of-3dtitle font-display text-3xl font-semibold leading-[1.06] tracking-tight text-white drop-shadow-sm sm:text-5xl`}>
               Every template,{" "}
               <span className="of-foil-text of-sheen inline-block rounded">finished</span>
               <br className="hidden sm:block" /> before you buy it.
             </h1>
             <p className="mt-4 max-w-2xl text-[13.5px] leading-relaxed text-white/85 sm:text-[15px]">
-              {totalProducts} product types · {totalExamples} live examples · {heroCount} hand-authored kits. Open any plate: play the working demo,
-              read the real files, buy, and download the ZIP — in one sitting, from this page.
+              {totalProducts} product types · {totalExamples} live examples · {heroCount} hand-authored kits — in five design engines.
+              Open any plate: play the working demo, read the real files, buy, and download the ZIP — in one sitting, from this page.
             </p>
             <div className="mt-5 flex flex-wrap items-center gap-2.5">
               <button onClick={() => onSelect({ kind: "family", familyId: "industry-warm" })} className="of-btn">
@@ -411,6 +509,9 @@ function HomeView({ onSelect, onOpen }: { onSelect: (v: View) => void; onOpen: (
           ))}
         </div>
       </section>
+
+      {/* engine ticker — the AO / SO signature marquee */}
+      {(style === "agencyos" || style === "studioos") && <KineticBand items={SYSTEM_TICKER} />}
 
       {/* ── Family picker ───────────────────────────────────────── */}
       <section className="pb-6">
@@ -441,6 +542,10 @@ function HomeView({ onSelect, onOpen }: { onSelect: (v: View) => void; onOpen: (
                 </div>
                 <h3 className="mb-1 font-display text-base font-semibold tracking-tight">{fm.label}</h3>
                 <p className="mb-3 line-clamp-2 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">{fm.blurb}</p>
+                <div className="mb-3"><FamilyGrammar fid={fid} /></div>
+                <div className="of-hairline mb-3 rounded-lg bg-[var(--of-plate-bg-2)]/40 p-2.5">
+                  <GrammarInfo fid={fid} compact />
+                </div>
                 <div className="mb-3 flex flex-wrap items-center gap-1.5">
                   {tierLetters.map((l) => {
                     const fp = items.find((fp) => fp.tierLetter === l)!;
@@ -487,6 +592,21 @@ function HomeView({ onSelect, onOpen }: { onSelect: (v: View) => void; onOpen: (
         </div>
       </section>
 
+      {/* ── Design matrix — one structure, six engines ───────── */}
+      <DesignMatrix totalExamples={totalExamples} liveSiteSlug={liveSiteSlug} />
+
+      {/* ── Showcase rooms — six engines, six stages ────────── */}
+      <ShowcaseRooms />
+
+      {/* ── Template atelier — the merged Template OS library ── */}
+      <TemplateAtelier />
+
+      {/* ── Module library — the bricks behind every kit ─────── */}
+      <ModuleLibrary />
+
+      {/* ── The design genome — the backbone, exposed ────────── */}
+      <GenomeBand />
+
       {/* ── Featured showcase — one authored kit per family ─────── */}
       <section className="pb-12">
         <div className="mb-4 flex items-center gap-2">
@@ -520,6 +640,31 @@ function HomeView({ onSelect, onOpen }: { onSelect: (v: View) => void; onOpen: (
 function App() {
   const [view, setView] = useState<View>({ kind: "home" });
   const [studio, setStudio] = useState<StudioState>(null);
+  const style = useStyle(); // subscribe so engine swaps re-render style-aware chrome
+
+  useEffect(() => {
+    initStyleClient();
+    initGenomeClient();
+    // Deep link: /?offer=<offerId> opens the studio for that offer
+    // (the "Buy in the forge" CTA on every full-site preview links here).
+    try {
+      const offerId = new URLSearchParams(window.location.search).get("offer");
+      if (offerId) {
+        const found = findExampleByOfferId(offerId);
+        if (found) {
+          setStudio({
+            offer: deriveOffer(found.productId, found.example),
+            config: found.example,
+            businessName: found.productName,
+            example: found.example,
+          });
+        }
+        window.history.replaceState({}, "", "/");
+      }
+    } catch {
+      /* no query params — normal entry */
+    }
+  }, []);
 
   const handleOpen = (example: ProductExample, productName: string) => {
     const productId = productIdFor(example);
@@ -530,6 +675,10 @@ function App() {
 
   return (
     <div className="min-h-screen text-zinc-900 dark:text-zinc-50">
+      {/* engine signature treatments — fixed layers + NC entrance,
+          applying to every surface of the dashboard */}
+      <EngineSignature />
+
       {/* Header — engraved brand, brass hairline */}
       <header className="of-hairline-b sticky top-0 z-30 bg-[var(--of-plate-bg)]/90 backdrop-blur-lg">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -543,9 +692,13 @@ function App() {
                 <div className="font-mono text-[10px] leading-tight text-zinc-400">Design Family Engine · Elite Edition</div>
               </div>
             </div>
-            <div className="hidden items-center gap-1.5 font-mono text-[11px] text-zinc-400 sm:flex">
+            <div className="hidden items-center gap-1.5 font-mono text-[11px] text-zinc-400 lg:flex">
               <Layers className="h-3.5 w-3.5" />
-              <span>5 families · {totalProducts} products · {heroCount} authored kits</span>
+              <span>6 engines · 5 families · {totalProducts} products · {heroCount} authored kits</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <StyleSwitcher />
+              <ModeToggle compact />
             </div>
           </div>
         </div>
@@ -566,7 +719,7 @@ function App() {
               <span className="of-engrave font-display text-sm font-bold text-zinc-600 dark:text-zinc-400">OMNIFORGE</span>
             </div>
             <p className="font-mono text-[11px] text-zinc-400 dark:text-zinc-500">
-              {totalProducts} products · {totalExamples} examples · 5 families · 4 plans · 22 modules
+              {totalProducts} products · {totalExamples} examples × 6 engines · 5 families · 4 plans · {MODULE_COUNT} modules
             </p>
           </div>
           <p className="mt-3 font-mono text-[10px] text-zinc-400/80 dark:text-zinc-600">

@@ -1,0 +1,756 @@
+     1→"use client";
+     2→
+     3→import { useMemo, useState } from "react";
+     4→import { AnimatePresence, motion } from "motion/react";
+     5→import {
+     6→  ChevronDown,
+     7→  Eye,
+     8→  ArrowRight,
+     9→  FileText,
+    10→  UnfoldVertical,
+    11→  FoldVertical,
+    12→  MonitorPlay,
+    13→  BadgeCheck,
+    14→  FileArchive,
+    15→  Zap,
+    16→  ShieldCheck,
+    17→  RefreshCw,
+    18→} from "lucide-react";
+    19→import type { MockupConfig } from "@/data/businessTypes";
+    20→import {
+    21→  productTierCategories,
+    22→  subscriptionSection,
+    23→  type ProductExample,
+    24→  type ProductType,
+    25→} from "@/data/exampleProducts";
+    26→import { familyTokens } from "@/data/designFamilies";
+    27→import { riseIn, staggerParent } from "@/lib/motion";
+    28→import { familyMeta } from "./family-visuals";
+    29→import { deriveOffer, formatPrice } from "./product-catalog";
+    30→import { PurchaseButton } from "./purchase-flow";
+    31→import { ManifestExplorer, SocialProofRow, TestimonialQuote } from "./listing-extras";
+    32→import { cn } from "@/lib/utils";
+    33→
+    34→/* ════════════════════════════════════════════════════════════════════
+    35→   Family browsing view — products grouped by tier, example cards.
+    36→   Every product block starts MINIMIZED; expanding it reveals full
+    37→   end-product listings: numbered "What's included" manifests, formats,
+    38→   license, price, instant demo checkout and downloads.
+    39→   ════════════════════════════════════════════════════════════════════ */
+    40→
+    41→export type FamilyProduct = {
+    42→  product: ProductType;
+    43→  tierLetter: string;
+    44→  tierName: string;
+    45→  tierColor: string;
+    46→  priceRange: string;
+    47→};
+    48→
+    49→/** Context threaded to the PresentationStudio so it can render the offer */
+    50→export type OfferContext = {
+    51→  tierLetter: string;
+    52→  productTypeId: string;
+    53→};
+    54→
+    55→export const tierColorMap: Record<string, { text: string; chip: string; badge: string; dot: string }> = {
+    56→  amber: {
+    57→    text: "text-amber-600 dark:text-amber-400",
+    58→    chip: "text-amber-700 dark:text-amber-400 bg-amber-100/70 dark:bg-amber-950/40",
+    59→    badge: "bg-amber-500",
+    60→    dot: "bg-amber-400",
+    61→  },
+    62→  sky: {
+    63→    text: "text-sky-600 dark:text-sky-400",
+    64→    chip: "text-sky-700 dark:text-sky-400 bg-sky-100/70 dark:bg-sky-950/40",
+    65→    badge: "bg-sky-500",
+    66→    dot: "bg-sky-400",
+    67→  },
+    68→  emerald: {
+    69→    text: "text-emerald-600 dark:text-emerald-400",
+    70→    chip: "text-emerald-700 dark:text-emerald-400 bg-emerald-100/70 dark:bg-emerald-950/40",
+    71→    badge: "bg-emerald-500",
+    72→    dot: "bg-emerald-400",
+    73→  },
+    74→  violet: {
+    75→    text: "text-violet-600 dark:text-violet-400",
+    76→    chip: "text-violet-700 dark:text-violet-400 bg-violet-100/70 dark:bg-violet-950/40",
+    77→    badge: "bg-violet-600",
+    78→    dot: "bg-violet-400",
+    79→  },
+    80→};
+    81→
+    82→export const allTierSections = [
+    83→  ...productTierCategories.map((c) => ({
+    84→    letter: c.letter,
+    85→    name: c.name,
+    86→    priceRange: c.priceRange,
+    87→    color: c.color,
+    88→    products: c.products,
+    89→  })),
+    90→  {
+    91→    letter: "S",
+    92→    name: subscriptionSection.name,
+    93→    priceRange: subscriptionSection.priceRange,
+    94→    color: "emerald",
+    95→    products: subscriptionSection.products,
+    96→  },
+    97→];
+    98→
+    99→/* ── MiniPreview — polished static miniature for example cards ────── */
+   100→
+   101→function MiniPreview({ config }: { config: MockupConfig }) {
+   102→  const t = config.theme;
+   103→  const isElevated = config.layout === "premium" || config.layout === "standard";
+   104→  const isPremium = config.layout === "premium";
+   105→  const [imgFailed, setImgFailed] = useState(false);
+   106→  const showImg = config.heroImage && !imgFailed;
+   107→  return (
+   108→    <div
+   109→      style={{ fontFamily: t.font }}
+   110→      className="pointer-events-none flex h-full w-full select-none flex-col overflow-hidden"
+   111→    >
+   112→      <div
+   113→        className="relative z-10 flex shrink-0 items-center justify-between px-2 py-1.5"
+   114→        style={{
+   115→          background: showImg ? "rgba(0,0,0,0.25)" : t.nav,
+   116→          borderBottom: showImg ? "none" : `1px solid ${t.border}`,
+   117→        }}
+   118→      >
+   119→        <div className="flex items-center gap-1">
+   120→          <div
+   121→            className="size-2"
+   122→            style={{ background: t.accent, borderRadius: isElevated ? 3 : 999 }}
+   123→          />
+   124→          <span className="text-[7px] font-bold" style={{ color: showImg ? "#fff" : t.text }}>
+   125→            {config.label}
+   126→          </span>
+   127→        </div>
+   128→        <div className="flex gap-1" aria-hidden="true">
+   129→          {[0, 1, 2].map((i) => (
+   130→            <div
+   131→              key={i}
+   132→              className="h-0.5 w-2.5 rounded-full"
+   133→              style={{ background: showImg ? "rgba(255,255,255,0.4)" : t.muted, opacity: 0.5 }}
+   134→            />
+   135→          ))}
+   136→        </div>
+   137→      </div>
+   138→      <div className="relative min-h-0 flex-1" style={{ backgroundColor: t.bg }}>
+   139→        {showImg ? (
+   140→          <img
+   141→            src={config.heroImage}
+   142→            alt=""
+   143→            onError={() => setImgFailed(true)}
+   144→            className="absolute inset-0 h-full w-full object-cover"
+   145→            loading="lazy"
+   146→          />
+   147→        ) : (
+   148→          <div
+   149→            className="absolute inset-0"
+   150→            style={{ background: `linear-gradient(135deg, ${t.accent}, ${t.surface})` }}
+   151→          />
+   152→        )}
+   153→        {showImg && (
+   154→          <div
+   155→            className="absolute inset-0"
+   156→            style={{
+   157→              background: isPremium
+   158→                ? "linear-gradient(135deg, rgba(0,0,0,0.65), rgba(0,0,0,0.25))"
+   159→                : "linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.55))",
+   160→            }}
+   161→          />
+   162→        )}
+   163→        <div
+   164→          className={cn(
+   165→            "relative flex h-full flex-col justify-center p-2.5",
+   166→            !isPremium && "items-center text-center"
+   167→          )}
+   168→        >
+   169→          <div
+   170→            className="mb-1 inline-block w-fit rounded px-1.5 py-0.5 text-[6px] font-bold uppercase tracking-wider"
+   171→            style={{ background: t.accent, color: "#fff" }}
+   172→          >
+   173→            {config.tier === "enterprise" ? "Platform" : "Template"}
+   174→          </div>
+   175→          <div
+   176→            className="max-w-[92%] text-[9px] font-bold leading-tight"
+   177→            style={{
+   178→              color: showImg ? "#fff" : t.text,
+   179→              textShadow: showImg ? "0 1px 6px rgba(0,0,0,0.5)" : "none",
+   180→            }}
+   181→          >
+   182→            {config.tagline.length > 36 ? `${config.tagline.slice(0, 36)}…` : config.tagline}
+   183→          </div>
+   184→          {showImg && (
+   185→            <div
+   186→              className="mt-1.5 inline-block w-fit rounded px-1.5 py-0.5 text-[6px] font-semibold"
+   187→              style={{ background: t.accent, color: "#fff" }}
+   188→            >
+   189→              {config.tier === "enterprise" ? "Request Demo" : "Get Started"}
+   190→            </div>
+   191→          )}
+   192→        </div>
+   193→      </div>
+   194→      {/* Mini content: reads like a real page — heading, two copy lines, CTA */}
+   195→      <div className="shrink-0 space-y-1.5 px-2.5 py-2" style={{ background: t.bg }} aria-hidden="true">
+   196→        <div className="h-1.5 w-3/5 rounded-full" style={{ background: t.text, opacity: 0.75 }} />
+   197→        <div className="h-1 w-4/5 rounded-full" style={{ background: t.muted, opacity: 0.55 }} />
+   198→        <div className="flex items-center gap-1.5 pt-0.5">
+   199→          <div
+   200→            className="h-2.5 w-9 rounded-sm"
+   201→            style={{ background: t.accent, borderRadius: isElevated ? 4 : 999 }}
+   202→          />
+   203→          <div className="h-1 flex-1 rounded-full" style={{ background: t.muted, opacity: 0.35 }} />
+   204→          <div className="size-2 rounded-full" style={{ background: t.accentSoft, border: `1px solid ${t.border}` }} />
+   205→        </div>
+   206→      </div>
+   207→    </div>
+   208→  );
+   209→}
+   210→
+   211→/* ── Helpers ──────────────────────────────────────────────────────── */
+   212→
+   213→function extractPageCount(features: string[]): number | null {
+   214→  for (const f of features) {
+   215→    const m = f.match(/(\d+)\s*pages?/i);
+   216→    if (m) return parseInt(m[1], 10);
+   217→  }
+   218→  for (const f of features) {
+   219→    if (/one-page|single-page|1-page/i.test(f)) return 1;
+   220→  }
+   221→  return null;
+   222→}
+   223→
+   224→export type PreviewFn = (
+   225→  config: MockupConfig,
+   226→  name: string,
+   227→  example?: ProductExample,
+   228→  ctx?: OfferContext
+   229→) => void;
+   230→
+   231→/* ── ExampleCard — compact card for the home featured rail ────────── */
+   232→
+   233→export function ExampleCard({
+   234→  example,
+   235→  onPreview,
+   236→  index,
+   237→  familyShort,
+   238→  familyChip,
+   239→  offerContext,
+   240→}: {
+   241→  example: ProductExample;
+   242→  onPreview: () => void;
+   243→  index: number;
+   244→  familyShort?: string;
+   245→  familyChip?: string;
+   246→  offerContext?: { tierLetter: string; productTypeId: string };
+   247→}) {
+   248→  const td = example.tier;
+   249→  const tierInfo = td === "low"
+   250→    ? { short: "STR", badge: "bg-amber-500" }
+   251→    : td === "mid"
+   252→      ? { short: "GRO", badge: "bg-sky-500" }
+   253→      : td === "high"
+   254→        ? { short: "PRO", badge: "bg-emerald-500" }
+   255→        : { short: "ENT", badge: "bg-violet-600" };
+   256→  const pages = extractPageCount(example.features);
+   257→  const social = useMemo(
+   258→    () =>
+   259→      offerContext
+   260→        ? deriveOffer({
+   261→            tierLetter: offerContext.tierLetter,
+   262→            productTypeId: offerContext.productTypeId,
+   263→            exampleName: example.exampleName,
+   264→            features: example.features,
+   265→          }).social
+   266→        : null,
+   267→    [offerContext, example.exampleName, example.features]
+   268→  );
+   269→
+   270→  return (
+   271→    <motion.button
+   272→      variants={riseIn}
+   273→      onClick={onPreview}
+   274→      className="group overflow-hidden rounded-xl border border-border bg-card text-left transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+   275→      aria-label={`Preview ${example.exampleName}`}
+   276→    >
+   277→      <div className="relative aspect-[16/10] overflow-hidden bg-muted">
+   278→        <MiniPreview config={example} />
+   279→        <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/20 group-focus-visible:bg-black/20">
+   280→          <span className="flex scale-95 items-center gap-1.5 rounded-md bg-background px-2.5 py-1 text-[11px] font-semibold text-foreground opacity-0 shadow-md transition-all duration-150 group-hover:scale-100 group-hover:opacity-100 group-focus-visible:scale-100 group-focus-visible:opacity-100">
+   281→            <Eye className="size-3" aria-hidden="true" />
+   282→            Preview
+   283→            <ArrowRight className="size-3" aria-hidden="true" />
+   284→          </span>
+   285→        </div>
+   286→        <span className="absolute right-1.5 top-1.5 z-20 flex items-center gap-1">
+   287→          {pages !== null && (
+   288→            <span className="flex items-center gap-0.5 rounded bg-background/90 px-1.5 py-0.5 font-mono-forge text-[8px] font-bold text-foreground shadow-sm">
+   289→              <FileText className="size-2.5" aria-hidden="true" />
+   290→              {pages === 1 ? "1 pg" : `${pages} pgs`}
+   291→            </span>
+   292→          )}
+   293→          <span
+   294→            className={cn(
+   295→              "rounded px-1.5 py-0.5 font-mono-forge text-[8px] font-bold text-white shadow-sm",
+   296→              tierInfo.badge
+   297→            )}
+   298→          >
+   299→            {tierInfo.short}
+   300→          </span>
+   301→        </span>
+   302→        {familyShort && (
+   303→          <span
+   304→            className={cn(
+   305→              "absolute bottom-1.5 left-1.5 z-20 rounded px-1.5 py-0.5 font-mono-forge text-[7px] font-semibold",
+   306→              familyChip
+   307→            )}
+   308→          >
+   309→            {familyShort}
+   310→          </span>
+   311→        )}
+   312→      </div>
+   313→      <div className="p-2.5">
+   314→        <div className="mb-0.5 truncate text-[11px] font-bold text-foreground">
+   315→          {example.exampleName}
+   316→        </div>
+   317→        {social && (
+   318→          <div className="mb-1">
+   319→            <SocialProofRow social={social} showVersion={false} />
+   320→          </div>
+   321→        )}
+   322→        <p className="line-clamp-2 text-[10px] leading-snug text-muted-foreground">
+   323→          {example.exampleDescription}
+   324→        </p>
+   325→      </div>
+   326→    </motion.button>
+   327→  );
+   328→}
+   329→
+   330→/* ── ProductListingCard — full end-product listing ────────────────── */
+   331→/* Expandable blocks reveal these: live-presentation previews plus a   */
+   332→/* complete offer — numbered manifest, formats, license, price, and    */
+   333→/* a one-click demo checkout with instant downloads.                   */
+   334→
+   335→function ProductListingCard({
+   336→  example,
+   337→  fp,
+   338→  onPreview,
+   339→  index,
+   340→  familyShort,
+   341→  familyChip,
+   342→}: {
+   343→  example: ProductExample;
+   344→  fp: FamilyProduct;
+   345→  onPreview: PreviewFn;
+   346→  index: number;
+   347→  familyShort: string;
+   348→  familyChip: string;
+   349→}) {
+   350→  const offer = useMemo(
+   351→    () =>
+   352→      deriveOffer({
+   353→        tierLetter: fp.tierLetter,
+   354→        productTypeId: fp.product.id,
+   355→        exampleName: example.exampleName,
+   356→        features: example.features,
+   357→      }),
+   358→    [fp.tierLetter, fp.product.id, example.exampleName, example.features]
+   359→  );
+   360→
+   361→  const td = example.tier;
+   362→  const tierInfo =
+   363→    td === "low"
+   364→      ? { short: "STR", badge: "bg-amber-500" }
+   365→      : td === "mid"
+   366→        ? { short: "GRO", badge: "bg-sky-500" }
+   367→        : td === "high"
+   368→          ? { short: "PRO", badge: "bg-emerald-500" }
+   369→          : { short: "ENT", badge: "bg-violet-600" };
+   370→
+   371→  const openPresentation = () =>
+   372→    onPreview(example, fp.product.name, example, {
+   373→      tierLetter: fp.tierLetter,
+   374→      productTypeId: fp.product.id,
+   375→    });
+   376→
+   377→  return (
+   378→    <motion.article
+   379→      variants={riseIn}
+   380→      className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-shadow duration-200 hover:shadow-lg sm:flex-row"
+   381→      aria-label={`${example.exampleName} — end-product listing`}
+   382→    >
+   383→      {/* Live-presentation preview */}
+   384→      <button
+   385→        onClick={openPresentation}
+   386→        className="relative aspect-[16/10] w-full shrink-0 overflow-hidden bg-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-primary sm:aspect-auto sm:w-52"
+   387→        aria-label={`Open ${example.exampleName} live presentation`}
+   388→      >
+   389→        <MiniPreview config={example} />
+   390→        <span className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/25 group-focus-visible:bg-black/25">
+   391→          <span className="flex translate-y-1 scale-95 items-center gap-1.5 rounded-lg bg-background/95 px-3 py-1.5 text-[11px] font-semibold text-foreground opacity-0 shadow-lg backdrop-blur transition-all duration-150 group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100">
+   392→            <MonitorPlay className="size-3.5" aria-hidden="true" />
+   393→            Live presentation
+   394→          </span>
+   395→        </span>
+   396→        <span
+   397→          className={cn(
+   398→            "absolute left-1.5 top-1.5 z-20 rounded px-1.5 py-0.5 font-mono-forge text-[7px] font-semibold",
+   399→            familyChip
+   400→          )}
+   401→        >
+   402→          {familyShort}
+   403→        </span>
+   404→        <span
+   405→          className={cn(
+   406→            "absolute right-1.5 top-1.5 z-20 rounded px-1.5 py-0.5 font-mono-forge text-[8px] font-bold text-white shadow-sm",
+   407→            tierInfo.badge
+   408→          )}
+   409→        >
+   410→          {tierInfo.short}
+   411→        </span>
+   412→      </button>
+   413→
+   414→      {/* Offer body */}
+   415→      <div className="flex min-w-0 flex-1 flex-col gap-3 p-3.5 sm:p-4">
+   416→        {/* Name + rating + description */}
+   417→        <div>
+   418→          <h4 className="truncate text-sm font-bold text-foreground">{example.exampleName}</h4>
+   419→          <SocialProofRow social={offer.social} className="mt-1" />
+   420→          <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
+   421→            {example.exampleDescription}
+   422→          </p>
+   423→        </div>
+   424→
+   425→        {/* What's included — interactive bundle explorer */}
+   426→        <ManifestExplorer offer={offer} />
+   427→
+   428→        {/* Meta chips */}
+   429→        <div className="flex flex-wrap items-center gap-1.5">
+   430→          {offer.formats.map((f) => (
+   431→            <span
+   432→              key={f}
+   433→              className="inline-flex items-center gap-1 rounded border border-border bg-background px-1.5 py-0.5 font-mono-forge text-[9px] font-semibold text-muted-foreground"
+   434→            >
+   435→              <FileArchive className="size-2.5" aria-hidden="true" />
+   436→              {f}
+   437→            </span>
+   438→          ))}
+   439→          <span className="inline-flex items-center gap-1 rounded px-1 py-0.5 text-[10px] text-muted-foreground">
+   440→            <ShieldCheck className="size-3 text-emerald-500" aria-hidden="true" />
+   441→            {offer.license}
+   442→          </span>
+   443→        </div>
+   444→
+   445→        {/* Customer voice */}
+   446→        <TestimonialQuote testimonial={offer.testimonial} />
+   447→
+   448→        {/* Price + actions */}
+   449→        <div className="mt-auto flex flex-col gap-3 border-t border-border/60 pt-3 min-[480px]:flex-row min-[480px]:flex-wrap min-[480px]:items-end min-[480px]:justify-between">
+   450→          <div className="min-w-0">
+   451→            <div className="flex items-baseline gap-1.5">
+   452→              <span className="font-display text-xl font-bold leading-none text-foreground">
+   453→                {offer.price === null ? "Custom quote" : formatPrice(offer.price)}
+   454→                {offer.price !== null && offer.period && (
+   455→                  <span className="text-xs font-semibold text-muted-foreground">{offer.period}</span>
+   456→                )}
+   457→              </span>
+   458→              {offer.compareAt !== null && (
+   459→                <s className="text-xs font-medium text-muted-foreground/70">
+   460→                  {formatPrice(offer.compareAt)}
+   461→                </s>
+   462→              )}
+   463→            </div>
+   464→            <span className="mt-1 flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-[10px] text-muted-foreground">
+   465→              <span className="flex items-center gap-1">
+   466→                <Zap className="size-3 text-amber-500" aria-hidden="true" />
+   467→                {offer.delivery}
+   468→              </span>
+   469→              <span className="flex items-center gap-1">
+   470→                <RefreshCw className="size-3 text-sky-500" aria-hidden="true" />
+   471→                {offer.updates}
+   472→              </span>
+   473→              <span className="flex items-center gap-1">
+   474→                <ShieldCheck className="size-3 text-emerald-500" aria-hidden="true" />
+   475→                30-day guarantee
+   476→              </span>
+   477→            </span>
+   478→          </div>
+   479→          <div className="flex shrink-0 flex-wrap items-center gap-2">
+   480→            <button
+   481→              onClick={openPresentation}
+   482→              className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-border bg-background px-3.5 text-xs font-semibold text-foreground transition-colors hover:bg-muted active:translate-y-px"
+   483→            >
+   484→              <Eye className="size-3.5" aria-hidden="true" />
+   485→              Live presentation
+   486→            </button>
+   487→            <PurchaseButton offer={offer} exampleName={example.exampleName} />
+   488→          </div>
+   489→        </div>
+   490→      </div>
+   491→    </motion.article>
+   492→  );
+   493→}
+   494→
+   495→/* ── ProductSection — accordion block, minimized by default ───────── */
+   496→
+   497→export function ProductSection({
+   498→  fp,
+   499→  onPreview,
+   500→  expanded,
+   501→  onToggle,
+   502→  index,
+   503→  familyShort,
+   504→  familyChip,
+   505→}: {
+   506→  fp: FamilyProduct;
+   507→  onPreview: PreviewFn;
+   508→  expanded: boolean;
+   509→  onToggle: () => void;
+   510→  index: number;
+   511→  familyShort: string;
+   512→  familyChip: string;
+   513→}) {
+   514→  const tc = tierColorMap[fp.tierColor] ?? tierColorMap.amber;
+   515→  const exampleNames = fp.product.examples.map((e) => e.exampleName);
+   516→  return (
+   517→    <motion.div
+   518→      variants={riseIn}
+   519→      className={cn(
+   520→        "overflow-hidden rounded-xl border bg-card transition-colors",
+   521→        expanded ? "border-border" : "border-border/70 hover:border-border"
+   522→      )}
+   523→    >
+   524→      <button
+   525→        onClick={onToggle}
+   526→        aria-expanded={expanded}
+   527→        className="flex w-full items-center justify-between gap-3 p-3.5 text-left transition-colors hover:bg-muted/40 sm:p-4"
+   528→      >
+   529→        <div className="flex min-w-0 flex-1 items-center gap-3">
+   530→          <span
+   531→            className={cn(
+   532→              "flex size-6 shrink-0 items-center justify-center rounded font-mono-forge text-[10px] font-bold",
+   533→              tc.chip
+   534→            )}
+   535→          >
+   536→            {fp.tierLetter}
+   537→          </span>
+   538→          <div className="min-w-0">
+   539→            <h3 className="text-sm font-bold text-foreground">{fp.product.name}</h3>
+   540→            <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">
+   541→              {fp.product.description}
+   542→            </p>
+   543→            {/* Scent of the minimized contents — example names */}
+   544→            {!expanded && (
+   545→              <p className="mt-1 truncate font-mono-forge text-[9px] uppercase tracking-[0.1em] text-muted-foreground/60">
+   546→                {exampleNames.slice(0, 3).join(" · ")}
+   547→                {exampleNames.length > 3 ? ` · +${exampleNames.length - 3}` : ""}
+   548→              </p>
+   549→            )}
+   550→          </div>
+   551→        </div>
+   552→        <div className="flex shrink-0 items-center gap-2.5">
+   553→          <span className="hidden items-center gap-1 rounded-full border border-border/80 bg-background/60 px-2 py-0.5 font-mono-forge text-[9px] font-semibold text-muted-foreground sm:inline-flex">
+   554→            {fp.product.examples.length} products
+   555→            <span className="text-muted-foreground/50">
+   556→              · {fp.tierLetter === "E" ? "scoped quotes" : "buy instantly"}
+   557→            </span>
+   558→          </span>
+   559→          <motion.span
+   560→            animate={{ rotate: expanded ? 180 : 0 }}
+   561→            transition={{ duration: 0.2 }}
+   562→            className="flex size-6 items-center justify-center rounded-md border border-border/70 bg-background text-muted-foreground"
+   563→          >
+   564→            <ChevronDown className="size-3.5" aria-hidden="true" />
+   565→          </motion.span>
+   566→        </div>
+   567→      </button>
+   568→      <AnimatePresence initial={false}>
+   569→        {expanded && (
+   570→          <motion.div
+   571→            initial={{ height: 0, opacity: 0 }}
+   572→            animate={{ height: "auto", opacity: 1 }}
+   573→            exit={{ height: 0, opacity: 0 }}
+   574→            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+   575→            className="overflow-hidden"
+   576→          >
+   577→            <div className="border-t border-border/60 px-3.5 pb-4 pt-3 sm:px-4">
+   578→              <motion.div
+   579→                initial="hidden"
+   580→                animate="show"
+   581→                variants={staggerParent(0.04)}
+   582→                className="mt-1 grid grid-cols-1 gap-3 xl:grid-cols-2"
+   583→              >
+   584→                {fp.product.examples.map((ex, i) => (
+   585→                  <ProductListingCard
+   586→                    key={i}
+   587→                    example={ex}
+   588→                    fp={fp}
+   589→                    onPreview={onPreview}
+   590→                    index={i}
+   591→                    familyShort={familyShort}
+   592→                    familyChip={familyChip}
+   593→                  />
+   594→                ))}
+   595→              </motion.div>
+   596→              <p className="mt-3 flex items-center gap-1.5 font-mono-forge text-[9px] uppercase tracking-[0.12em] text-muted-foreground/60">
+   597→                <BadgeCheck className="size-3" aria-hidden="true" />
+   598→                Sample catalog · demo checkout — purchases and downloads are simulated
+   599→              </p>
+   600→            </div>
+   601→          </motion.div>
+   602→        )}
+   603→      </AnimatePresence>
+   604→    </motion.div>
+   605→  );
+   606→}
+   607→
+   608→/* ── FamilyView ───────────────────────────────────────────────────── */
+   609→
+   610→export function FamilyView({
+   611→  familyId,
+   612→  items,
+   613→  onPreview,
+   614→}: {
+   615→  familyId: string;
+   616→  items: FamilyProduct[];
+   617→  onPreview: PreviewFn;
+   618→}) {
+   619→  const fm = familyMeta[familyId] ?? familyMeta.micro;
+   620→  const tokens = familyTokens[familyId as keyof typeof familyTokens] ?? familyTokens.micro;
+   621→  const exampleCount = items.reduce((n, fp) => n + fp.product.examples.length, 0);
+   622→
+   623→  /* Every product block starts minimized */
+   624→  const [openIds, setOpenIds] = useState<ReadonlySet<string>>(() => new Set());
+   625→  const allOpen = items.length > 0 && items.every((fp) => openIds.has(fp.product.id));
+   626→  const someOpen = items.some((fp) => openIds.has(fp.product.id));
+   627→
+   628→  const toggleSection = (id: string) =>
+   629→    setOpenIds((prev) => {
+   630→      const next = new Set(prev);
+   631→      if (next.has(id)) next.delete(id);
+   632→      else next.add(id);
+   633→      return next;
+   634→    });
+   635→
+   636→  const toggleAll = () =>
+   637→    setOpenIds(allOpen ? new Set() : new Set(items.map((fp) => fp.product.id)));
+   638→
+   639→  const byTier = useMemo(() => {
+   640→    const groups: Record<string, FamilyProduct[]> = {};
+   641→    for (const fp of items) {
+   642→      (groups[fp.tierLetter] ||= []).push(fp);
+   643→    }
+   644→    return Object.entries(groups).sort(([a], [b]) => a.localeCompare(b));
+   645→  }, [items]);
+   646→
+   647→  return (
+   648→    <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+   649→      <motion.div
+   650→        initial="hidden"
+   651→        animate="show"
+   652→        variants={staggerParent(0.06)}
+   653→        className="space-y-6"
+   654→      >
+   655→        {/* Header */}
+   656→        <motion.div
+   657→          variants={riseIn}
+   658→          className={cn("relative overflow-hidden rounded-xl border p-4 sm:p-5", fm.border, fm.bg)}
+   659→        >
+   660→          <div
+   661→            className="pointer-events-none absolute inset-0 opacity-50"
+   662→            style={{ background: `radial-gradient(90% 120% at 100% 0%, ${fm.glow}, transparent 60%)` }}
+   663→            aria-hidden="true"
+   664→          />
+   665→          <div className="relative flex flex-wrap items-start justify-between gap-3">
+   666→            <div className="flex items-center gap-3">
+   667→              <fm.icon className={cn("size-5", fm.text)} aria-hidden="true" />
+   668→              <h2 className="font-display text-xl font-bold text-foreground sm:text-2xl">
+   669→                {fm.label}
+   670→              </h2>
+   671→            </div>
+   672→            <div className="flex flex-wrap items-center gap-2">
+   673→              <span className={cn("rounded px-2 py-1 font-mono-forge text-[10px] font-semibold", fm.chip)}>
+   674→                {items.length} products · {exampleCount} examples
+   675→              </span>
+   676→              <button
+   677→                onClick={toggleAll}
+   678→                className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-border bg-background/80 px-3 text-[11px] font-semibold text-foreground backdrop-blur transition-colors hover:bg-muted active:translate-y-px"
+   679→                aria-label={allOpen ? "Collapse all product blocks" : "Expand all product blocks"}
+   680→              >
+   681→                {allOpen ? (
+   682→                  <FoldVertical className="size-3.5" aria-hidden="true" />
+   683→                ) : (
+   684→                  <UnfoldVertical className="size-3.5" aria-hidden="true" />
+   685→                )}
+   686→                {allOpen ? "Collapse all" : "Expand all"}
+   687→              </button>
+   688→            </div>
+   689→          </div>
+   690→          <p className="relative mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+   691→            {fm.blurb}
+   692→          </p>
+   693→          <div className="relative mt-3 flex flex-wrap items-center gap-3 font-mono-forge text-[10px] text-muted-foreground">
+   694→            <span>Recipe: {fm.recipe}</span>
+   695→            <span aria-hidden="true">·</span>
+   696→            <span>{tokens.radius.md}px radius</span>
+   697→            <span aria-hidden="true">·</span>
+   698→            <span>{tokens.sectionStyle} sections</span>
+   699→            <span aria-hidden="true">·</span>
+   700→            <span className="text-muted-foreground/70">
+   701→              blocks start minimized {someOpen ? "· some expanded" : ""}
+   702→            </span>
+   703→          </div>
+   704→        </motion.div>
+   705→
+   706→        {/* Tier groups */}
+   707→        {byTier.map(([tierLetter, tierProducts]) => {
+   708→          const tc = tierColorMap[tierProducts[0].tierColor] ?? tierColorMap.amber;
+   709→          return (
+   710→            <section key={tierLetter} aria-label={tierProducts[0].tierName} className="space-y-2.5">
+   711→              <div className="flex flex-wrap items-center gap-2">
+   712→                <span
+   713→                  className={cn(
+   714→                    "flex size-6 items-center justify-center rounded font-mono-forge text-[10px] font-bold",
+   715→                    tc.chip
+   716→                  )}
+   717→                >
+   718→                  {tierLetter}
+   719→                </span>
+   720→                <h3 className="font-display text-base font-bold text-foreground">
+   721→                  {tierProducts[0].tierName}
+   722→                </h3>
+   723→                <span className="font-mono-forge text-[11px] text-muted-foreground">
+   724→                  {tierProducts[0].priceRange}
+   725→                </span>
+   726→                <span className="font-mono-forge text-[10px] text-muted-foreground">
+   727→                  · {tierProducts.length} products
+   728→                </span>
+   729→              </div>
+   730→              <motion.div
+   731→                initial="hidden"
+   732→                animate="show"
+   733→                variants={staggerParent(0.05)}
+   734→                className="space-y-2.5"
+   735→              >
+   736→                {tierProducts.map((fp, i) => (
+   737→                  <ProductSection
+   738→                    key={fp.product.id}
+   739→                    fp={fp}
+   740→                    onPreview={onPreview}
+   741→                    expanded={openIds.has(fp.product.id)}
+   742→                    onToggle={() => toggleSection(fp.product.id)}
+   743→                    index={i}
+   744→                    familyShort={fm.short}
+   745→                    familyChip={fm.chip}
+   746→                  />
+   747→                ))}
+   748→              </motion.div>
+   749→            </section>
+   750→          );
+   751→        })}
+   752→      </motion.div>
+   753→    </main>
+   754→  );
+   755→}
+   756→

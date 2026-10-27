@@ -1,0 +1,895 @@
+     1→/* ════════════════════════════════════════════════════════════════════
+     2→   B-TP-3 · Presentation Template Pack
+     3→   20 master slide layouts (index CSV + cover/data/story spec docs), a
+     4→   fully written 12-slide pitch deck, a quarterly report deck with chart
+     5→   specs, speaker notes for every layout, setup guide. Every file's key
+     6→   equals its bundle path. The Try-it demo reads the same copy.
+     7→   ════════════════════════════════════════════════════════════════════ */
+     8→
+     9→import type { DemoContent } from "../../catalog/schema";
+    10→
+    11→export const kitId = "B-TP-3";
+    12→
+    13→export const files: Record<string, string> = {
+    14→  /* ── 01 Master layouts ─────────────────────────────────────────── */
+    15→
+    16→  "01-master-layouts/layout-index.csv": `layout_id,name,purpose,grid,notes
+    17→L01,cover-title,Open the deck with the project in one line,Full-bleed image right / title block left 5 cols,Title ≤ 8 words; one-line subtitle; date + presenter strip
+    18→L02,cover-agenda,Tell them the three things you will cover,Title top / three numbered rows below,Write the three agenda items as verbs not topics
+    19→L03,section-divider,Reset attention between chapters,Oversized section number left / section title right,Use between unlike chapters; number sections not slides
+    20→L04,statement-slide,Plant the one claim they must remember,Single centered claim / 60% of slide height,One sentence; if it needs a second sentence it is two slides
+    21→L05,big-number,Make one metric land emotionally,Number left 60% / context and comparison right,Always state the comparison: down from / up to / bigger than
+    22→L06,comparison-two-column,Contrast two options honestly,Two equal columns / shared heading,A predictable winner column reads as rigged; keep both honest
+    23→L07,before-after,Show the change the work produced,Left before / right after / shared caption,Same framing and same scale in both halves
+    24→L08,timeline-horizontal,Walk a plan across time,Horizontal spine / 3-5 labeled nodes,Verb-first labels; dates above the line and outcomes below
+    25→L09,process-flow,Explain how the work happens,Three or four connected steps left to right,Name the steps from the client's point of view
+    26→L10,feature-grid-2x2,Group four related facts,2x2 grid / equal cells / icon + four-word label,Four is the ceiling; five needs the 3-col layout
+    27→L11,feature-grid-3-col,Group three facts or six in two rows,Three columns / optional second row,Default for team slides and win roundups
+    28→L12,chart-single,Prove the story with one chart,Chart 80% width / takeaway title above / source below,One series maximum; label directly not via legend
+    29→L13,chart-duo,Compare two views of the same story,Two half-width charts / shared takeaway title,Only when the pair tells one story together
+    30→L14,chart-plus-commentary,Chart with the reasoning beside it,Chart left 7 cols / commentary right 5,Commentary is three bullets max; the chart stays the hero
+    31→L15,table-data,Show structured detail without clutter,Clean table / header row / zebra striping,Right-align numbers; cap at 7 rows per slide
+    32→L16,quote-slide,Let a customer or stakeholder speak,Large quote centered / attribution bottom right,Their words beat your words; 25 words maximum per quote
+    33→L17,team-grid,Show who does the work,3-6 cards / photo + name + one-line role,One-line roles only; full credentials live in the appendix
+    34→L18,roadmap,Show the plan across quarters or phases,Horizontal swimlanes / phase columns,Name phases by outcome not by calendar month
+    35→L19,options-table,Present choices with a recommendation,Three option columns / recommended tier tagged,Tag the recommendation visually; never hide it
+    36→L20,closing-cta,Land the one ask,Single ask centered / contact strip bottom,One ask per deck; it should be the deck's only ask
+    37→`,
+    38→
+    39→  "01-master-layouts/cover-sections.md": `# Master layouts I — covers, sections, statements and closers
+    40→
+    41→Spec sheet for the structural layouts: L01, L02, L03, L04, L16, L20.
+    42→Data-carrying layouts live in \`data-slides.md\`; narrative patterns live
+    43→in \`story-slides.md\`. Every layout below is specified on a 12-column
+    44→grid, 16:9, with the same type scale.
+    45→
+    46→## The type scale (all layouts)
+    47→
+    48→| Role | Size | Weight | Notes |
+    49→| --- | --- | --- | --- |
+    50→| Cover title | 54–72pt | Bold | One line; two lines maximum |
+    51→| Slide title | 32–40pt | Semibold | The takeaway, not the topic |
+    52→| Statement text | 40–48pt | Medium | One sentence fills the slide |
+    53→| Body / table text | 18–24pt | Regular | 18pt is the absolute floor |
+    54→| Caption / source | 14–16pt | Regular | Source lines live here |
+    55→
+    56→## L01 — cover-title
+    57→
+    58→**Purpose:** the deck's first impression and its filing name.
+    59→**Grid:** full-bleed image right (7 cols) / title block left (5 cols),
+    60→both vertically centered.
+    61→**Copy pattern:**
+    62→
+    63→- Title: {{project_name}} — at most 8 words
+    64→- Subtitle: {{one_line_outcome}} — what changes if this deck works
+    65→- Strip: "Prepared for {{client_name}} · {{sent_date}} · {{sender_company}}"
+    66→
+    67→**Rules:** the image comes from the client's world — their product,
+    68→their store, their dashboard — never stock photography of handshakes.
+    69→If no image exists, a flat brand color beats a bad photo.
+    70→
+    71→## L02 — cover-agenda
+    72→
+    73→**Purpose:** set expectations in three items; buy attention for the
+    74→whole deck.
+    75→**Grid:** title top-left; three numbered rows beneath, left-aligned.
+    76→**Copy pattern:**
+    77→
+    78→1. {{agenda_verb_1}} {{agenda_object_1}} — e.g. "Name the problem"
+    79→2. {{agenda_verb_2}} {{agenda_object_2}} — e.g. "Show the plan"
+    80→3. {{agenda_verb_3}} {{agenda_object_3}} — e.g. "Agree the next step"
+    81→
+    82→**Rules:** verbs, not topics ("Name the problem" beats "Background").
+    83→Three items — a fourth halves recall. Skip this layout for decks under
+    84→six slides.
+    85→
+    86→## L03 — section-divider
+    87→
+    88→**Purpose:** reset attention between chapters that feel different.
+    89→**Grid:** oversized section number left ({{section_number}}), section
+    90→title right, both on a flat background.
+    91→**Copy pattern:** number ("02") + title ("What it costs").
+    92→**Rules:** use between unlike chapters only (context → plan → ask).
+    93→Number sections, not slides — the audience counts sections back to
+    94→questions later.
+    95→
+    96→## L04 — statement-slide
+    97→
+    98→**Purpose:** plant the one claim they must remember a week later.
+    99→**Grid:** a single sentence, centered, 40–48pt, nothing else on the
+   100→slide.
+   101→**Copy pattern:** {{subject}} {{verb}} {{number or stake}} —
+   102→"{{statement_example}}".
+   103→**Rules:** one sentence. If it needs a second sentence, it is two
+   104→slides. No logos, no footers, no decoration — the emptiness is the
+   105→emphasis.
+   106→
+   107→## L16 — quote-slide
+   108→
+   109→**Purpose:** let someone else say it — a customer, the client's own
+   110→stakeholder, a user.
+   111→**Grid:** large quote centered (left-aligned rag), attribution bottom
+   112→right.
+   113→**Copy pattern:** "{{quote_text}}" — {{quote_speaker}},
+   114→{{quote_context}}.
+   115→**Rules:** 25 words maximum. Their words beat your words: a client
+   116→stakeholder describing the problem is stronger than you describing the
+   117→solution. Never trim a quote into meaning something it didn't say.
+   118→
+   119→## L20 — closing-cta
+   120→
+   121→**Purpose:** land the one ask, then end.
+   122→**Grid:** single ask centered, contact strip along the bottom.
+   123→**Copy pattern:**
+   124→Ask: {{the_ask}} — "Sign by {{signature_date}}; kickoff
+   125→{{kickoff_date}}"
+   126→Strip: {{sender_name}} · {{sender_email}} · {{sender_phone}}
+   127→**Rules:** one ask per deck. It should be the deck's only ask — an
+   128→audience that was asked twice remembers neither. After this slide:
+   129→black. A "thank you / questions?" slide dilutes the ask.
+   130→`,
+   131→
+   132→  "01-master-layouts/data-slides.md": `# Master layouts II — data slides
+   133→
+   134→Spec sheet for the data-carrying layouts: L05, L12, L13, L14, L15, L19.
+   135→The chart specs in \`03-report-slides/quarterly-report-deck.md\` use the
+   136→exact format defined here.
+   137→
+   138→## The takeaway-title rule (applies to every data slide)
+   139→
+   140→The slide title states the conclusion, not the topic. "Checkout
+   141→conversion, Q2" is a topic. "Conversion held above {{rate}} through the
+   142→migration" is a takeaway. The audience should understand the slide from
+   143→the title alone — the chart is the evidence, not the message.
+   144→
+   145→## The chart chooser
+   146→
+   147→| Your data situation | Use | Not |
+   148→| --- | --- | --- |
+   149→| One metric over time | Line (L12) | Area with shading |
+   150→| Compare 3–7 categories | Horizontal bar (L12) | Pie, ever |
+   151→| Two metrics, one story | Chart duo (L13) | Dual-axis single chart |
+   152→| One chart + your reasoning | Chart + commentary (L14) | Chart + paragraph |
+   153→| Structure and status | Table (L15) | Traffic-light icons alone |
+   154→| Before vs after one change | Two bars or L07 | Two pies |
+   155→| Composition of a total | Stacked bar (if 2–3 parts) | Pie of 6+ slices |
+   156→
+   157→## The chart spec format (copy for every chart you build)
+   158→
+   159→1. **Type + series:** e.g. line, one series
+   160→2. **Metric + unit:** {{metric_name}} ({{unit}})
+   161→3. **Source:** {{data_source}}, pulled {{pull_date}}
+   162→4. **Annotation:** mark {{annotation_event}} on the week it happened
+   163→5. **Takeaway title:** "Takeaway: {{takeaway_line}}"
+   164→
+   165→If you cannot fill all five lines, the chart is not ready for a slide.
+   166→
+   167→## L05 — big-number
+   168→
+   169→**Purpose:** make one metric land emotionally before anyone reads
+   170→anything.
+   171→**Grid:** number left (60% of the slide, 200pt+), context right.
+   172→**Copy pattern:**
+   173→Number: {{big_number}} — the unit and period in small text
+   174→Context: {{comparison_line}} — "down from {{old_value}} in
+   175→{{old_period}}"
+   176→**Rules:** always give the comparison. A number without a comparison is
+   177→a number nobody can feel. One big number per deck section.
+   178→
+   179→## L12 — chart-single
+   180→
+   181→**Grid:** takeaway title above, chart at 80% width, source line at 14pt
+   182→bottom-left.
+   183→**Rules:** one series; label the line or bar directly — delete the
+   184→legend; start bar axes at zero (line axes may zoom, but annotate the
+   185→zoom).
+   186→
+   187→## L13 — chart-duo
+   188→
+   189→**Grid:** two half-width charts under one shared takeaway title; one
+   190→source line covers both.
+   191→**Rules:** only pair charts that tell one story together ("volume and
+   192→quality moved together"). Same y-scale unless labeled otherwise. If
+   193→each chart has its own title, they belong on two slides.
+   194→
+   195→## L14 — chart-plus-commentary
+   196→
+   197→**Grid:** chart left (7 cols), commentary right (5 cols).
+   198→**Copy pattern:** three bullets maximum — what moved, why, what we do
+   199→next. The chart stays the hero; commentary supports, never competes.
+   200→
+   201→## L15 — table-data
+   202→
+   203→**Grid:** header row + zebra striping; 7 rows maximum per slide.
+   204→**Rules:** right-align numbers (units in the header, not the cells);
+   205→round to the precision that matters — 2.1% not 2.1379%; "—" for
+   206→not-applicable, "n/a" only when you must.
+   207→
+   208→## L19 — options-table
+   209→
+   210→**Grid:** three option columns; the recommended one carries a visible
+   211→tag or border.
+   212→**Copy pattern:** identical row labels across tiers (price / duration /
+   213→what's included / best for) — the audience compares down the rows.
+   214→**Rules:** tag the recommendation visually and say it out loud once.
+   215→Never let the top option be an obvious strawman — see the three-tier
+   216→builder in the Proposal Pack.
+   217→
+   218→## Honest-data rules (non-negotiable)
+   219→
+   220→1. Every chart carries its source line. No source, no slide.
+   221→2. Annotate the bad news too — the chart that hides a dip is the chart
+   222→   nobody trusts again.
+   223→3. Don't truncate axes to inflate a change; when a line axis zooms,
+   224→   write the zoom on the slide.
+   225→4. Show the base size where it matters (n = {{sample_size}}).
+   226→
+   227→## Accessibility
+   228→
+   229→- Text on charts ≥ 14pt; contrast ratio 4.5:1 or better.
+   230→- Never encode meaning in color alone — add labels, patterns or direct
+   231→  annotation. One in twelve men reads color differently than you.
+   232→- Alt-text formula for shared charts: "Chart type of {{metric}}
+   233→showing {{takeaway}} from {{period_start}} to {{period_end}},
+   234→source {{data_source}}."
+   235→`,
+   236→
+   237→  "01-master-layouts/story-slides.md": `# Master layouts III — story slides
+   238→
+   239→Spec sheet for the narrative patterns: L04 as story beat, L06, L07, L08,
+   240→L16, and how sequences of them carry a room.
+   241→
+   242→## The one-slide-one-beat rule
+   243→
+   244→A slide is one beat of a story: one situation, one tension, one turn.
+   245→Two beats on one slide means neither lands. Testing a deck: say each
+   246→slide's beat out loud in one sentence — "this is where they learn the
+   247→cost." A slide with no beat is a slide to cut.
+   248→
+   249→## The five-beat arc (whole decks, not single slides)
+   250→
+   251→| Beat | Job | Typical layouts |
+   252→| --- | --- | --- |
+   253→| 1. Situation | Their world, fairly stated | L01, L16 |
+   254→| 2. Tension | The problem and its owner | L16, L11 |
+   255→| 3. Stakes | What it costs, in their numbers | L05, L12 |
+   256→| 4. Turn | The plan that changes it | L04, L09 |
+   257→| 5. New state | Life after, then the ask | L07, L20 |
+   258→
+   259→Most weak decks are beats 1–3 repeated with different fonts.
+   260→
+   261→## L04 as a story beat — writing the claim line
+   262→
+   263→Pattern: {{subject}} {{verb}} {{number or stake}}.
+   264→
+   265→- "Every week the leak continues costs {{weekly_cost}}."
+   266→- "{{client_company}}'s team spends {{hours}} hours a month on
+   267→  {{wasted_activity}}."
+   268→
+   269→Two rules: the subject is the client's world (never "our methodology");
+   270→the verb is concrete ("loses", "spends", "ships"), never "leverages".
+   271→
+   272→## L06 — comparison-two-column
+   273→
+   274→Two equal columns under a shared heading: "{{option_a}} vs
+   275→{{option_b}}". Three rows of honest differences. Rules: if one column
+   276→wins every row, you have written an ad, not a comparison — find the row
+   277→where the other option legitimately wins and say so. Credibility here
+   278→is what the investment slide spends later.
+   279→
+   280→## L07 — before-after
+   281→
+   282→Left "before", right "after", shared caption underneath. Rules: same
+   283→framing, same scale, same lighting — the audience must be able to
+   284→attribute every difference to the work, not the camera. Caption
+   285→pattern: "{{before_state}} ({{before_date}}) → {{after_state}}
+   286→({{after_date}})". When the change is a number, not an image, use two
+   287→bars and label the delta between them.
+   288→
+   289→## L08 — timeline-horizontal
+   290→
+   291→A horizontal spine with 3–5 nodes. Labels are verb-first: "Ship
+   292→{{deliverable}}", "Review {{artifact}}", "Decide {{decision}}". Dates
+   293→sit above the line; what the client sees sits below it. Rules: never
+   294→draw a timeline you cannot staff — every node needs an owner name in
+   295→the appendix. Five nodes maximum; a longer plan is a roadmap (L18).
+   296→
+   297→## L16 as a story beat — the quote sequence
+   298→
+   299→The strongest three-slide opening in this pack: their user quotes the
+   300→problem (L16), their numbers size it (L05), their stakeholder asks for
+   301→the plan (L16). You have not claimed anything yet — and the room is
+   302→already on your side of the table.
+   303→
+   304→## A written example — the six-slide story
+   305→
+   306→1. **L16:** "{{user_quote}}" — {{user_name}}, {{user_role}}. Beat:
+   307→   a real person feels this.
+   308→2. **L05:** {{cost_number}} a month. Down from {{trend_line}}. Beat:
+   309→   and it has a number.
+   310→3. **L04:** "{{client_company}} should not have to
+   311→   {{simplified_outcome}}." Beat: the turn.
+   312→4. **L09:** Audit → Fix → Harden, each step with what you see. Beat:
+   313→   the plan is real.
+   314→5. **L12:** {{proof_metric}} after the same fix at {{peer_company}}.
+   315→   Beat: it has worked before.
+   316→6. **L20:** Approve the sprint by {{date}}. Beat: the ask.
+   317→
+   318→Twenty sentences, six slides, one story. That is the density target.
+   319→`,
+   320→
+   321→  /* ── 02 Pitch deck ─────────────────────────────────────────────── */
+   322→
+   323→  "02-pitch-deck/pitch-deck-12-slides.md": `# The 12-slide client pitch — fully written
+   324→
+   325→A freelancer/agency pitch deck: every slide's copy, message and visual
+   326→direction. Fill the {{merge_fields}}, paste into your slide tool, apply
+   327→the layouts from \`layout-index.csv\`. At 12 slides it runs 15 minutes
+   328→with questions — the room's attention budget for a first pitch.
+   329→
+   330→**The spine:** their words → their numbers → your plan → your proof →
+   331→the ask. You do not speak about yourself until slide 9.
+   332→
+   333→### Slide 1 — {{project_name}} (L01 cover-title)
+   334→
+   335→**Key message:** this deck is about one project for one client.
+   336→**On-slide copy:** "{{project_name}}" / "{{one_line_outcome}}" /
+   337→"Prepared for {{client_name}} · {{sent_date}} · {{sender_company}}"
+   338→**Visual direction:** full-bleed image from the client's world — their
+   339→product, storefront or dashboard — duotoned to your brand accent.
+   340→**Speaker beat:** say the project in one sentence, then the agenda in
+   341→one breath. 15 seconds, next slide.
+   342→
+   343→### Slide 2 — What you told me (L11 three quotes)
+   344→
+   345→**Key message:** I listened; this is your problem in your words.
+   346→**On-slide copy:** "{{their_quote_1}}" — {{quote_1_speaker}} /
+   347→"{{their_quote_2}}" — {{quote_2_speaker}} / "{{their_quote_3}}" —
+   348→{{quote_3_speaker}}
+   349→**Visual direction:** three columns, quote text at 24pt, no quotation
+   350→clip-art, no stock faces.
+   351→**Speaker beat:** read quote one aloud, slowly. Attribute it. That's
+   352→all.
+   353→
+   354→### Slide 3 — What it costs (L05 big number)
+   355→
+   356→**Key message:** the problem has a number.
+   357→**On-slide copy:** {{cost_number}} {{cost_unit}} per {{period}}.
+   358→Comparison line: "{{comparison_anchor}} — and it recurs every
+   359→{{period}} until it's fixed."
+   360→**Visual direction:** the number at 200pt+; comparison line at 18pt
+   361→right of it.
+   362→**Speaker beat:** say the number, then stop. The pause after a big
+   363→number is the slide doing its job.
+   364→
+   365→### Slide 4 — Why now (L04 statement)
+   366→
+   367→**Key message:** a real trigger makes this quarter different.
+   368→**On-slide copy:** "{{why_now_claim}}"
+   369→**Visual direction:** one sentence, centered, nothing else.
+   370→**Speaker beat:** connect the trigger to their calendar —
+   371→{{trigger_event}} — not to your availability.
+   372→
+   373→### Slide 5 — The plan in one sentence (L04 statement)
+   374→
+   375→**Key message:** if they remember one slide, this one.
+   376→**On-slide copy:** "We will {{the_plan}} by {{deadline}}."
+   377→**Visual direction:** identical treatment to slide 4 — the repetition
+   378→is deliberate: claim, then plan.
+   379→**Speaker beat:** slow down. This sentence is the deck's thesis.
+   380→
+   381→### Slide 6 — How it works (L09 process-flow)
+   382→
+   383→**Key message:** the plan is a process, not a hope.
+   384→**On-slide copy:** {{step_1_name}} ({{step_1_duration}}) →
+   385→{{step_2_name}} ({{step_2_duration}}) → {{step_3_name}}
+   386→({{step_3_duration}}), each with "you see: {{step_output}}".
+   387→**Visual direction:** three connected boxes left to right; outputs
+   388→below the line.
+   389→**Speaker beat:** name what they receive at each step — reviews,
+   390→access, deliverables. Process trust is built of visible outputs.
+   391→
+   392→### Slide 7 — Proof (L13 chart-duo)
+   393→
+   394→**Key message:** this has worked before, in comparable conditions.
+   395→**On-slide copy:** Chart A takeaway: "{{case_1_takeaway}}" (metric:
+   396→{{case_1_metric}}, source {{case_1_source}}). Chart B takeaway:
+   397→"{{case_2_takeaway}}" (metric: {{case_2_metric}}, source
+   398→{{case_2_source}}).
+   399→**Visual direction:** two single-series charts under one shared title;
+   400→both carry source lines.
+   401→**Speaker beat:** "Same category, tighter constraints" — then stop.
+   402→Never volunteer the differences; answer them if asked.
+   403→
+   404→### Slide 8 — Timeline (L08 timeline-horizontal)
+   405→
+   406→**Key message:** the finish line is dated and owned.
+   407→**On-slide copy:** {{milestone_1}} ({{m1_date}}) → {{milestone_2}}
+   408→({{m2_date}}) → {{milestone_3}} ({{m3_date}}) → Final review
+   409→({{m4_date}}), each with "you see: {{milestone_output}}".
+   410→**Visual direction:** four nodes, verb-first labels, outputs below the
+   411→line.
+   412→**Speaker beat:** flag the client dependencies — feedback windows and
+   413→the single decision-maker — before they ask.
+   414→
+   415→### Slide 9 — Who does the work (L17 team-grid)
+   416→
+   417→**Key message:** named people, not "resources".
+   418→**On-slide copy:** {{team_member_1}} — {{role_1}}, one line on what
+   419→they own. Repeat for 2–4 more.
+   420→**Visual direction:** cards with photos, one-line roles; no CV lists.
+   421→**Speaker beat:** this is the first slide about you. Keep it about
+   422→them: "You'll work directly with {{senior_name}} — no account-manager
+   423→wall."
+   424→
+   425→### Slide 10 — Investment (L19 options-table)
+   426→
+   427→**Key message:** three options, one recommendation, no hidden numbers.
+   428→**On-slide copy:** {{tier_a_name}} / {{tier_b_name}} — recommended /
+   429→{{tier_c_name}}, with rows: price / duration / what's included /
+   430→revisions / best for.
+   431→**Visual direction:** three columns; recommended column tagged. Built
+   432→with the Proposal Pack's three-tier builder.
+   433→**Speaker beat:** "All three achieve the outcome we opened with. They
+   434→differ in depth and speed." Then let them read.
+   435→
+   436→### Slide 11 — De-risked (L10 feature-grid-2x2)
+   437→
+   438→**Key message:** the four questions you're too polite to ask, answered.
+   439→**On-slide copy:** If it's late → {{late_policy}}. If the scope changes
+   440→→ written change orders, priced before work. If you're unhappy →
+   441→{{remedy_policy}}. Your data and IP → {{ip_policy}}.
+   442→**Visual direction:** four equal cells, icon + four-word label.
+   443→**Speaker beat:** read the four cells as questions, answer them as
+   444→policies. This slide exists because someone in the room is thinking
+   445→them.
+   446→
+   447→### Slide 12 — The ask (L20 closing-cta)
+   448→
+   449→**Key message:** one decision, dated.
+   450→**On-slide copy:** "Sign by {{signature_date}} → kickoff
+   451→{{kickoff_date}} → first deliverable {{first_deliverable_date}}."
+   452→Contact strip: {{sender_name}} · {{sender_email}}.
+   453→**Visual direction:** single ask centered; black slide after this one.
+   454→**Speaker beat:** say the ask. Then stop talking. Ten full seconds of
+   455→silence is the slide doing its job — the first voice after it should
+   456→not be yours.
+   457→`,
+   458→
+   459→  /* ── 03 Report slides ──────────────────────────────────────────── */
+   460→
+   461→  "03-report-slides/quarterly-report-deck.md": `# The quarterly report deck — 10 slides with chart specs
+   462→
+   463→A client-facing quarterly report: honest numbers, shipped work, misses
+   464→with fixes, and one decision. Built from the data layouts
+   465→(L05/L12/L13/L14/L15/L18/L20); every chart uses the spec format from
+   466→\`data-slides.md\`. Runs 25 minutes with discussion.
+   467→
+   468→**The spine:** numbers first, story second, decision last. A report
+   469→deck that saves the numbers for the end has already lost the room.
+   470→
+   471→### Slide 1 — {{client_company}} · {{quarter}} report (L01)
+   472→
+   473→On-slide: title, "{{quarter}} results and what they mean", "Prepared by
+   474→{{sender_company}} · {{report_date}}". Presenter strip with the single
+   475→sentence the whole quarter reduces to: "{{quarter_headline}}".
+   476→
+   477→### Slide 2 — Executive summary (L13 or three L05s)
+   478→
+   479→**Key message:** three numbers defined the quarter — here they are.
+   480→On-slide: {{primary_metric}}: {{primary_now}} ({{primary_delta}} vs
+   481→{{previous_quarter}}) / {{secondary_metric}}: {{secondary_now}}
+   482→({{secondary_delta}}) / {{tertiary_metric}}: {{tertiary_now}}
+   483→({{tertiary_delta}}).
+   484→Speaker beat: good or bad, say it in the first 60 seconds — the room
+   485→already knows which it is.
+   486→
+   487→### Slide 3 — Primary metric, {{n}}-week trend (L12 chart-single)
+   488→
+   489→**Chart spec**
+   490→1. Type + series: line, one series
+   491→2. Metric + unit: {{primary_metric}} ({{primary_unit}})
+   492→3. Source: {{data_source}}, pulled {{pull_date}}
+   493→4. Annotation: mark {{annotation_event}} on the week it happened
+   494→5. Takeaway title: "Takeaway: {{trend_takeaway}}"
+   495→
+   496→Speaker beat: walk the annotation first ("this jump is the
+   497→{{annotation_event}} shipping"), then the trend.
+   498→
+   499→### Slide 4 — Channel / workstream breakdown (L13 chart-duo)
+   500→
+   501→**Chart A spec:** horizontal bar, {{channel_a_metric}} by
+   502→{{breakdown_dimension}}; source {{data_source_a}}; takeaway
+   503→"{{breakdown_a_takeaway}}".
+   504→**Chart B spec:** horizontal bar, {{channel_b_metric}} by the same
+   505→dimension; source {{data_source_b}}; takeaway
+   506→"{{breakdown_b_takeaway}}".
+   507→Speaker beat: name the best and the worst channel out loud — in that
+   508→order — and what the pair tells you together.
+   509→
+   510→### Slide 5 — The work shipped (L11 feature-grid-3-col)
+   511→
+   512→On-slide: six cards, verb-first: "Shipped {{shipped_item_1}}" …
+   513→"Shipped {{shipped_item_6}}", each with its one-line effect:
+   514→"{{shipped_effect_1}}". Speaker beat: one sentence per card, no more —
+   515→the deck exists so you don't have to recount the quarter verbosely.
+   516→
+   517→### Slide 6 — Misses and fixes (L15 table-data)
+   518→
+   519→**Key message:** we found what underperformed and here is the fix.
+   520→Table columns: Miss | Impact | The fix | Status. Rows:
+   521→{{miss_1}} | {{miss_1_impact}} | {{miss_1_fix}} | {{miss_1_status}}
+   522→…(cap at 4 misses; the fifth goes in the appendix).
+   523→Speaker beat: this slide buys more trust than slide 2. Read every miss
+   524→before every win you mention after it.
+   525→
+   526→### Slide 7 — Experiments (L15 table-data)
+   527→
+   528→Table columns: Test | Hypothesis | Result | Verdict. Rows:
+   529→{{test_1}} | {{hypothesis_1}} | {{result_1}} | {{verdict_1}} …
+   530→Verdicts are "double down / tweak / kill" — never "inconclusive"
+   531→without a next step attached.
+   532→
+   533→### Slide 8 — Spend vs plan (L12 chart-single)
+   534→
+   535→**Chart spec**
+   536→1. Type + series: two bars per month — planned vs actual
+   537→2. Metric + unit: {{budget_metric}} ({{currency}})
+   538→3. Source: {{finance_source}}, as of {{pull_date}}
+   539→4. Annotation: variance >{{variance_threshold}} gets a labeled note
+   540→5. Takeaway title: "Takeaway: {{spend_takeaway}}"
+   541→
+   542→Speaker beat: explain variance in one cause + one correction, not a
+   543→paragraph of accounting.
+   544→
+   545→### Slide 9 — Next quarter (L18 roadmap)
+   546→
+   547→Three priorities, outcome-named: "{{next_q_priority_1}}",
+   548→"{{next_q_priority_2}}", "{{next_q_priority_3}}", each with a target:
+   549→"→ {{priority_1_target}}". Speaker beat: three priorities, not seven —
+   550→a plan with seven priorities is a to-do list.
+   551→
+   552→### Slide 10 — The one decision (L20 closing-cta)
+   553→
+   554→On-slide: "{{the_decision}} by {{decision_date}}" plus the contact
+   555→strip. Speaker beat: reports end with a decision, not a "thank you" —
+   556→name the one call you need from them, then stop.
+   557→
+   558→## Building the charts
+   559→
+   560→1. Pull the data on {{pull_date}} or later — never before; stale
+   561→   numbers in a report cost the credibility of every other number.
+   562→2. Build charts natively in your slide tool (PowerPoint / Keynote /
+   563→   Google Slides / Figma) from the five-line spec; the spec is the
+   564→   contract between the data and the slide.
+   565→3. Every chart gets its source line at 14pt bottom-left. No source, no
+   566→   slide — this rule is why the deck survives scrutiny.
+   567→`,
+   568→
+   569→  /* ── 04 Speaker notes ──────────────────────────────────────────── */
+   570→
+   571→  "04-speaker-notes/speaker-notes.md": `# Speaker notes — what to say on every layout
+   572→
+   573→The layouts say what's on the slide; the notes say what to do while it's
+   574→up. Paste the relevant note into the notes pane of each slide, then edit
+   575→the {{merge_fields}}.
+   576→
+   577→## The three-part note (the pattern for any slide)
+   578→
+   579→1. **Beat:** what this slide means — one sentence you could say
+   580→   verbatim.
+   581→2. **Evidence:** the number or example behind the beat — the thing you
+   582→   say when someone challenges it.
+   583→3. **Bridge:** the one line that carries the room into the next slide.
+   584→
+   585→If you cannot write all three for a slide, the slide isn't ready to be
+   586→presented — it might not need to exist.
+   587→
+   588→## Timing (before you write a single note)
+   589→
+   590→| Deck | Runtime | Budget |
+   591→| --- | --- | --- |
+   592→| 12-slide pitch | 15 min with questions | ~60s per slide; slides 3, 10 and 12 get 90s |
+   593→| 10-slide report | 25 min with discussion | ~120s per slide; misses slide gets 240s |
+   594→| Warm intro (deck halved) | 8 min | Slides 1, 3, 5, 10, 12 of the pitch only |
+   595→
+   596→## What to say, layout by layout
+   597→
+   598→- **L01 cover-title:** Beat: "This is about {{project_name}} for
+   599→  {{client_company}}." Don't introduce yourself for two minutes — your
+   600→  name is on the strip; the agenda is more valuable than your bio.
+   601→- **L02 cover-agenda:** Beat: the three things. Say them as verbs.
+   602→  Bridge: "Let's start with the one you already feel."
+   603→- **L03 section-divider:** Say nothing for two seconds. The divider is
+   604→  a palate reset — use the silence, don't fill it.
+   605→- **L04 statement-slide:** Read it once, verbatim, slowly. Then say the
+   606→  evidence line. Never paraphrase your own thesis slide — it dilutes
+   607→  the sentence you chose as the most important in the deck.
+   608→- **L05 big-number:** Say the number, then the comparison, then stop
+   609→  for three seconds. The pause is the delivery.
+   610→- **L06 comparison-two-column:** Concede the row the weaker option
+   611→  legitimately wins. The concession is what makes the winning rows
+   612→  land.
+   613→- **L07 before-after:** "Same framing, same scale" — say it out loud
+   614→  once, while pointing at both halves. Then the caption.
+   615→- **L08 timeline:** Point at the client-dependency nodes while naming
+   616→  them. A timeline you present as effortless reads as unowned.
+   617→- **L09 process-flow:** For each step, name the output the client sees
+   618→  — not the work you do. Evidence: the output list under the line.
+   619→- **L10 feature-grid-2x2:** Read cells as questions, answer as
+   620→  policies. Bridge: "That's the downside mapped. Here's the upside
+   621→  you're buying."
+   622→- **L11 feature-grid-3-col:** One sentence per card, max. The grid does
+   623→  the enumeration; you do the meaning.
+   624→- **L12 chart-single:** Title first ("The takeaway is in the title —
+   625→  the chart is the evidence"), then the annotation, then the trend.
+   626→  Never narrate the line point by point.
+   627→- **L13 chart-duo:** Say what the pair tells you together, then the
+   628→  best and worst item. Bridge to the fix or the ask.
+   629→- **L14 chart-plus-commentary:** Let them read the three bullets
+   630→  silently for five seconds, then add the one thing that's not written.
+   631→- **L15 table-data:** Never read the table aloud. Say the row that
+   632→  matters, then invite the room to the others.
+   633→- **L16 quote-slide:** Read the quote in the speaker's voice — flat,
+   634→  unhurried. Attribution second. Never editorialize a quote before
+   635→  reading it.
+   636→- **L17 team-grid:** "You'll work directly with {{senior_name}}" —
+   637→  the org-chart reassurance beats the credential list.
+   638→- **L18 roadmap:** Priorities by outcome, then targets. If asked "when
+   639→  exactly", answer from the appendix, not by inventing dates.
+   640→- **L19 options-table:** "All three hit the outcome; they differ in
+   641→  depth and speed." Then silence. Let them read — the table was built
+   642→  to be read, not narrated.
+   643→- **L20 closing-cta:** Say the ask, verbatim. Then stop talking. The
+   644→  ten-second silence after the ask is the single most important moment
+   645→  in the deck — the first voice after it should not be yours.
+   646→
+   647→## Five delivery rules
+   648→
+   649→1. **Never read the slide.** The only exceptions: statements (L04),
+   650→   quotes (L16) and big numbers (L05) — written to be read aloud once.
+   651→2. **Pause after numbers.** Three seconds after L05, ten after the ask.
+   652→3. **One conversation, one voice.** Agree who fields questions before
+   653→   the room joins; "let me check with {{colleague}}" twice reads as
+   654→   unrehearsed.
+   655→4. **The table read.** Rehearse aloud, seated, once. Every sentence
+   656→   that doesn't survive being spoken gets edited on the spot.
+   657→5. **Remote:** share the slides, not your face, while presenting; the
+   658→   layouts carry the room. Bring your face back for questions — trust
+   659→   transfers in the Q&A, not the deck.
+   660→`,
+   661→
+   662→  /* ── 05 Setup ──────────────────────────────────────────────────── */
+   663→
+   664→  "05-setup/setup-guide.md": `# Setup guide — Presentation Template Pack
+   665→
+   666→The pack is tool-agnostic: the .md files are the source of truth, and
+   667→every layout, chart and note transfers to PowerPoint, Keynote, Google
+   668→Slides, Figma or Canva. This guide is the 45-minute path from download
+   669→to a presented deck.
+   670→
+   671→## What's in the pack
+   672→
+   673→- \`01-master-layouts/layout-index.csv\` — the 20 master layouts: id,
+   674→  purpose, grid and usage notes
+   675→- \`01-master-layouts/cover-sections.md\`, \`data-slides.md\`,
+   676→  \`story-slides.md\` — the layout spec docs (type scale, grids, copy
+   677→  patterns, chart rules)
+   678→- \`02-pitch-deck/pitch-deck-12-slides.md\` — a complete 12-slide client
+   679→  pitch, every slide written
+   680→- \`03-report-slides/quarterly-report-deck.md\` — a complete 10-slide
+   681→  quarterly report with chart specs
+   682→- \`04-speaker-notes/speaker-notes.md\` — the note pattern plus what to
+   683→  say on every layout
+   684→
+   685→## The 45-minute setup
+   686→
+   687→### 1. Pick the deck (5 min)
+   688→
+   689→| You need to | Start from |
+   690→| --- | --- |
+   691→| Win a project (freelancer / agency pitch) | \`pitch-deck-12-slides.md\` |
+   692→| Report quarterly results to a client | \`quarterly-report-deck.md\` |
+   693→| Build something else | The spec docs + \`layout-index.csv\` |
+   694→
+   695→### 2. Set up the master (10 min)
+   696→
+   697→In your slide tool, create a master slide per layout you'll use (both
+   698→decks need 8–10 of the 20). Copy the grid description from
+   699→\`layout-index.csv\` into the master's layout name — "L05 big-number
+   700→(number 60% / comparison right)" — so the layouts stay findable a
+   701→quarter from now. Apply the type scale from \`cover-sections.md\` once,
+   702→at the master level.
+   703→
+   704→### 3. Fill the deck (10 min)
+   705→
+   706→Paste each slide's "On-slide copy" from the .md into its layout. The
+   707→{{merge_fields}} are the same vocabulary the Proposal Pack uses —
+   708→{{client_name}}, {{project_name}}, {{tier_b_price}} — so a pitch deck
+   709→and its proposal read as one document.
+   710→
+   711→### 4. Rebuild the charts natively (10 min)
+   712→
+   713→Never screenshot a chart. Recreate it in the slide tool from the
+   714→five-line chart spec (type / metric / source / annotation / takeaway
+   715→title) defined in \`data-slides.md\`. Native charts stay editable when
+   716→the numbers move — and the numbers always move before the meeting.
+   717→
+   718→### 5. Write the speaker notes (5 min)
+   719→
+   720→Paste the layout's note from \`speaker-notes.md\` into each slide's
+   721→notes pane; edit the {{merge_fields}}. Then do the table read, out
+   722→loud, seated, once — editing every sentence that doesn't survive being
+   723→spoken.
+   724→
+   725→### 6. The pre-flight check (5 min)
+   726→
+   727→- Every slide answers one beat (say it out loud per slide)
+   728→- Every data slide has a takeaway title and a source line
+   729→- Body text ≥ 18pt; captions ≥ 14pt
+   730→- One ask, on the last slide, with a date
+   731→- The slide after the ask is black — no "thank you" slide
+   732→
+   733→## The four rules that make decks land
+   734→
+   735→1. **One message per slide.** Two messages means neither survives the
+   736→   room's recall test a week later.
+   737→2. **Takeaway titles.** The title states the conclusion; the chart is
+   738→   evidence. Topic titles make the audience do the work.
+   739→3. **18pt floor.** If it doesn't fit at 18pt, it's an appendix, not a
+   740→   slide.
+   741→4. **Every chart carries its source.** No source, no slide. The source
+   742→   line is why your numbers survive the skeptic in the room.
+   743→
+   744→## Troubleshooting
+   745→
+   746→- **"My deck is too long"** — merge, never shrink: font size is not a
+   747→  length strategy. Two related slides become one L14; three background
+   748→  slides become one appendix.
+   749→- **"Charts look different in PowerPoint"** — build them natively from
+   750→  the spec rather than pasting; the spec format exists precisely so
+   751→  the chart survives the tool.
+   752→- **"Presenting in a bright room"** — use the light variant: same
+   753→  layouts, background flipped, brand accent unchanged.
+   754→- **"They want the deck beforehand"** — send the PDF export of a
+   755→  notes-free version, and say so: "I'll send the version with speaker
+   756→  notes after the meeting."
+   757→
+   758→## Files reference
+   759→
+   760→| Path | What it is |
+   761→| --- | --- |
+   762→| \`01-master-layouts/*.csv/.md\` | 20 layouts + the spec docs |
+   763→| \`02-pitch-deck/*.md/.docx\` | the 12-slide client pitch |
+   764→| \`03-report-slides/*.md/.docx\` | the quarterly report deck |
+   765→| \`04-speaker-notes/*.md\` | notes for every layout |
+   766→| \`05-setup/*\` | this guide + walkthrough link |
+   767→`,
+   768→
+   769→  "05-setup/walkthrough-link.md": `# Walkthrough
+   770→
+   771→An 11-minute video walkthrough of this pack — the 20 layouts paged
+   772→through one by one, the pitch deck assembled live from a blank file,
+   773→and the chart spec turned into a native chart:
+   774→
+   775→**→ https://omniforge.example/walkthroughs/B-TP-3**
+   776→
+   777→Contents:
+   778→- 00:00 — The 45-minute setup
+   779→- 01:00 — The 20 layouts in 90 seconds (the index, read)
+   780→- 02:30 — The type scale and why 18pt is the floor
+   781→- 03:45 — The pitch deck assembled, slide by slide
+   782→- 06:10 — Chart specs → native charts in PowerPoint and Google Slides
+   783→- 08:20 — Speaker notes: the three-part pattern and the pauses
+   784→- 10:00 — The table read + the pre-flight check
+   785→
+   786→The video is hosted (not bundled) so the pack stays under 5 MB.
+   787→Questions: support@omniforge.example.
+   788→`,
+   789→
+   790→  /* kit stub note for the extended pack */
+   791→  "EXTENDED-PACK/pptx-master-file.md": `# Native .pptx master — in production
+   792→
+   793→Status: **in production** — not in this archive.
+   794→
+   795→What the finished file will contain: a native .pptx master with the 20
+   796→layouts installed as slide masters in dark and light themes, the type
+   797→scale preloaded, the L19 options table and L15 table as editable
+   798→components, and the chart specs mapped to the tool's native chart
+   799→types.
+   800→`,
+   801→};
+   802→
+   803→/* ── Try-it demo content — the same copy, playable in the studio ─── */
+   804→
+   805→export const demo: DemoContent = {
+   806→  kind: "templates",
+   807→  intro:
+   808→    "Open the flagship slides from the pack. Fill a merge field, watch it propagate, copy the result — this is the same copy you download.",
+   809→  templates: [
+   810→    {
+   811→      id: "pitch-plan",
+   812→      folder: "02-pitch-deck",
+   813→      title: "Pitch deck — Slide 5: The plan in one sentence",
+   814→      subject: "Layout L04 · if they remember one slide, this one",
+   815→      mergeFields: [
+   816→        { key: "client_company", sample: "Meridian Goods" },
+   817→        { key: "the_plan", sample: "rebuild the checkout around one-page payment" },
+   818→        { key: "deadline", sample: "March 31" },
+   819→      ],
+   820→      body: `**Key message:** if they remember one slide, this one.
+   821→
+   822→**On-slide copy:**
+   823→
+   824→"We will {{the_plan}} by {{deadline}}."
+   825→
+   826→**Visual direction:** one sentence, centered, 40–48pt, nothing else —
+   827→the same treatment as slide 4. The repetition is deliberate: claim,
+   828→then plan.
+   829→
+   830→**Speaker beat:** slow down. This sentence is the deck's thesis. Read
+   831→it once, verbatim, then say the evidence line and bridge: "Here's how
+   832→it works, step by step."`,
+   833→    },
+   834→    {
+   835→      id: "report-kpi",
+   836→      folder: "03-report-slides",
+   837→      title: "Quarterly report — Slide 2: Executive summary",
+   838→      subject: "Three numbers defined {{quarter}} — here they are",
+   839→      mergeFields: [
+   840→        { key: "quarter", sample: "Q3" },
+   841→        { key: "primary_metric", sample: "checkout conversion" },
+   842→        { key: "primary_delta", sample: "+0.4pts" },
+   843→        { key: "secondary_metric", sample: "support tickets" },
+   844→      ],
+   845→      body: `**Key message:** three numbers defined {{quarter}} — good or bad, the
+   846→room hears them in the first 60 seconds.
+   847→
+   848→**On-slide copy:**
+   849→
+   850→| Metric | Result | Change |
+   851→| --- | --- | --- |
+   852→| {{primary_metric}} | {{primary_now}} | {{primary_delta}} vs last quarter |
+   853→| {{secondary_metric}} | {{secondary_now}} | {{secondary_delta}} |
+   854→| {{tertiary_metric}} | {{tertiary_now}} | {{tertiary_delta}} |
+   855→
+   856→**Chart spec (slide 3, this metric's trend):**
+   857→1. Type + series: line, one series
+   858→2. Metric + unit: {{primary_metric}} ({{primary_unit}})
+   859→3. Source: {{data_source}}, pulled {{pull_date}}
+   860→4. Annotation: mark {{annotation_event}} on the week it happened
+   861→5. Takeaway title: "Takeaway: {{trend_takeaway}}"
+   862→
+   863→**Speaker beat:** walk the annotation first ("this jump is the
+   864→{{annotation_event}} shipping"), then the trend.`,
+   865→    },
+   866→    {
+   867→      id: "layout-big-number",
+   868→      folder: "01-master-layouts",
+   869→      title: "Layout L05 — Big number",
+   870→      subject: "One metric, its comparison, and nothing else",
+   871→      mergeFields: [
+   872→        { key: "big_number", sample: "38%" },
+   873→        { key: "comparison_line", sample: "of carts abandoned at payment — down from 44% in May" },
+   874→        { key: "period", sample: "last 30 days" },
+   875→      ],
+   876→      body: `**Purpose:** make one metric land emotionally before anyone reads
+   877→anything.
+   878→
+   879→**Grid:** number left (60% of the slide, 200pt+), context right.
+   880→
+   881→**Copy pattern:**
+   882→
+   883→- Number: {{big_number}} — the unit and period in small text
+   884→  ({{period}})
+   885→- Context: {{comparison_line}}
+   886→
+   887→**Rules:** always give the comparison — a number without a comparison
+   888→is a number nobody can feel. One big number per deck section.
+   889→
+   890→**Speaker note:** say the number, then the comparison, then stop for
+   891→three seconds. The pause is the delivery.`,
+   892→    },
+   893→  ],
+   894→};
+   895→

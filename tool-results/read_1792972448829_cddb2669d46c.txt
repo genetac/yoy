@@ -1,0 +1,741 @@
+     1→/* ════════════════════════════════════════════════════════════════════
+     2→   B-TP-1 · Email Template Pack — REFERENCE KIT
+     3→   11 fully-written emails, a 120-row subject-line bank, merge-field
+     4→   map, setup guide. Every file's key equals its bundle path.
+     5→   The Try-it demo (TemplateReader) reads the same copy.
+     6→   ════════════════════════════════════════════════════════════════════ */
+     7→
+     8→import type { DemoContent } from "../../catalog/schema";
+     9→
+    10→export const kitId = "B-TP-1";
+    11→
+    12→export const files: Record<string, string> = {
+    13→  /* ── 01 Welcome series ─────────────────────────────────────────── */
+    14→
+    15→  "01-welcome-series/day-0-welcome.md": `# Day 0 — Welcome + quick win
+    16→
+    17→**Send:** immediately after signup · **From:** {{sender_name}} at {{company_name}}
+    18→**Subject:** Welcome — here's the thing I promised you
+    19→**Preview text:** Plus the 5-minute setup that makes the rest work.
+    20→
+    21→---
+    22→
+    23→{{first_name}},
+    24→
+    25→Thanks for joining {{list_name}} — I'm glad you're here.
+    26→
+    27→I know why you signed up: {{signup_reason}}. So before anything else,
+    28→here's the quick win I promised — the same one I give my own clients
+    29→on day one:
+    30→
+    31→1. Open {{product_name}} and go straight to {{quick_win_screen}}.
+    32→2. Change **one** setting: {{quick_win_setting}}.
+    33→3. Watch what happens to {{quick_win_metric}} the next time you
+    34→   {{trigger_action}}.
+    35→
+    36→That's it. Five minutes, one meaningful result. Everything else I send
+    37→you builds on that single change.
+    38→
+    39→**What to expect from me:** one email every few days. Short, specific,
+    40→always with something you can use the same day. No "newsletter
+    41→updates", no filler — if I don't have something worth your attention,
+    42→I don't send.
+    43→
+    44→Reply and tell me how the quick win worked out — I read every reply.
+    45→
+    46→— {{sender_name}}
+    47→{{company_name}}
+    48→
+    49→*You're receiving this because you asked to join {{list_name}}.
+    50→Unsubscribe any time: {{unsubscribe_link}}*`,
+    51→
+    52→  "01-welcome-series/day-2-value.md": `# Day 2 — The mistake almost everyone makes
+    53→
+    54→**Send:** 2 days after Day 0 · **From:** {{sender_name}} at {{company_name}}
+    55→**Subject:** The mistake I made for 3 years
+    56→**Preview text:** So you can skip straight past it.
+    57→
+    58→---
+    59→
+    60→{{first_name}},
+    61→
+    62→Quick question: after you did the quick win, did you also
+    63→{{common_reflex_action}}?
+    64→
+    65→Almost everyone does. It feels productive. It's actually the single
+    66→biggest time-sink in {{category_name}} — and I did it for three years
+    67→before someone showed me the numbers.
+    68→
+    69→Here's what the numbers say:
+    70→
+    71→- {{reflex_stat_1}}
+    72→- {{reflex_stat_2}}
+    73→- {{reflex_stat_3}}
+    74→
+    75→The fix is counter-intuitive: {{counter_intuitive_fix}}. It takes the
+    76→same effort as the reflex, but compounds instead of resetting.
+    77→
+    78→**Your action today:** apply {{counter_intuitive_fix}} to
+    79→{{current_project}}. It takes about 15 minutes.
+    80→
+    81→Tomorrow I'll show you the full system — and where people usually get
+    82→it wrong.
+    83→
+    84→— {{sender_name}}
+    85→
+    86→*{{company_name}} · {{unsubscribe_link}}*`,
+    87→
+    88→  "01-welcome-series/day-4-story.md": `# Day 4 — The story that changed how I work
+    89→
+    90→**Send:** 4 days after Day 0 · **From:** {{sender_name}} at {{company_name}}
+    91→**Subject:** {{customer_name}} was ready to quit
+    92→**Preview text:** What happened next is the reason this email exists.
+    93→
+    94→---
+    95→
+    96→{{first_name}},
+    97→
+    98→{{customer_name}} almost became a statistic.
+    99→
+   100→Six months into {{category_name}}, {{customer_pronoun}} had nothing to
+   101→show for it: {{failure_snapshot}}. The spreadsheet was fine. The tools
+   102→were fine. The effort was there. The *results* weren't.
+   103→
+   104→What {{customer_pronoun}} changed isn't what you'd expect. It wasn't a
+   105→new tool or more hours — it was {{pivotal_change}}.
+   106→
+   107→Ninety days later: {{turnaround_result}}.
+   108→
+   109→I tell this story because the pattern repeats everywhere I look:
+   110→
+   111→1. Effort without a **feedback loop** always plateaus
+   112→2. Plateaus feel like personal failure — they're system failure
+   113→3. Fixing the system takes a afternoon; the *story* that you can't,
+   114→   takes years to unlearn
+   115→
+   116→The full walkthrough of {{pivotal_change}} — including the exact
+   117→{{artifact_name}} {{customer_pronoun}} used — is here: {{link}}.
+   118→
+   119→— {{sender_name}}
+   120→
+   121→*{{company_name}} · {{unsubscribe_link}}*`,
+   122→
+   123→  "01-welcome-series/day-6-offer.md": `# Day 6 — The soft pitch
+   124→
+   125→**Send:** 6 days after Day 0 · **From:** {{sender_name}} at {{company_name}}
+   126→**Subject:** The system behind everything I've sent you
+   127→**Preview text:** Plus who it's wrong for — that part matters.
+   128→
+   129→---
+   130→
+   131→{{first_name}},
+   132→
+   133→Over the last week you've used the quick win, sidestepped the
+   134→beginner trap, and seen what changes when the feedback loop exists.
+   135→
+   136→All of it comes from one system: {{product_name}}.
+   137→
+   138→**What it is:** {{product_one_liner}}
+   139→
+   140→**What's inside:**
+   141→- {{component_1}} — {{component_1_promise}}
+   142→- {{component_2}} — {{component_2_promise}}
+   143→- {{component_3}} — {{component_3_promise}}
+   144→- Plus {{bonus_name}} ({{bonus_worth}} value)
+   145→
+   146→**Who it's for:** {{ideal_customer}}.
+   147→**Who it's wrong for:** {{wrong_customer}} — if that's you, skip it and
+   148→keep using the free emails; that's what they're for.
+   149→
+   150→**Launch terms** (this week only): {{price}} instead of
+   151→{{compare_at_price}}, 30-day money-back guarantee.
+   152→**→ {{buy_link}}**
+   153→
+   154→Either way — thanks for a good week. Reply with questions; a human
+   155→(that's me) answers.
+   156→
+   157→— {{sender_name}}
+   158→
+   159→*{{company_name}} · {{unsubscribe_link}}*`,
+   160→
+   161→  /* ── 02 Cold outreach ──────────────────────────────────────────── */
+   162→
+   163→  "02-cold-outreach/opener-problem.md": `# Opener A — Problem-led
+   164→
+   165→**Use when:** you can see a specific, public problem the prospect has.
+   166→**Subject:** {{their_problem_in_three_words}}
+   167→**Length:** under 120 words.
+   168→
+   169→---
+   170→
+   171→Hi {{first_name}},
+   172→
+   173→Noticed {{observable_problem}} on {{observable_location}} —
+   174→specifically {{specific_detail}}.
+   175→
+   176→Companies in {{their_industry}} usually lose {{loss_metric}} to that
+   177→exact issue. The fix is usually {{short_fix}}, which takes
+   178→{{fix_time}}.
+   179→
+   180→We do this for {{peer_company_1}} and {{peer_company_2}}. Happy to send
+   181→the 1-page breakdown of how {{peer_company_1}}'s numbers moved — no
+   182→call needed.
+   183→
+   184→Worth a look?
+   185→
+   186→— {{sender_name}}
+   187→
+   188→---
+   189→
+   190→**Why it works:** leads with *their* world, not yours; offers proof
+   191→before asking for time; the ask is a yes/no, not a calendar link.`,
+   192→
+   193→  "02-cold-outreach/opener-referral.md": `# Opener B — Referral-led
+   194→
+   195→**Use when:** a named person connected you (mutual acquaintance,
+   196→investor, customer overlap).
+   197→**Subject:** {{mutual_name}} said to email you
+   198→**Length:** under 110 words.
+   199→
+   200→---
+   201→
+   202→Hi {{first_name}},
+   203→
+   204→{{mutual_name}} suggested I reach out — {{mutual_reason}}
+   205→({{mutual_quote}} if you want the exact words).
+   206→
+   207→Short version: we help {{their_role}}s at {{their_company_type}} with
+   208→{{core_outcome}}. {{mutual_name}} thought your
+   209→{{relevant_initiative}} makes you the right kind of fit.
+   210→
+   211→If useful, I can share {{proof_artifact}} — it shows
+   212→{{proof_specific}} for a team like yours. No call required.
+   213→
+   214→Want me to send it?
+   215→
+   216→— {{sender_name}}
+   217→
+   218→---
+   219→
+   220→**Why it works:** the mutual name is the subject line; permission is
+   221→implied by the referral; again — zero asks for meetings.`,
+   222→
+   223→  "02-cold-outreach/opener-trigger.md": `# Opener C — Trigger-led
+   224→
+   225→**Use when:** a verifiable event just happened (funding, hire, launch,
+   226→expansion, incident).
+   227→**Subject:** About {{trigger_event}}
+   228→**Length:** under 100 words.
+   229→
+   230→---
+   231→
+   232→Hi {{first_name}},
+   233→
+   234→Saw {{trigger_event}} — congratulations, {{relevant_congrats}}.
+   235→
+   236→Teams right after {{trigger_event}} usually hit
+   237→{{post_trigger_problem}} within {{time_window}}. When that lands,
+   238→{{consequence}}.
+   239→
+   240→We built {{short_solution}} exactly for that window:
+   241→{{proof_company}} saw {{proof_result}} in {{proof_timeframe}}.
+   242→
+   243→One-page breakdown, no call: {{yes_or_no}}?
+   244→
+   245→— {{sender_name}}
+   246→
+   247→---
+   248→
+   249→**Why it works:** timing does the convincing; the congratulations is
+   250→specific (not "congrats on the news!"); the pattern-interrupt is the
+   251→"no call" close.`,
+   252→
+   253→  "02-cold-outreach/merge-field-map.csv": `merge_field,where_it_appears,example_value,if_missing
+   254→first_name,every opener,Maya,drop the email entirely
+   255→sender_name,signature + body,Jonas,use company name
+   256→company_name,signature,Forge Labs,omit line
+   257→their_problem_in_three_words,subject line (opener A),Cart leaks,rewrite subject
+   258→observable_problem,body (opener A),checkout errors,body without it fails — research first
+   259→observable_location,body (opener A),pricing page,required
+   260→specific_detail,body (opener A),404 on /pricing,required
+   261→their_industry,body (opener A),DTC retail,required
+   262→loss_metric,body (opener A),8% of revenue,use category default
+   263→short_fix,body (opener A),CDN cache rule,required
+   264→fix_time,body (opener A),under an hour,required
+   265→peer_company_1,body (opener A),Hearth Co,required
+   266→peer_company_2,body (opener A),Lumen Goods,required
+   267→mutual_name,subject + body (opener B),Priya,required — never fake
+   268→mutual_reason,body (opener B),shared board seat,required
+   269→mutual_quote,body (opener B),"""they run the tightest ops in the category""",optional
+   270→their_role,body (opener B),Head of Ops,required
+   271→their_company_type,body (opener B),Series B startups,required
+   272→core_outcome,body (opener B),cut infra spend 30%,required
+   273→relevant_initiative,body (opener B),the EU expansion,required
+   274→proof_artifact,body (opener B),the Lumen teardown,required
+   275→proof_specific,body (opener B),savings per order,required
+   276→trigger_event,subject + body (opener C),the Series A,required
+   277→relevant_congrats,body (opener C),on the clean cap table,be specific or cut
+   278→post_trigger_problem,body (opener C),onboarding debt,required
+   279→time_window,body (opener C),90 days,use 90 days
+   280→consequence,body (opener C),CSAT drops a full point,required
+   281→short_solution,body (opener C),the 2-week onboarding kit,required
+   282→proof_company,body (opener C),Verano,required
+   283→proof_result,body (opener C),+0.8 CSAT,required
+   284→proof_timeframe,body (opener C),6 weeks,required
+   285→yes_or_no,close (opener C),Want it,keep it lowercase`,
+   286→
+   287→  /* ── 03 Follow-up ──────────────────────────────────────────────── */
+   288→
+   289→  "03-follow-up/day-3-nudge.md": `# Day 3 — The gentle nudge
+   290→
+   291→**Use on:** proposals, replies-gone-cold, post-demo silence.
+   292→**Subject:** Re: {{original_subject}}
+   293→**Length:** under 60 words. Reply in-thread.
+   294→
+   295→---
+   296→
+   297→{{first_name}},
+   298→
+   299→Floating this back up — I know {{their_week}} weeks like this.
+   300→
+   301→One thing that might help the decision: {{decision_helper}}. Happy to
+   302→share regardless of what you decide.
+   303→
+   304→If the timing is simply wrong, a one-word "later" works and I'll
+   305→circle back in {{later_window}}.
+   306→
+   307→— {{sender_name}}
+   308→
+   309→---
+   310→
+   311→**Why it works:** stays in-thread (context preserved); gives before
+   312→asking again; offers an easy exit — which, counter-intuitively, keeps
+   313→deals alive.`,
+   314→
+   315→  "03-follow-up/day-7-value-add.md": `# Day 7 — The value add
+   316→
+   317→**Use on:** the follow-up after the nudge. Never ask for anything.
+   318→**Subject:** {{value_subject}}
+   319→**Length:** under 80 words.
+   320→
+   321→---
+   322→
+   323→{{first_name}},
+   324→
+   325→No ask today — just something useful.
+   326→
+   327→We mapped {{relevant_process}} across {{sample_size}}
+   328→{{their_company_type}}s. The pattern that surprised us:
+   329→{{surprising_finding}}.
+   330→
+   331→The one-pager is here: {{link}}. Numbers, method and the raw data are
+   332→all in it — steal whatever's useful.
+   333→
+   334→(If the original thread is still alive on your side, I'm still glad to
+   335→continue it whenever.)
+   336→
+   337→— {{sender_name}}
+   338→
+   339→---
+   340→
+   341→**Why it works:** re-earns attention instead of spending it; the
+   342→"no ask" line is honest (there is no ask); the data gift is specific
+   343→to their world.`,
+   344→
+   345→  "03-follow-up/day-14-last-call.md": `# Day 14 — The last call
+   346→
+   347→**Use on:** final follow-up in a sequence. One per thread, ever.
+   348→**Subject:** Closing the loop on {{original_subject}}
+   349→**Length:** under 70 words.
+   350→
+   351→---
+   352→
+   353→{{first_name}},
+   354→
+   355→I'll assume {{topic}} isn't a priority right now and close the loop
+   356→on my side — no hard feelings, timing is a real thing.
+   357→
+   358→If it comes back around, the shortest path is a reply to this email;
+   359→it lands at the top of my queue.
+   360→
+   361→Last thing: {{parting_gift}} is yours regardless: {{link}}.
+   362→
+   363→— {{sender_name}}
+   364→
+   365→---
+   366→
+   367→**Why it works:** "closing the loop" is the least needy close that
+   368→exists; the door stays open with a specific mechanism; the parting
+   369→gift ends the sequence with value, not guilt.`,
+   370→
+   371→  "03-follow-up/win-back.md": `# Win-back — 6 months later
+   372→
+   373→**Use on:** churned customers or dead threads, once.
+   374→**Subject:** What changed since you left
+   375→**Length:** under 90 words.
+   376→
+   377→---
+   378→
+   379→{{first_name}},
+   380→
+   381→You tried {{product_name}} back in {{original_period}}. Since then,
+   382→the thing that probably drove you away — {{likely_churn_reason}} — is
+   383→fixed: {{fix_description}}.
+   384→
+   385→If you want to see it, the 2-minute version is here: {{link}}. Your
+   386→old {{account_artifact}} still exists, so nothing to rebuild.
+   387→
+   388→If {{category_name}} still isn't on your list, ignore me and it's the
+   389→last you'll hear for another six months.
+   390→
+   391→— {{sender_name}}
+   392→
+   393→---
+   394→
+   395→**Why it works:** names the likely churn reason before they have to;
+   396→respects the "last you'll hear" promise; reactivating an old account
+   397→beats starting a new one — for both sides.`,
+   398→
+   399→  /* ── 04 Subject-line bank (120 rows) ───────────────────────────── */
+   400→
+   401→  "04-subject-lines/subject-line-bank.csv": `subject_line,intent,tags,proven_on,notes
+   402→Welcome — here's the thing I promised you,welcome,promise;delivery,onboarding sequences,front-loads the promise
+   403→Your first result is 5 minutes away,welcome,quick-win;time-box,onboarding sequences,concrete time-box
+   404→The mistake I made for 3 years,welcome,story;vulnerability,newsletter welcomes,curiosity + humility
+   405→What nobody tells you about {{topic}},welcome,curiosity;contrarian,newsletter welcomes,generic but tests well
+   406→Before you open {{product_name}},welcome,priming,onboarding sequences,anticipation beat
+   407→The 10 minutes that saved me 10 hours,welcome,story;time-roi,newsletter welcomes,time math always opens
+   408→The {{their_problem}} fix, on one page,welcome,specificity;utility,onboarding sequences,utility first
+   409→You made the right call joining {{list_name}},welcome,reassurance,onboarding sequences,reduces buyer's remorse
+   410→Noticed something on your {{page_type}},outreach,observation;cold,email outreach,pair with opener A
+   411→{{their_problem_in_three_words}},outreach,mirror;cold,email outreach,subject mirrors their words
+   412→About {{trigger_event}},outreach,trigger;cold,email outreach,pair with opener C
+   413→{{mutual_name}} said to email you,outreach,referral;cold,email outreach,pair with opener B
+   414→A question about {{relevant_initiative}},outreach,question;cold,email outreach,questions out-open statements
+   415→{{peer_company}}'s {{metric}} — the breakdown,outreach,proof;cold,email outreach,social proof in subject
+   416→Wrong number?,outreach,pattern-interrupt;cold,email outreach,high risk — split test first
+   417→Quick one, {{first_name}},outreach,short;cold,email outreach,under 25 chars
+   418→Your {{page_type}} has a leak,outreach,problem;cold,email outreach,only if verifiably true
+   419→Re: our {{event_type}} conversation,outreach,continuation,email outreach,in-thread follow-ups only
+   420→The 1-page {{topic}} breakdown,outreach,utility;cold,email outreach,utility promise
+   421→Saw your {{trigger_event}} — congrats,outreach,trigger;cold,email outreach,specific congrats beat generic
+   422→Worth a look?,outreach,yes-no;cold,email outreach,micro-ask subject
+   423→Day 3 nudge — still worth it?,follow-up,nudge,post-proposal follow-up,in-thread reply preferred
+   424→Re: {{original_subject}},follow-up,in-thread,post-proposal follow-up,context preserved
+   425→Still on your desk?,follow-up,nudge,post-proposal follow-up,physical metaphor
+   426→One thing for the decision,follow-up,decision-helper,post-proposal follow-up,pair with day-3
+   427→No ask today,follow-up,value-add,post-demo follow-up,honest — there is no ask
+   428→Something useful, no strings,follow-up,value-add,post-demo follow-up,curiosity without bait
+   429→The pattern we found in {{sample_size}} {{type}}s,follow-up,data;value-add,post-demo follow-up,sample size = credibility
+   430→This changed the numbers — see for yourself,follow-up,proof,post-demo follow-up,show don't tell
+   431→Should I close the file?,follow-up,last-call,dead threads,gentle exit
+   432→Closing the loop on {{original_subject}},follow-up,last-call,dead threads,respectful exit
+   433→Bumping this one last time,follow-up,last-call,dead threads,use sparingly
+   434→If timing is the only problem,follow-up,timing,dead threads,keeps door open
+   435→Later works too — just say the word,follow-up,timing,dead threads,easy exit
+   436→When it's a no, tell me,follow-up,clarity,dead threads,prefers truth over hope
+   437→The one-question version,follow-up,simplification,post-demo follow-up,shrinks the ask
+   438→{{parting_gift}} — yours regardless,follow-up,gift,dead threads,value at exit
+   439→What changed since you left,win-back,fixed-churn,lapsed customers,leads with the fix
+   440→The {{churn_reason}} problem is fixed,win-back,fixed-churn,lapsed customers,name the real reason
+   441→Your {{account_artifact}} still exists,win-back,reactivation,lapsed customers,zero-rebuild promise
+   442→6 months, one fix,win-back,re-engage,lapsed customers,time + fix
+   443→We shipped what you asked for,win-back,shipped-request,lapsed customers,only if literally true
+   444→Give it one more week,win-back,re-engage,lapsed customers,soft second chance
+   445→The invoice-killer feature,win-back,objection;lapsed,lapsed customers,only if that was the objection
+   446→Ready when you are,win-back,open-door,lapsed customers,zero pressure
+   447→Before your renewal date,win-back,timing,lapsed customers,calendar-driven
+   448→What {{n}} customers changed next,win-back,social-proof,lapsed customers,cohort story
+   449→You were right about {{product_area}},win-back,validation,lapsed customers,concede honestly
+   450→The 5-minute setup, on one screen,welcome,utility;time-box,onboarding sequences,screenshot pairs well
+   451→Your week-1 plan,welcome,plan;onboarding,onboarding sequences,structure reduces anxiety
+   452→What to expect from me,welcome,expectation-setting,onboarding sequences,anti-newsletter promise
+   453→The 3 settings that matter,welcome,utility;specificity,onboarding sequences,numbered promise
+   454→Skip the queue — start here,welcome,orientation,onboarding sequences,reduces choice paralysis
+   455→The beginner's trap,welcome,warning;contrarian,newsletter welcomes,pairs with day-2 email
+   456→Everyone does this (don't),welcome,warning;contrarian,newsletter welcomes,gentle warning
+   457→The numbers behind the mistake,welcome,data;story,newsletter welcomes,proof for day-2
+   458→The afternoon fix that compounds,welcome,counter-intuitive,newsletter welcomes,contrarian fix
+   459→{{customer_name}} was ready to quit,welcome,story;turnaround,newsletter welcomes,pairs with day-4
+   460→90 days later: {{result}},welcome,story;turnaround,newsletter welcomes,outcome first
+   461→The system behind the emails,welcome,bridge-to-offer,onboarding sequences,pairs with day-6
+   462→Who this is wrong for,welcome,honesty;offer,onboarding sequences,disqualifies honestly
+   463→Launch week: {{price}} not {{compare_at}},welcome,offer;price,onboarding sequences,transparent pricing
+   464→The guarantee, in plain words,welcome,offer;guarantee,onboarding sequences,risk removal
+   465→A question before the week ends,welcome,engagement,onboarding sequences,reply-bait
+   466→Hit reply with your {{metric}},welcome,engagement,onboarding sequences,makes replies easy
+   467→The template from {{scenario}},value,utility;template,newsletter sends,attach real artifact
+   468→Steal this {{artifact_name}},value,utility;gift,newsletter sends,permission granted
+   469→The exact {{process}} we use,value,process;utility,newsletter sends,internal transparency
+   470→I was wrong about {{topic}},value,vulnerability,newsletter sends,trust builder
+   471→The {{timeframe}} teardown,value,teardown,newsletter sends,recurring format
+   472→Numbers, method, raw data,value,transparency,newsletter sends,link triples open rate
+   473→Ask me anything about {{topic}},value,engagement,newsletter sends,reply-bait
+   474→The case against {{common_advice}},value,contrarian,newsletter sends,myth-busting
+   475→What {{group}} gets wrong,value,contrarian;specificity,newsletter sends,specific beats general
+   476→The cheaper way to {{outcome}},value,cost;utility,newsletter sends,saves them money
+   477→Do this, not that,value,comparison,newsletter sends,scannable format
+   478→The 2-minute audit,value,audit;time-box,newsletter sends,diagnostic gift
+   479→Your {{metric}} is lying to you,value,data;contrarian,newsletter sends,metric myth-busting
+   480→From {{before}} to {{after}},value,transformation,newsletter sends,before/after proof
+   481→The one slide that explains it,value,simplicity,newsletter sends,dense-idea digest
+   482→Nothing to sell today,value,no-sell,newsletter sends,subject matches content
+   483→The unglamorous thing that works,value,honesty,newsletter sends,anti-hack
+   484→Year in review — the honest version,value,retrospective,year-end sends,annual format
+   485→What we're keeping in {{year}},value,intentions,year-end sends,annual format
+   486→The waitlist is open (early access),launch,scarcity;access,product launches,time-boxed
+   487→Doors open: {{date_and_time}},launch,launch;specificity,product launches,exact timestamp
+   488→24 hours early — because you're on this list,launch,early-access,product launches,list privilege
+   489→The first {{n}} get {{bonus}},launch,bonus;scarcity,product launches,honest cap
+   490→Price goes up {{date}},launch,deadline;price,product launches,only if true
+   491→The last day for {{price}},launch,deadline;price,product launches,final call
+   492→We're closing {{date}} (for real),launch,deadline,product launches,never fake this
+   493→Sold out — waitlist inside,launch,sold-out,product launches,turns scarcity into list growth
+   494→What's inside: the full walkthrough,launch,transparency,product launches,demo email
+   495→The top 3 questions, answered,launch,objection-handling,product launches,FAQ beat
+   496→Is this you? (honest checklist),launch,qualification,product launches,self-selection
+   497→The offer in one screen,launch,simplicity,product launches,single-link email
+   498→Cart open — 72 hours,launch,window,product launches,concrete window
+   499→One seat left in {{cohort}},launch,cohort;scarcity,live programs,only if literally true
+   500→Your receipt + first steps,purchase,onboarding;logistics,purchase confirmations,bridge to usage
+   501→Here's your login,purchase,logistics,purchase confirmations,minimal friction
+   502→The file you asked for,purchase,attachment,purchase follow-ups,delivery first
+   503→How was your first week?,purchase,check-in,purchase follow-ups,survey lite
+   504→You're {{n}}% through the course,purchase,progress,product usage,progress nudge
+   505→Stuck? Here's the shortcut,purchase,support,product usage,proactive help
+   506→The update you voted for,product,shipped;feedback,existing customers,closes the loop
+   507→New: {{feature_name}},product,shipped,existing customers,changelog email
+   508→We fixed {{bug_name}},product,fixed,existing customers,plain-language fix note
+   509→{{feature}} is now {{faster_metric}} faster,product,performance,existing customers,quantified
+   510→The roadmap for {{quarter}},product,transparency,existing customers,sets expectations
+   511→Sunsetting {{feature}} — here's why,product,sunset;honesty,existing customers,respectful sunset
+   512→Your data export is ready,product,data;logistics,existing customers,portability gesture
+   513→Renewal in 30 days (and what's new),product,renewal,existing customers,earn the renewal
+   514→Bring a friend to {{event}},event,invite,community events,plus-one
+   515→The replay is up,event,replay,webinars,24-hour window works
+   516→Your seat + the prep list,event,logistics,live workshops,prep reduces no-shows
+   517→See you {{day}} at {{time}},event,reminder,live workshops,final reminder
+   518→The recording + top 3 moments,event,recap,live workshops,value archive
+   519→Rsvp: {{deadline}} is firm,event,deadline,live workshops,soft deadline stated
+   520→What you missed (and where to find it),event,recap,live workshops,FOMO-lite
+   521→Notes from {{event_name}},event,notes,conferences,unique value
+   522→The discount inside expires tonight,reminder,deadline,cart abandonment,only once per cart
+   523→You left {{product_name}} in the cart,reminder,cart-recovery,cart abandonment,factual not guilt
+   524→Still thinking it over?,reminder,check-in,cart abandonment,one gentle beat
+   525→Your trial ends {{date}},reminder,trial-deadline,product trials,decision point
+   526→The {{n}}-day trial results,reminder,trial-recap,product trials,usage-based nudge
+   527→Last day of your trial,reminder,final-deadline,product trials,clear CTA
+   528→What you'd lose (honest list),reminder,value-recap,product trials,features-used recap
+   529→`,
+   530→
+   531→  /* ── 05 Setup ──────────────────────────────────────────────────── */
+   532→
+   533→  "05-setup/setup-guide.md": `# Setup guide — Email Template Pack
+   534→
+   535→Everything in this pack is copy-paste-then-edit. This guide shows the
+   536→30-minute path from download to first send.
+   537→
+   538→## What's in the pack
+   539→
+   540→- 11 emails: a 4-email welcome series, 3 cold-outreach openers,
+   541→  4 follow-up templates (day-3 / day-7 / day-14 / win-back)
+   542→- \`04-subject-lines/subject-line-bank.csv\` — 120 subject lines tagged
+   543→  by intent (\`welcome\`, \`outreach\`, \`follow-up\`, \`win-back\`,
+   544→  \`value\`, \`launch\`, \`purchase\`, \`product\`, \`event\`,
+   545→  \`reminder\`) with notes on when each pattern wins
+   546→- \`02-cold-outreach/merge-field-map.csv\` — every merge field, where
+   547→  it appears, an example value, and what to do if it's missing
+   548→
+   549→## The 30-minute setup
+   550→
+   551→### 1. Load the pack (5 min)
+   552→
+   553→Open the DOCX files in Word / Google Docs / Pages — or the .md sources
+   554→in any editor. Keep \`merge-field-map.csv\` open in a second tab; it's
+   555→your reference for every placeholder.
+   556→
+   557→### 2. Define your voice replacements (10 min)
+   558→
+   559→Find-and-replace these once, across all files:
+   560→
+   561→| Placeholder | Replace with |
+   562→| --- | --- |
+   563→| \`{{sender_name}}\` | your first name |
+   564→| \`{{company_name}}\` | your brand |
+   565→| \`{{product_name}}\` | what you sell |
+   566→| \`{{list_name}}\` | the list/community name |
+   567→
+   568→Then per-email fields (\`{{first_name}}\`, \`{{signup_reason}}\`, …)
+   569→get filled by your ESP or by hand — the map says which.
+   570→
+   571→### 3. Pick your subject lines (5 min)
+   572→
+   573→Open the subject bank. Filter \`intent\` to the sequence you're
+   574→building. Pick **two** per email — every subject line is written to
+   575→survive an A/B test.
+   576→
+   577→### 4. Sequence and send (10 min)
+   578→
+   579→1. Welcome series: load days 0/2/4/6 into your ESP as a 4-step
+   580→   automation, trigger = list join.
+   581→2. Cold outreach: openers go out **one at a time** — never all three
+   582→   to the same person.
+   583→3. Follow-ups: day-3/day-7/day-14 chain off your sends; win-back is a
+   584→   **6-month-later** one-off.
+   585→
+   586→## Rules that make the templates work
+   587→
+   588→1. **Under 120 words for cold, under 90 for follow-ups.** Every
+   589→   template is already inside the limit — your edits shouldn't escape
+   590→   it.
+   591→2. **One ask per email.** The ask is always either a yes/no or a
+   592→   one-click. Never "book 30 minutes".
+   593→3. **Merge fields or it doesn't send.** If \`{{first_name}}\` is
+   594→   empty, delete the row. A missing name reads as spam faster than no
+   595→   name at all.
+   596→4. **Reply, always.** These templates are written to generate replies.
+   597→   Answer them within 24 hours or the whole system decays.
+   598→
+   599→## Troubleshooting
+   600→
+   601→- **"My ESP stripped the formatting"** — paste as plain text; the
+   602→  structure (short paragraphs, one-line asks) survives without styles.
+   603→- **"Open rates under 30%"** — subject line first, sender name second,
+   604→  list quality third. The bank's \`notes\` column tells you which
+   605→  patterns to A/B against.
+   606→- **"Someone replied grumpy to a cold email"** — reply like a human,
+   607→  apologise once, move on. Opener A's research requirement exists
+   608→  precisely to keep this rare.
+   609→
+   610→## Files reference
+   611→
+   612→| Path | What it is |
+   613→| --- | --- |
+   614→| \`01-welcome-series/*.md/.docx\` | 4-email welcome automation |
+   615→| \`02-cold-outreach/*.md\` | 3 openers + merge-field map |
+   616→| \`03-follow-up/*.md/.docx\` | nudge / value-add / last-call / win-back |
+   617→| \`04-subject-lines/*.csv\` | 120-row subject bank |
+   618→| \`05-setup/*\` | this guide + walkthrough link |
+   619→`,
+   620→
+   621→  "05-setup/walkthrough-link.md": `# Walkthrough
+   622→
+   623→A 6-minute video walkthrough of this pack — every email annotated with
+   624→why it works and where to edit first:
+   625→
+   626→**→ https://omniforge.example/walkthroughs/B-TP-1**
+   627→
+   628→Contents:
+   629→- 00:00 — The 30-minute setup
+   630→- 01:12 — Voice replacements (find & replace once)
+   631→- 02:30 — Welcome series, annotated
+   632→- 03:48 — Cold openers: research first, send second
+   633→- 04:55 — Follow-up cadence and the easy-exit close
+   634→- 05:40 — Reading the subject-line bank
+   635→
+   636→The video is hosted (not bundled) so the pack stays under 5 MB.
+   637→`,
+   638→
+   639→  /* kit stub note for the extended pack */
+   640→  "EXTENDED-PACK/dark-mode-html-variants.md": `# Dark-mode HTML variants — in production
+   641→
+   642→Status: **in production** — not in this archive.
+   643→
+   644→What the finished file will contain: dark-mode-safe HTML versions of
+   645→all 11 emails, tested in Gmail (web + iOS/Android), Apple Mail and
+   646→Outlook mobile rendering engines, with a tested \`color-scheme\`
+   647→meta strategy and per-client fallback table.
+   648→`,
+   649→};
+   650→
+   651→/* ── Try-it demo content — the same copy, playable in the studio ─── */
+   652→
+   653→export const demo: DemoContent = {
+   654→  kind: "templates",
+   655→  intro:
+   656→    "Open the flagship emails from the pack. Fill a merge field, watch it propagate, copy the result — this is the actual copy you download.",
+   657→  templates: [
+   658→    {
+   659→      id: "day-0",
+   660→      folder: "01-welcome-series",
+   661→      title: "Day 0 — Welcome + quick win",
+   662→      subject: "Welcome — here's the thing I promised you",
+   663→      mergeFields: [
+   664→        { key: "first_name", sample: "Maya" },
+   665→        { key: "company_name", sample: "Forge Labs" },
+   666→        { key: "quick_win_screen", sample: "the Alerts tab" },
+   667→      ],
+   668→      body: `{{first_name}},
+   669→
+   670→Thanks for joining — I'm glad you're here.
+   671→
+   672→Before anything else, here's the quick win I promised: open
+   673→{{product_name}} and go straight to {{quick_win_screen}}. Change one
+   674→setting, and watch what happens the next time you publish.
+   675→
+   676→That's it. Five minutes, one meaningful result. Everything else I
+   677→send builds on that single change.
+   678→
+   679→**What to expect from me:** one email every few days. Short,
+   680→specific, always with something you can use the same day. No
+   681→"newsletter updates", no filler.
+   682→
+   683→Reply and tell me how the quick win worked out — I read every reply.
+   684→
+   685→— {{sender_name}}
+   686→{{company_name}}`,
+   687→    },
+   688→    {
+   689→      id: "opener-a",
+   690→      folder: "02-cold-outreach",
+   691→      title: "Opener A — Problem-led",
+   692→      subject: "{{their_problem_in_three_words}}",
+   693→      mergeFields: [
+   694→        { key: "first_name", sample: "Daniel" },
+   695→        { key: "observable_problem", sample: "checkout errors" },
+   696→        { key: "observable_location", sample: "the pricing page" },
+   697→        { key: "peer_company_1", sample: "Hearth Co" },
+   698→      ],
+   699→      body: `Hi {{first_name}},
+   700→
+   701→Noticed {{observable_problem}} on {{observable_location}} —
+   702→specifically the 404 that fires when the annual toggle flips.
+   703→
+   704→Companies in your category usually lose 6–8% of checkouts to exactly
+   705→that. The fix is usually a one-line cache rule, which takes under an
+   706→hour.
+   707→
+   708→We do this for {{peer_company_1}} and Lumen Goods. Happy to send the
+   709→1-page breakdown of how Hearth's numbers moved — no call needed.
+   710→
+   711→Worth a look?
+   712→
+   713→— {{sender_name}}`,
+   714→    },
+   715→    {
+   716→      id: "day-7",
+   717→      folder: "03-follow-up",
+   718→      title: "Day 7 — The value add",
+   719→      subject: "Something useful, no strings",
+   720→      mergeFields: [
+   721→        { key: "first_name", sample: "Priya" },
+   722→        { key: "surprising_finding", sample: " Tuesday is the worst send day" },
+   723→        { key: "sample_size", sample: "214" },
+   724→      ],
+   725→      body: `{{first_name}},
+   726→
+   727→No ask today — just something useful.
+   728→
+   729→We mapped onboarding emails across {{sample_size}} B2B SaaS teams.
+   730→The pattern that surprised us: {{surprising_finding}}. The one-pager
+   731→with numbers, method and the raw data: {{link}} — steal whatever's
+   732→useful.
+   733→
+   734→(If the original thread is still alive on your side, I'm still glad
+   735→to continue it whenever.)
+   736→
+   737→— {{sender_name}}`,
+   738→    },
+   739→  ],
+   740→};
+   741→

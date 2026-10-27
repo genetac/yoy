@@ -1,0 +1,814 @@
+     1→"use client";
+     2→
+     3→import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+     4→import { AnimatePresence, motion } from "motion/react";
+     5→import {
+     6→  X,
+     7→  Eye,
+     8→  Package,
+     9→  GitCompare,
+    10→  Check,
+    11→  Clock,
+    12→  DollarSign,
+    13→  Layers,
+    14→  FileText,
+    15→  Monitor,
+    16→  Tablet,
+    17→  Smartphone,
+    18→  Lock,
+    19→  Info,
+    20→  ChevronLeft,
+    21→  ChevronRight,
+    22→  Sparkles,
+    23→  Gauge,
+    24→  Keyboard,
+    25→} from "lucide-react";
+    26→import type { MockupConfig } from "@/data/businessTypes";
+    27→import type { ProductExample } from "@/data/exampleProducts";
+    28→import { FamilyPreview } from "./FamilyPreview";
+    29→import { deriveOffer, formatPrice, type ListingOffer } from "./product-catalog";
+    30→import { PurchaseButton } from "./purchase-flow";
+    31→import {
+    32→  getPackage,
+    33→  lowTierPackage,
+    34→  midTierPackage,
+    35→  highTierPackage,
+    36→  enterpriseTierPackage,
+    37→  tierDisplay,
+    38→  type Tier,
+    39→} from "@/data/servicePackages";
+    40→import { familyTokens, getFamilyForProductType, type DesignFamilyId } from "@/data/designFamilies";
+    41→import { overlayIn, panelIn } from "@/lib/motion";
+    42→import { cn } from "@/lib/utils";
+    43→
+    44→type Props = {
+    45→  config: MockupConfig;
+    46→  businessName: string;
+    47→  onClose: () => void;
+    48→  example?: ProductExample;
+    49→  /** Catalog context for the end-product offer panel */
+    50→  offerContext?: {
+    51→    tierLetter: string;
+    52→    productTypeId: string;
+    53→    productName: string;
+    54→  };
+    55→};
+    56→
+    57→type Tab = "preview" | "services" | "comparison";
+    58→type Device = "desktop" | "tablet" | "mobile";
+    59→
+    60→const tierAccent: Record<Tier, { text: string; bg: string; border: string }> = {
+    61→  low: { text: "text-amber-600 dark:text-amber-400", bg: "bg-amber-50 dark:bg-amber-950/30", border: "border-amber-200 dark:border-amber-800" },
+    62→  mid: { text: "text-sky-600 dark:text-sky-400", bg: "bg-sky-50 dark:bg-sky-950/30", border: "border-sky-200 dark:border-sky-800" },
+    63→  high: { text: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-50 dark:bg-emerald-950/30", border: "border-emerald-200 dark:border-emerald-800" },
+    64→  enterprise: { text: "text-violet-600 dark:text-violet-400", bg: "bg-violet-50 dark:bg-violet-950/30", border: "border-violet-200 dark:border-violet-800" },
+    65→};
+    66→
+    67→const devices: { id: Device; label: string; icon: typeof Monitor; width: number | null }[] = [
+    68→  { id: "desktop", label: "Desktop", icon: Monitor, width: null },
+    69→  { id: "tablet", label: "Tablet", icon: Tablet, width: 768 },
+    70→  { id: "mobile", label: "Mobile", icon: Smartphone, width: 390 },
+    71→];
+    72→
+    73→/* ── Focus trap utilities ─────────────────────────────────────────── */
+    74→
+    75→const FOCUSABLE =
+    76→  'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])';
+    77→
+    78→function useFocusTrap(active: boolean, onClose: () => void) {
+    79→  const ref = useRef<HTMLDivElement>(null);
+    80→  const returnFocusRef = useRef<HTMLElement | null>(null);
+    81→
+    82→  useEffect(() => {
+    83→    if (!active) return;
+    84→    returnFocusRef.current = document.activeElement as HTMLElement;
+    85→    document.body.style.overflow = "hidden";
+    86→
+    87→    const first = ref.current?.querySelector<HTMLElement>(FOCUSABLE);
+    88→    requestAnimationFrame(() => first?.focus());
+    89→
+    90→    const onKeyDown = (e: KeyboardEvent) => {
+    91→      if (e.key === "Escape") {
+    92→        e.preventDefault();
+    93→        onClose();
+    94→        return;
+    95→      }
+    96→      if (e.key !== "Tab" || !ref.current) return;
+    97→      const nodes = Array.from(ref.current.querySelectorAll<HTMLElement>(FOCUSABLE)).filter(
+    98→        (n) => n.offsetParent !== null
+    99→      );
+   100→      if (nodes.length === 0) return;
+   101→      const firstNode = nodes[0];
+   102→      const lastNode = nodes[nodes.length - 1];
+   103→      if (e.shiftKey && document.activeElement === firstNode) {
+   104→        e.preventDefault();
+   105→        lastNode.focus();
+   106→      } else if (!e.shiftKey && document.activeElement === lastNode) {
+   107→        e.preventDefault();
+   108→        firstNode.focus();
+   109→      }
+   110→    };
+   111→
+   112→    document.addEventListener("keydown", onKeyDown);
+   113→    return () => {
+   114→      document.removeEventListener("keydown", onKeyDown);
+   115→      document.body.style.overflow = "";
+   116→      returnFocusRef.current?.focus?.();
+   117→    };
+   118→  }, [active, onClose]);
+   119→
+   120→  return ref;
+   121→}
+   122→
+   123→/* ── Why this design (design brief summary) ──────────────────────── */
+   124→
+   125→const familyWhy: Record<DesignFamilyId, { audience: string; hierarchy: string; intent: string }> = {
+   126→  micro: {
+   127→    audience: "Solo buyers evaluating a small, focused product in seconds",
+   128→    hierarchy: "One bold typographic hero, numbered feature list, single instant-buy CTA",
+   129→    intent: "Instant comprehension → immediate purchase with near-zero friction",
+   130→  },
+   131→  "industry-warm": {
+   132→    audience: "Local-service visitors who choose businesses on trust and warmth",
+   133→    hierarchy: "Editorial serif copy, full-bleed photography, small-caps section labels",
+   134→    intent: "Build emotional trust, then drive contact / booking actions",
+   135→  },
+   136→  "data-dense": {
+   137→    audience: "Operators and analysts who need dense, ordered information",
+   138→    hierarchy: "Monospaced type, tabular data, hairline panels, status semantics",
+   139→    intent: "Fast scanning and confident operational decisions",
+   140→  },
+   141→  "saas-product": {
+   142→    audience: "B2B evaluators comparing tools on clarity and craft",
+   143→    hierarchy: "Crisp product UI, gradient-mesh hero, feature grid, keyboard-chip UI",
+   144→    intent: "Communicate product polish, then convert to trial or demo",
+   145→  },
+   146→  "enterprise-platform": {
+   147→    audience: "Procurement teams assessing complex platforms",
+   148→    hierarchy: "Multi-level navigation, KPI panels, activity feeds, request-demo funnels",
+   149→    intent: "Demonstrate operational depth, then route to a sales conversation",
+   150→  },
+   151→};
+   152→
+   153→/* ════════════════════════════════════════════════════════════════════
+   154→   PresentationStudio — the upgraded BrowserFrame
+   155→   ════════════════════════════════════════════════════════════════════ */
+   156→
+   157→export function PresentationStudio({ config, businessName, onClose, example, offerContext }: Props) {
+   158→  const [tab, setTab] = useState<Tab>("preview");
+   159→  const [device, setDevice] = useState<Device>("desktop");
+   160→  const dialogRef = useFocusTrap(true, onClose);
+   161→  const pkg = getPackage(config.tier);
+   162→  const td = tierDisplay[config.tier];
+   163→  const url = `${config.label.toLowerCase().replace(/[^a-z]/g, "")}.com`;
+   164→  const familyId = getFamilyForProductType(
+   165→    example ? guessProductTypeId(example) : config.layout === "premium" ? "saas-tool" : "landing-template"
+   166→  );
+   167→  const why = familyWhy[familyId];
+   168→  const tokens = familyTokens[familyId];
+   169→
+   170→  /* End-product offer derived from the catalog (demo-labeled) */
+   171→  const offer = useMemo<ListingOffer | null>(() => {
+   172→    if (!example || !offerContext) return null;
+   173→    return deriveOffer({
+   174→      tierLetter: offerContext.tierLetter,
+   175→      productTypeId: offerContext.productTypeId,
+   176→      exampleName: example.exampleName,
+   177→      features: example.features,
+   178→    });
+   179→  }, [example, offerContext]);
+   180→
+   181→  const cycleDevice = useCallback((dir: 1 | -1) => {
+   182→    setDevice((d) => {
+   183→      const idx = devices.findIndex((x) => x.id === d);
+   184→      return devices[(idx + dir + devices.length) % devices.length].id;
+   185→    });
+   186→  }, []);
+   187→
+   188→  useEffect(() => {
+   189→    const onKey = (e: KeyboardEvent) => {
+   190→      if (tab !== "preview") return;
+   191→      if (e.key === "ArrowRight" && e.altKey) cycleDevice(1);
+   192→      if (e.key === "ArrowLeft" && e.altKey) cycleDevice(-1);
+   193→    };
+   194→    document.addEventListener("keydown", onKey);
+   195→    return () => document.removeEventListener("keydown", onKey);
+   196→  }, [tab, cycleDevice]);
+   197→
+   198→  const tabs: { id: Tab; label: string; icon: typeof Eye }[] = [
+   199→    { id: "preview", label: "Live Preview", icon: Eye },
+   200→    { id: "services", label: "What's Included", icon: Package },
+   201→    { id: "comparison", label: "Compare Tiers", icon: GitCompare },
+   202→  ];
+   203→
+   204→  const activeDevice = devices.find((d) => d.id === device)!;
+   205→
+   206→  return (
+   207→    <AnimatePresence>
+   208→      <motion.div
+   209→        className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-2 backdrop-blur-md sm:p-4"
+   210→        initial="hidden"
+   211→        animate="show"
+   212→        exit="exit"
+   213→        variants={overlayIn}
+   214→        ref={dialogRef}
+   215→        role="dialog"
+   216→        aria-modal="true"
+   217→        aria-label={`Preview of ${businessName} — ${config.label}`}
+   218→      >
+   219→        <motion.div
+   220→          className="flex max-h-[96vh] w-full max-w-6xl flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-2xl"
+   221→          variants={panelIn}
+   222→        >
+   223→          {/* Chrome bar */}
+   224→          <div className="flex shrink-0 items-center gap-2 border-b border-border bg-muted/50 px-3 py-2.5 sm:px-4">
+   225→            <div className="flex shrink-0 gap-1.5" aria-hidden="true">
+   226→              <div className="size-3 rounded-full bg-red-400/90" />
+   227→              <div className="size-3 rounded-full bg-amber-400/90" />
+   228→              <div className="size-3 rounded-full bg-green-400/90" />
+   229→            </div>
+   230→            <div className="mx-2 min-w-0 flex-1 sm:mx-3">
+   231→              <div className="flex items-center gap-2 truncate rounded-md bg-background px-3 py-1.5 text-xs text-muted-foreground">
+   232→                <Lock className="size-3 shrink-0 text-emerald-500" aria-hidden="true" />
+   233→                <span className="truncate font-mono-forge">https://{url}</span>
+   234→              </div>
+   235→            </div>
+   236→            <span
+   237→              className={cn(
+   238→                "shrink-0 rounded-full px-2.5 py-1 text-[10px] font-bold text-white",
+   239→                pkg.badgeColor
+   240→              )}
+   241→            >
+   242→              {td.short}
+   243→            </span>
+   244→            <button
+   245→              onClick={onClose}
+   246→              className="ml-1 shrink-0 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+   247→              aria-label="Close preview (Escape)"
+   248→            >
+   249→              <X className="size-4" aria-hidden="true" />
+   250→            </button>
+   251→          </div>
+   252→
+   253→          {/* Info bar */}
+   254→          <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-border bg-background px-4 py-2.5 sm:px-5">
+   255→            <div className="min-w-0">
+   256→              <span className="text-sm font-semibold text-foreground">{businessName}</span>
+   257→              <span className="mx-2 text-muted-foreground/40" aria-hidden="true">|</span>
+   258→              <span className="text-sm font-medium text-muted-foreground">{config.label}</span>
+   259→            </div>
+   260→            <div className="flex shrink-0 items-center gap-3 text-xs text-muted-foreground">
+   261→              <span className="flex items-center gap-1">
+   262→                <DollarSign className="size-3.5" aria-hidden="true" />
+   263→                {offer ? (
+   264→                  <>
+   265→                    <span className="font-semibold text-foreground">
+   266→                      {offer.price === null ? "Custom" : `${formatPrice(offer.price)}${offer.period}`}
+   267→                    </span>
+   268→                    <span className="mx-1 text-muted-foreground/30" aria-hidden="true">|</span>
+   269→                  </>
+   270→                ) : null}
+   271→                {pkg.priceRange}
+   272→              </span>
+   273→              <span className="flex items-center gap-1">
+   274→                <Clock className="size-3.5" aria-hidden="true" />
+   275→                {pkg.deliveryWeeks}
+   276→              </span>
+   277→              {offer && (
+   278→                <PurchaseButton
+   279→                  offer={offer}
+   280→                  exampleName={example?.exampleName ?? ""}
+   281→                  size="sm"
+   282→                  compact
+   283→                  className="[&_button]:h-7 [&_button]:px-3 [&_button]:text-[10px]"
+   284→                />
+   285→              )}
+   286→            </div>
+   287→          </div>
+   288→
+   289→          {/* Tab bar + device toolbar */}
+   290→          <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-border bg-background px-4 py-2 sm:px-5">
+   291→            <div className="flex gap-1" role="tablist" aria-label="Preview sections">
+   292→              {tabs.map((t) => {
+   293→                const Icon = t.icon;
+   294→                const active = tab === t.id;
+   295→                return (
+   296→                  <button
+   297→                    key={t.id}
+   298→                    role="tab"
+   299→                    aria-selected={active}
+   300→                    onClick={() => setTab(t.id)}
+   301→                    className={cn(
+   302→                      "relative flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition-colors sm:px-4 sm:text-sm",
+   303→                      active ? "text-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground"
+   304→                    )}
+   305→                  >
+   306→                    {active && (
+   307→                      <motion.span
+   308→                        layoutId="forge-tab-pill"
+   309→                        className="absolute inset-0 rounded-lg bg-primary"
+   310→                        transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+   311→                      />
+   312→                    )}
+   313→                    <Icon className="relative z-10 size-3.5" aria-hidden="true" />
+   314→                    <span className="relative z-10">{t.label}</span>
+   315→                  </button>
+   316→                );
+   317→              })}
+   318→            </div>
+   319→
+   320→            {tab === "preview" && (
+   321→              <div className="flex items-center gap-2">
+   322→                <div
+   323→                  className="flex items-center rounded-lg border border-border bg-muted/40 p-0.5"
+   324→                  role="radiogroup"
+   325→                  aria-label="Preview device"
+   326→                >
+   327→                  {devices.map((d) => {
+   328→                    const Icon = d.icon;
+   329→                    const active = device === d.id;
+   330→                    return (
+   331→                      <button
+   332→                        key={d.id}
+   333→                        role="radio"
+   334→                        aria-checked={active}
+   335→                        onClick={() => setDevice(d.id)}
+   336→                        className={cn(
+   337→                          "flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[11px] font-medium transition-colors",
+   338→                          active
+   339→                            ? "bg-background text-foreground shadow-sm"
+   340→                            : "text-muted-foreground hover:text-foreground"
+   341→                        )}
+   342→                      >
+   343→                        <Icon className="size-3.5" aria-hidden="true" />
+   344→                        <span className="hidden sm:inline">{d.label}</span>
+   345→                      </button>
+   346→                    );
+   347→                  })}
+   348→                </div>
+   349→                <button
+   350→                  onClick={() => cycleDevice(-1)}
+   351→                  className="hidden rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground md:block"
+   352→                  aria-label="Previous device (Alt+←)"
+   353→                >
+   354→                  <ChevronLeft className="size-4" aria-hidden="true" />
+   355→                </button>
+   356→                <button
+   357→                  onClick={() => cycleDevice(1)}
+   358→                  className="hidden rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground md:block"
+   359→                  aria-label="Next device (Alt+→)"
+   360→                >
+   361→                  <ChevronRight className="size-4" aria-hidden="true" />
+   362→                </button>
+   363→              </div>
+   364→            )}
+   365→          </div>
+   366→
+   367→          {/* Content */}
+   368→          <div className="flex-1 overflow-y-auto bg-muted/30">
+   369→            <AnimatePresence mode="wait">
+   370→              <motion.div
+   371→                key={tab}
+   372→                initial={{ opacity: 0, y: 8 }}
+   373→                animate={{ opacity: 1, y: 0 }}
+   374→                exit={{ opacity: 0, y: -6 }}
+   375→                transition={{ duration: 0.18 }}
+   376→              >
+   377→                {tab === "preview" && (
+   378→                  <div className="bg-background">
+   379→                    {/* Demo-data honesty banner */}
+   380→                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border bg-amber-500/10 px-4 py-2 sm:px-6">
+   381→                      <p className="flex items-center gap-2 text-[11px] font-medium text-amber-700 dark:text-amber-300">
+   382→                        <Info className="size-3.5 shrink-0" aria-hidden="true" />
+   383→                        Illustrative demo data — sample content, not real metrics or customers.
+   384→                      </p>
+   385→                      <p className="hidden items-center gap-1.5 font-mono-forge text-[10px] text-muted-foreground sm:flex">
+   386→                        <Keyboard className="size-3" aria-hidden="true" />
+   387→                        Alt + ←/→ switch device · Esc closes
+   388→                      </p>
+   389→                    </div>
+   390→
+   391→                    {example ? (
+   392→                      <>
+   393→                        <TemplateBrief
+   394→                          example={example}
+   395→                          businessName={businessName}
+   396→                          why={why}
+   397→                          tokens={tokens}
+   398→                          offer={offer}
+   399→                          offerProductName={offerContext?.productName}
+   400→                        />
+   401→                        {/* Device viewport */}
+   402→                        <div className="flex justify-center bg-muted/40 p-4 sm:p-6">
+   403→                          <div
+   404→                            className={cn(
+   405→                              "relative w-full overflow-hidden rounded-xl border bg-white shadow-xl transition-[max-width] duration-300",
+   406→                              device === "mobile" && "max-w-[390px]",
+   407→                              device === "tablet" && "max-w-[768px]",
+   408→                              device === "desktop" && "max-w-none"
+   409→                            )}
+   410→                          >
+   411→                            <div className="flex items-center gap-1.5 border-b border-zinc-200 bg-zinc-100 px-3 py-1.5" aria-hidden="true">
+   412→                              <div className="size-2 rounded-full bg-zinc-300" />
+   413→                              <div className="size-2 rounded-full bg-zinc-300" />
+   414→                              <div className="size-2 rounded-full bg-zinc-300" />
+   415→                              <span className="ml-2 font-mono-forge text-[9px] uppercase tracking-wider text-zinc-400">
+   416→                                {activeDevice.label} viewport · {activeDevice.width ?? "fluid"}px
+   417→                              </span>
+   418→                            </div>
+   419→                            <FamilyPreview example={example} />
+   420→                          </div>
+   421→                        </div>
+   422→                      </>
+   423→                    ) : (
+   424→                      <div className="p-8 text-center text-sm text-muted-foreground">
+   425→                        Preview unavailable for this configuration.
+   426→                      </div>
+   427→                    )}
+   428→                  </div>
+   429→                )}
+   430→
+   431→                {tab === "services" && <ServicesTab config={config} />}
+   432→                {tab === "comparison" && <ComparisonTab currentTier={config.tier} />}
+   433→              </motion.div>
+   434→            </AnimatePresence>
+   435→          </div>
+   436→        </motion.div>
+   437→      </motion.div>
+   438→    </AnimatePresence>
+   439→  );
+   440→}
+   441→
+   442→/* ── Helpers ──────────────────────────────────────────────────────── */
+   443→
+   444→function guessProductTypeId(example: ProductExample): string {
+   445→  // Mirrors the label→product map in FamilyPreview without importing cycles
+   446→  if (example.layout === "premium") return example.tier === "enterprise" ? "custom-saas" : "saas-tool";
+   447→  if (example.layout === "standard") return "website-kit";
+   448→  return "landing-template";
+   449→}
+   450→
+   451→function TemplateBrief({
+   452→  example,
+   453→  businessName,
+   454→  why,
+   455→  tokens,
+   456→  offer,
+   457→  offerProductName,
+   458→}: {
+   459→  example: ProductExample;
+   460→  businessName: string;
+   461→  why: { audience: string; hierarchy: string; intent: string };
+   462→  tokens: (typeof familyTokens)[DesignFamilyId];
+   463→  offer: ListingOffer | null;
+   464→  offerProductName?: string;
+   465→}) {
+   466→  return (
+   467→    <section
+   468→      className="border-b border-border bg-zinc-950 px-5 py-6 text-white sm:px-8"
+   469→      aria-label="Template overview"
+   470→    >
+   471→      <div className="mx-auto flex max-w-6xl flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+   472→        <div className="min-w-0 max-w-2xl flex-1">
+   473→          <div className="mb-2 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-400">
+   474→            <span className="rounded-full bg-white/10 px-2 py-1">
+   475→              {tierDisplay[example.tier].label} template
+   476→            </span>
+   477→            <span className="text-zinc-600" aria-hidden="true">/</span>
+   478→            <span>{businessName}</span>
+   479→          </div>
+   480→          <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+   481→            {example.exampleName}
+   482→          </h2>
+   483→          <p className="mt-2 max-w-xl text-sm leading-6 text-zinc-300">
+   484→            {example.exampleDescription}
+   485→          </p>
+   486→          <div className="mt-3 flex flex-wrap gap-2">
+   487→            {example.features.slice(0, 4).map((feature) => (
+   488→              <span
+   489→                key={feature}
+   490→                className="rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs text-zinc-200"
+   491→              >
+   492→                {feature}
+   493→              </span>
+   494→            ))}
+   495→          </div>
+   496→        </div>
+   497→        {/* Why this design */}
+   498→        <div className="w-full min-w-0 max-w-sm shrink-0 rounded-xl border border-white/10 bg-white/5 p-4">
+   499→          <div className="mb-3 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.16em] text-amber-300">
+   500→            <Sparkles className="size-3.5" aria-hidden="true" />
+   501→            Why this design
+   502→          </div>
+   503→          <dl className="space-y-2.5 break-words text-xs leading-relaxed">
+   504→            <div>
+   505→              <dt className="font-semibold text-zinc-100">Audience fit</dt>
+   506→              <dd className="text-zinc-400">{why.audience}</dd>
+   507→            </div>
+   508→            <div>
+   509→              <dt className="font-semibold text-zinc-100">Visual hierarchy</dt>
+   510→              <dd className="text-zinc-400">{why.hierarchy}</dd>
+   511→            </div>
+   512→            <div>
+   513→              <dt className="font-semibold text-zinc-100">Conversion intent</dt>
+   514→              <dd className="text-zinc-400">{why.intent}</dd>
+   515→            </div>
+   516→            <div className="border-t border-white/10 pt-2.5">
+   517→              <dt className="font-semibold text-zinc-100">Family recipe</dt>
+   518→              <dd className="mt-0.5 font-mono-forge text-[10px] text-zinc-500">
+   519→                {tokens.fontDisplay.split(",")[0].replace(/'/g, "")} · {tokens.radius.md}px radius ·{" "}
+   520→                {tokens.sectionStyle}
+   521→              </dd>
+   522→            </div>
+   523→          </dl>
+   524→        </div>
+   525→      </div>
+   526→
+   527→      {/* Get this product — end-product offer strip */}
+   528→      {offer && (
+   529→        <div className="mx-auto mt-6 max-w-6xl">
+   530→          <div className="rounded-xl border border-white/10 bg-white/[0.04] p-4 sm:p-5">
+   531→            <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+   532→              {/* Manifest */}
+   533→              <div className="min-w-0 flex-1">
+   534→                <div className="mb-3 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.16em] text-amber-300">
+   535→                  <Package className="size-3.5" aria-hidden="true" />
+   536→                  Get this product — what&apos;s included
+   537→                </div>
+   538→                <ol className="grid grid-cols-1 gap-x-6 gap-y-1.5 sm:grid-cols-2 lg:grid-cols-3">
+   539→                  {offer.manifest.map((item, i) => (
+   540→                    <li key={item} className="flex min-w-0 items-baseline gap-2">
+   541→                      <span className="shrink-0 font-mono-forge text-[10px] font-bold tabular-nums text-amber-300/80">
+   542→                        {String(i + 1).padStart(2, "0")}
+   543→                      </span>
+   544→                      <span className="truncate text-xs text-zinc-200">{item}</span>
+   545→                    </li>
+   546→                  ))}
+   547→                </ol>
+   548→                <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] text-zinc-400">
+   549→                  <span className="flex items-center gap-1.5">
+   550→                    <Layers className="size-3.5 text-zinc-500" aria-hidden="true" />
+   551→                    {offer.formats.join(" · ")}
+   552→                  </span>
+   553→                  <span className="flex items-center gap-1.5">
+   554→                    <Check className="size-3.5 text-emerald-400" aria-hidden="true" />
+   555→                    {offer.license}
+   556→                  </span>
+   557→                  <span className="flex items-center gap-1.5">
+   558→                    <Clock className="size-3.5 text-sky-400" aria-hidden="true" />
+   559→                    {offer.delivery}
+   560→                  </span>
+   561→                </div>
+   562→              </div>
+   563→              {/* Price + buy */}
+   564→              <div className="w-full shrink-0 rounded-lg border border-white/10 bg-zinc-900/60 p-4 lg:w-64">
+   565→                <div className="flex items-baseline gap-2">
+   566→                  <span className="text-2xl font-bold text-white">
+   567→                    {offer.price === null ? "Custom" : formatPrice(offer.price)}
+   568→                  </span>
+   569→                  {offer.price !== null && offer.period && (
+   570→                    <span className="text-xs font-medium text-zinc-400">{offer.period}</span>
+   571→                  )}
+   572→                  {offer.compareAt !== null && (
+   573→                    <s className="text-xs text-zinc-500">{formatPrice(offer.compareAt)}</s>
+   574→                  )}
+   575→                </div>
+   576→                <p className="mt-0.5 text-[11px] text-zinc-500">
+   577→                  {offerProductName ? `${offerProductName} · ` : ""}{offer.updates}
+   578→                </p>
+   579→                <div className="mt-3">
+   580→                  <PurchaseButton offer={offer} exampleName={example.exampleName} className="w-full" />
+   581→                </div>
+   582→              </div>
+   583→            </div>
+   584→          </div>
+   585→        </div>
+   586→      )}
+   587→    </section>
+   588→  );
+   589→}
+   590→
+   591→function ServicesTab({ config }: { config: MockupConfig }) {
+   592→  const pkg = getPackage(config.tier);
+   593→  const a = tierAccent[config.tier];
+   594→
+   595→  return (
+   596→    <div className="mx-auto max-w-4xl space-y-8 p-5 sm:p-8">
+   597→      <div className={cn("rounded-2xl border p-5 sm:p-6", a.border, a.bg)}>
+   598→        <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
+   599→          <div>
+   600→            <div className={cn("mb-1 text-xs font-bold uppercase tracking-wider", a.text)}>
+   601→              {pkg.level} Package
+   602→            </div>
+   603→            <h3 className="text-xl font-bold text-foreground">{pkg.tagline}</h3>
+   604→          </div>
+   605→          <div className="text-right">
+   606→            <div className={cn("text-2xl font-bold", a.text)}>{pkg.priceRange}</div>
+   607→            <div className="text-xs text-muted-foreground">Delivery: {pkg.deliveryWeeks}</div>
+   608→          </div>
+   609→        </div>
+   610→      </div>
+   611→
+   612→      <div>
+   613→        <h4 className="mb-4 flex items-center gap-2 text-sm font-bold text-foreground">
+   614→          <Check className={cn("size-4", a.text)} aria-hidden="true" />
+   615→          What You Get
+   616→        </h4>
+   617→        <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+   618→          {pkg.features.map((feature, i) => (
+   619→            <div
+   620→              key={i}
+   621→              className="flex items-start gap-2.5 rounded-lg border border-border bg-background p-3"
+   622→            >
+   623→              <div
+   624→                className={cn(
+   625→                  "mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full",
+   626→                  pkg.badgeColor
+   627→                )}
+   628→              >
+   629→                <Check className="size-2.5 text-white" strokeWidth={3} aria-hidden="true" />
+   630→              </div>
+   631→              <span className="text-sm text-foreground/90">{feature}</span>
+   632→            </div>
+   633→          ))}
+   634→        </div>
+   635→      </div>
+   636→
+   637→      <div>
+   638→        <h4 className="mb-4 flex items-center gap-2 text-sm font-bold text-foreground">
+   639→          <FileText className={cn("size-4", a.text)} aria-hidden="true" />
+   640→          Project Deliverables
+   641→        </h4>
+   642→        <div className="space-y-2.5">
+   643→          {pkg.deliverables.map((del, i) => (
+   644→            <div
+   645→              key={i}
+   646→              className="flex items-start gap-3 rounded-lg border border-border bg-background p-4"
+   647→            >
+   648→              <div
+   649→                className={cn(
+   650→                  "flex size-7 shrink-0 items-center justify-center rounded-lg text-xs font-bold",
+   651→                  a.bg,
+   652→                  a.text
+   653→                )}
+   654→              >
+   655→                {i + 1}
+   656→              </div>
+   657→              <div className="min-w-0">
+   658→                <div className="text-sm font-semibold text-foreground">{del.name}</div>
+   659→                <div className="mt-0.5 text-xs text-muted-foreground">{del.detail}</div>
+   660→              </div>
+   661→            </div>
+   662→          ))}
+   663→        </div>
+   664→      </div>
+   665→
+   666→      <div>
+   667→        <h4 className="mb-4 flex items-center gap-2 text-sm font-bold text-foreground">
+   668→          <Layers className={cn("size-4", a.text)} aria-hidden="true" />
+   669→          OMNIFORGE Modules Activated ({pkg.modules.length} of 22)
+   670→        </h4>
+   671→        <div className="flex flex-wrap gap-2">
+   672→          {pkg.modules.map((mod) => (
+   673→            <div
+   674→              key={mod.id}
+   675→              className="flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-2"
+   676→            >
+   677→              <span
+   678→                className={cn(
+   679→                  "flex size-5 items-center justify-center rounded text-[10px] font-bold",
+   680→                  a.bg,
+   681→                  a.text
+   682→                )}
+   683→              >
+   684→                {mod.id}
+   685→              </span>
+   686→              <div>
+   687→                <div className="text-xs font-medium text-foreground">{mod.name}</div>
+   688→                <div className="text-[10px] text-muted-foreground">{mod.description}</div>
+   689→              </div>
+   690→            </div>
+   691→          ))}
+   692→        </div>
+   693→      </div>
+   694→    </div>
+   695→  );
+   696→}
+   697→
+   698→const comparisonRows: { label: string; values: Record<Tier, string> }[] = [
+   699→  { label: "Price Range", values: { low: lowTierPackage.priceRange, mid: midTierPackage.priceRange, high: highTierPackage.priceRange, enterprise: enterpriseTierPackage.priceRange } },
+   700→  { label: "Delivery Time", values: { low: lowTierPackage.deliveryWeeks, mid: midTierPackage.deliveryWeeks, high: highTierPackage.deliveryWeeks, enterprise: enterpriseTierPackage.deliveryWeeks } },
+   701→  { label: "Pages", values: { low: "Single page", mid: "3–7 pages", high: "Multi-page + routing", enterprise: "Full platform" } },
+   702→  { label: "Design System", values: { low: "Coherent tokens", mid: "Custom tokens", high: "Full token system + components", enterprise: "Versioned library + Storybook" } },
+   703→  { label: "Backend & Database", values: { low: "None", mid: "Basic backend", high: "API + schema + RLS", enterprise: "Microservices / modular monolith" } },
+   704→  { label: "Authentication", values: { low: "None", mid: "Email/password", high: "Auth + role permissions", enterprise: "SSO + multi-tenant auth" } },
+   705→  { label: "Payment Integration", values: { low: "None", mid: "None", high: "Stripe checkout + subscriptions", enterprise: "Custom billing + marketplace" } },
+   706→  { label: "Admin Dashboard", values: { low: "None", mid: "Content editing", high: "Full CRUD panel", enterprise: "Multi-tenant admin suite" } },
+   707→  { label: "AI & Automation", values: { low: "None", mid: "None", high: "None", enterprise: "LLM agents + workflows" } },
+   708→  { label: "SEO Setup", values: { low: "Basic meta tags", mid: "Sitemap + structured data", high: "Full SEO suite", enterprise: "Full SEO + internationalization" } },
+   709→  { label: "Accessibility", values: { low: "Same craft floor", mid: "Keyboard + contrast", high: "WCAG 2.2 AA audit", enterprise: "WCAG 2.2 AA + ongoing" } },
+   710→  { label: "Performance", values: { low: "No regressions", mid: "Image optimization", high: "Budgets + code splitting", enterprise: "Edge caching + CDN + budgets" } },
+   711→  { label: "Revisions", values: { low: "1 round", mid: "2 rounds", high: "3 rounds", enterprise: "Weekly reviews" } },
+   712→  { label: "Post-launch Support", values: { low: "None", mid: "14 days", high: "30 days", enterprise: "90-day SLA" } },
+   713→  { label: "Modules Activated", values: { low: `${lowTierPackage.modules.length} of 22`, mid: `${midTierPackage.modules.length} of 22`, high: `${highTierPackage.modules.length} of 22`, enterprise: `${enterpriseTierPackage.modules.length} of 22` } },
+   714→];
+   715→
+   716→function ComparisonTab({ currentTier }: { currentTier: Tier }) {
+   717→  const tiers: Tier[] = ["low", "mid", "high", "enterprise"];
+   718→  return (
+   719→    <div className="mx-auto max-w-5xl p-5 sm:p-8">
+   720→      <h3 className="mb-1 flex items-center gap-2 text-lg font-bold text-foreground">
+   721→        <Gauge className="size-4 text-muted-foreground" aria-hidden="true" />
+   722→        Tier Comparison
+   723→      </h3>
+   724→      <p className="mb-6 text-sm text-muted-foreground">
+   725→        Scope changes between tiers — the craft floor (responsive, accessible, coherent design) never does.
+   726→      </p>
+   727→
+   728→      <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+   729→        {tiers.map((t) => {
+   730→          const td = tierDisplay[t];
+   731→          const a = tierAccent[t];
+   732→          const pkg = getPackage(t);
+   733→          const isCurrent = t === currentTier;
+   734→          return (
+   735→            <div
+   736→              key={t}
+   737→              className={cn(
+   738→                "relative rounded-xl border p-4",
+   739→                a.border,
+   740→                a.bg,
+   741→                isCurrent && "ring-2 ring-[rgb(var(--forge-glow))] ring-offset-2 ring-offset-background"
+   742→              )}
+   743→            >
+   744→              {isCurrent && (
+   745→                <span className="absolute -top-2.5 right-3 rounded-full bg-[rgb(var(--forge-glow))] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-black">
+   746→                  Current
+   747→                </span>
+   748→              )}
+   749→              <div className={cn("mb-1 text-xs font-bold uppercase tracking-wider", a.text)}>{td.label}</div>
+   750→              <div className="text-lg font-bold text-foreground">{pkg.priceRange}</div>
+   751→              <div className="mt-1 text-[11px] leading-tight text-muted-foreground">{pkg.tagline}</div>
+   752→            </div>
+   753→          );
+   754→        })}
+   755→      </div>
+   756→
+   757→      <div className="overflow-x-auto rounded-xl border border-border bg-background">
+   758→        <table className="w-full text-sm">
+   759→          <thead>
+   760→            <tr className="border-b border-border">
+   761→              <th scope="col" className="px-3 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+   762→                Feature
+   763→              </th>
+   764→              {tiers.map((t) => (
+   765→                <th
+   766→                  scope="col"
+   767→                  key={t}
+   768→                  className={cn(
+   769→                    "px-2 py-3 text-center text-xs font-semibold uppercase tracking-wider",
+   770→                    tierAccent[t].text
+   771→                  )}
+   772→                >
+   773→                  {tierDisplay[t].label}
+   774→                </th>
+   775→              ))}
+   776→            </tr>
+   777→          </thead>
+   778→          <tbody>
+   779→            {comparisonRows.map((row, i) => (
+   780→              <tr
+   781→                key={row.label}
+   782→                className={cn("border-b border-border/60", i % 2 === 0 ? "bg-muted/20" : "bg-transparent")}
+   783→              >
+   784→                <th scope="row" className="whitespace-nowrap px-3 py-2.5 text-left text-xs font-medium text-foreground sm:text-sm">
+   785→                  {row.label}
+   786→                </th>
+   787→                {tiers.map((t) => (
+   788→                  <td
+   789→                    key={t}
+   790→                    className={cn(
+   791→                      "px-2 py-2.5 text-center text-[11px] text-muted-foreground sm:text-xs",
+   792→                      t === currentTier && "font-semibold text-foreground"
+   793→                    )}
+   794→                  >
+   795→                    {row.values[t]}
+   796→                  </td>
+   797→                ))}
+   798→              </tr>
+   799→            ))}
+   800→          </tbody>
+   801→        </table>
+   802→      </div>
+   803→
+   804→      <div className="mt-6 rounded-xl border border-border bg-muted/40 p-4">
+   805→        <p className="text-xs leading-relaxed text-muted-foreground">
+   806→          Prices are illustrative starting points, not verified market rates. Final cost depends on scope,
+   807→          integrations, content volume, and customization. The Enterprise tier scales from a focused internal
+   808→          tool to a full multi-tenant SaaS platform — the module set expands accordingly.
+   809→        </p>
+   810→      </div>
+   811→    </div>
+   812→  );
+   813→}
+   814→

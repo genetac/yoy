@@ -1,0 +1,742 @@
+     1→     1→"use client";
+     2→     2→
+     3→     3→import { useMemo, useState } from "react";
+     4→     4→import { AnimatePresence, motion } from "motion/react";
+     5→     5→import {
+     6→     6→  ChevronDown,
+     7→     7→  Eye,
+     8→     8→  ArrowRight,
+     9→     9→  FileText,
+    10→    10→  UnfoldVertical,
+    11→    11→  FoldVertical,
+    12→    12→  MonitorPlay,
+    13→    13→  BadgeCheck,
+    14→    14→  FileArchive,
+    15→    15→  Zap,
+    16→    16→  ShieldCheck,
+    17→    17→  RefreshCw,
+    18→    18→} from "lucide-react";
+    19→    19→import type { MockupConfig } from "@/data/businessTypes";
+    20→    20→import {
+    21→    21→  productTierCategories,
+    22→    22→  subscriptionSection,
+    23→    23→  type ProductExample,
+    24→    24→  type ProductType,
+    25→    25→} from "@/data/exampleProducts";
+    26→    26→import { familyTokens } from "@/data/designFamilies";
+    27→    27→import { riseIn, staggerParent } from "@/lib/motion";
+    28→    28→import { familyMeta } from "./family-visuals";
+    29→    29→import { deriveOffer, formatPrice } from "./product-catalog";
+    30→    30→import { PurchaseButton } from "./purchase-flow";
+    31→    31→import { cn } from "@/lib/utils";
+    32→    32→
+    33→    33→/* ════════════════════════════════════════════════════════════════════
+    34→    34→   Family browsing view — products grouped by tier, example cards.
+    35→    35→   Every product block starts MINIMIZED; expanding it reveals full
+    36→    36→   end-product listings: numbered "What's included" manifests, formats,
+    37→    37→   license, price, instant demo checkout and downloads.
+    38→    38→   ════════════════════════════════════════════════════════════════════ */
+    39→    39→
+    40→    40→export type FamilyProduct = {
+    41→    41→  product: ProductType;
+    42→    42→  tierLetter: string;
+    43→    43→  tierName: string;
+    44→    44→  tierColor: string;
+    45→    45→  priceRange: string;
+    46→    46→};
+    47→    47→
+    48→    48→/** Context threaded to the PresentationStudio so it can render the offer */
+    49→    49→export type OfferContext = {
+    50→    50→  tierLetter: string;
+    51→    51→  productTypeId: string;
+    52→    52→};
+    53→    53→
+    54→    54→export const tierColorMap: Record<string, { text: string; chip: string; badge: string; dot: string }> = {
+    55→    55→  amber: {
+    56→    56→    text: "text-amber-600 dark:text-amber-400",
+    57→    57→    chip: "text-amber-700 dark:text-amber-400 bg-amber-100/70 dark:bg-amber-950/40",
+    58→    58→    badge: "bg-amber-500",
+    59→    59→    dot: "bg-amber-400",
+    60→    60→  },
+    61→    61→  sky: {
+    62→    62→    text: "text-sky-600 dark:text-sky-400",
+    63→    63→    chip: "text-sky-700 dark:text-sky-400 bg-sky-100/70 dark:bg-sky-950/40",
+    64→    64→    badge: "bg-sky-500",
+    65→    65→    dot: "bg-sky-400",
+    66→    66→  },
+    67→    67→  emerald: {
+    68→    68→    text: "text-emerald-600 dark:text-emerald-400",
+    69→    69→    chip: "text-emerald-700 dark:text-emerald-400 bg-emerald-100/70 dark:bg-emerald-950/40",
+    70→    70→    badge: "bg-emerald-500",
+    71→    71→    dot: "bg-emerald-400",
+    72→    72→  },
+    73→    73→  violet: {
+    74→    74→    text: "text-violet-600 dark:text-violet-400",
+    75→    75→    chip: "text-violet-700 dark:text-violet-400 bg-violet-100/70 dark:bg-violet-950/40",
+    76→    76→    badge: "bg-violet-600",
+    77→    77→    dot: "bg-violet-400",
+    78→    78→  },
+    79→    79→};
+    80→    80→
+    81→    81→export const allTierSections = [
+    82→    82→  ...productTierCategories.map((c) => ({
+    83→    83→    letter: c.letter,
+    84→    84→    name: c.name,
+    85→    85→    priceRange: c.priceRange,
+    86→    86→    color: c.color,
+    87→    87→    products: c.products,
+    88→    88→  })),
+    89→    89→  {
+    90→    90→    letter: "S",
+    91→    91→    name: subscriptionSection.name,
+    92→    92→    priceRange: subscriptionSection.priceRange,
+    93→    93→    color: "emerald",
+    94→    94→    products: subscriptionSection.products,
+    95→    95→  },
+    96→    96→];
+    97→    97→
+    98→    98→/* ── MiniPreview — polished static miniature for example cards ────── */
+    99→    99→
+   100→   100→function MiniPreview({ config }: { config: MockupConfig }) {
+   101→   101→  const t = config.theme;
+   102→   102→  const isElevated = config.layout === "premium" || config.layout === "standard";
+   103→   103→  const isPremium = config.layout === "premium";
+   104→   104→  const [imgFailed, setImgFailed] = useState(false);
+   105→   105→  const showImg = config.heroImage && !imgFailed;
+   106→   106→  return (
+   107→   107→    <div
+   108→   108→      style={{ fontFamily: t.font }}
+   109→   109→      className="pointer-events-none flex h-full w-full select-none flex-col overflow-hidden"
+   110→   110→    >
+   111→   111→      <div
+   112→   112→        className="relative z-10 flex shrink-0 items-center justify-between px-2 py-1.5"
+   113→   113→        style={{
+   114→   114→          background: showImg ? "rgba(0,0,0,0.25)" : t.nav,
+   115→   115→          borderBottom: showImg ? "none" : `1px solid ${t.border}`,
+   116→   116→        }}
+   117→   117→      >
+   118→   118→        <div className="flex items-center gap-1">
+   119→   119→          <div
+   120→   120→            className="size-2"
+   121→   121→            style={{ background: t.accent, borderRadius: isElevated ? 3 : 999 }}
+   122→   122→          />
+   123→   123→          <span className="text-[7px] font-bold" style={{ color: showImg ? "#fff" : t.text }}>
+   124→   124→            {config.label}
+   125→   125→          </span>
+   126→   126→        </div>
+   127→   127→        <div className="flex gap-1" aria-hidden="true">
+   128→   128→          {[0, 1, 2].map((i) => (
+   129→   129→            <div
+   130→   130→              key={i}
+   131→   131→              className="h-0.5 w-2.5 rounded-full"
+   132→   132→              style={{ background: showImg ? "rgba(255,255,255,0.4)" : t.muted, opacity: 0.5 }}
+   133→   133→            />
+   134→   134→          ))}
+   135→   135→        </div>
+   136→   136→      </div>
+   137→   137→      <div className="relative min-h-0 flex-1" style={{ backgroundColor: t.bg }}>
+   138→   138→        {showImg ? (
+   139→   139→          <img
+   140→   140→            src={config.heroImage}
+   141→   141→            alt=""
+   142→   142→            onError={() => setImgFailed(true)}
+   143→   143→            className="absolute inset-0 h-full w-full object-cover"
+   144→   144→            loading="lazy"
+   145→   145→          />
+   146→   146→        ) : (
+   147→   147→          <div
+   148→   148→            className="absolute inset-0"
+   149→   149→            style={{ background: `linear-gradient(135deg, ${t.accent}, ${t.surface})` }}
+   150→   150→          />
+   151→   151→        )}
+   152→   152→        {showImg && (
+   153→   153→          <div
+   154→   154→            className="absolute inset-0"
+   155→   155→            style={{
+   156→   156→              background: isPremium
+   157→   157→                ? "linear-gradient(135deg, rgba(0,0,0,0.65), rgba(0,0,0,0.25))"
+   158→   158→                : "linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.55))",
+   159→   159→            }}
+   160→   160→          />
+   161→   161→        )}
+   162→   162→        <div
+   163→   163→          className={cn(
+   164→   164→            "relative flex h-full flex-col justify-center p-2.5",
+   165→   165→            !isPremium && "items-center text-center"
+   166→   166→          )}
+   167→   167→        >
+   168→   168→          <div
+   169→   169→            className="mb-1 inline-block w-fit rounded px-1.5 py-0.5 text-[6px] font-bold uppercase tracking-wider"
+   170→   170→            style={{ background: t.accent, color: "#fff" }}
+   171→   171→          >
+   172→   172→            {config.tier === "enterprise" ? "Platform" : "Template"}
+   173→   173→          </div>
+   174→   174→          <div
+   175→   175→            className="max-w-[92%] text-[9px] font-bold leading-tight"
+   176→   176→            style={{
+   177→   177→              color: showImg ? "#fff" : t.text,
+   178→   178→              textShadow: showImg ? "0 1px 6px rgba(0,0,0,0.5)" : "none",
+   179→   179→            }}
+   180→   180→          >
+   181→   181→            {config.tagline.length > 36 ? `${config.tagline.slice(0, 36)}…` : config.tagline}
+   182→   182→          </div>
+   183→   183→          {showImg && (
+   184→   184→            <div
+   185→   185→              className="mt-1.5 inline-block w-fit rounded px-1.5 py-0.5 text-[6px] font-semibold"
+   186→   186→              style={{ background: t.accent, color: "#fff" }}
+   187→   187→            >
+   188→   188→              {config.tier === "enterprise" ? "Request Demo" : "Get Started"}
+   189→   189→            </div>
+   190→   190→          )}
+   191→   191→        </div>
+   192→   192→      </div>
+   193→   193→      {/* Mini content: reads like a real page — heading, two copy lines, CTA */}
+   194→   194→      <div className="shrink-0 space-y-1.5 px-2.5 py-2" style={{ background: t.bg }} aria-hidden="true">
+   195→   195→        <div className="h-1.5 w-3/5 rounded-full" style={{ background: t.text, opacity: 0.75 }} />
+   196→   196→        <div className="h-1 w-4/5 rounded-full" style={{ background: t.muted, opacity: 0.55 }} />
+   197→   197→        <div className="flex items-center gap-1.5 pt-0.5">
+   198→   198→          <div
+   199→   199→            className="h-2.5 w-9 rounded-sm"
+   200→   200→            style={{ background: t.accent, borderRadius: isElevated ? 4 : 999 }}
+   201→   201→          />
+   202→   202→          <div className="h-1 flex-1 rounded-full" style={{ background: t.muted, opacity: 0.35 }} />
+   203→   203→          <div className="size-2 rounded-full" style={{ background: t.accentSoft, border: `1px solid ${t.border}` }} />
+   204→   204→        </div>
+   205→   205→      </div>
+   206→   206→    </div>
+   207→   207→  );
+   208→   208→}
+   209→   209→
+   210→   210→/* ── Helpers ──────────────────────────────────────────────────────── */
+   211→   211→
+   212→   212→function extractPageCount(features: string[]): number | null {
+   213→   213→  for (const f of features) {
+   214→   214→    const m = f.match(/(\d+)\s*pages?/i);
+   215→   215→    if (m) return parseInt(m[1], 10);
+   216→   216→  }
+   217→   217→  for (const f of features) {
+   218→   218→    if (/one-page|single-page|1-page/i.test(f)) return 1;
+   219→   219→  }
+   220→   220→  return null;
+   221→   221→}
+   222→   222→
+   223→   223→export type PreviewFn = (
+   224→   224→  config: MockupConfig,
+   225→   225→  name: string,
+   226→   226→  example?: ProductExample,
+   227→   227→  ctx?: OfferContext
+   228→   228→) => void;
+   229→   229→
+   230→   230→/* ── ExampleCard — compact card for the home featured rail ────────── */
+   231→   231→
+   232→   232→export function ExampleCard({
+   233→   233→  example,
+   234→   234→  onPreview,
+   235→   235→  index,
+   236→   236→  familyShort,
+   237→   237→  familyChip,
+   238→   238→}: {
+   239→   239→  example: ProductExample;
+   240→   240→  onPreview: () => void;
+   241→   241→  index: number;
+   242→   242→  familyShort?: string;
+   243→   243→  familyChip?: string;
+   244→   244→}) {
+   245→   245→  const td = example.tier;
+   246→   246→  const tierInfo = td === "low"
+   247→   247→    ? { short: "STR", badge: "bg-amber-500" }
+   248→   248→    : td === "mid"
+   249→   249→      ? { short: "GRO", badge: "bg-sky-500" }
+   250→   250→      : td === "high"
+   251→   251→        ? { short: "PRO", badge: "bg-emerald-500" }
+   252→   252→        : { short: "ENT", badge: "bg-violet-600" };
+   253→   253→  const pages = extractPageCount(example.features);
+   254→   254→
+   255→   255→  return (
+   256→   256→    <motion.button
+   257→   257→      variants={riseIn}
+   258→   258→      onClick={onPreview}
+   259→   259→      className="group overflow-hidden rounded-xl border border-border bg-card text-left transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+   260→   260→      aria-label={`Preview ${example.exampleName}`}
+   261→   261→    >
+   262→   262→      <div className="relative aspect-[16/10] overflow-hidden bg-muted">
+   263→   263→        <MiniPreview config={example} />
+   264→   264→        <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/20 group-focus-visible:bg-black/20">
+   265→   265→          <span className="flex scale-95 items-center gap-1.5 rounded-md bg-background px-2.5 py-1 text-[11px] font-semibold text-foreground opacity-0 shadow-md transition-all duration-150 group-hover:scale-100 group-hover:opacity-100 group-focus-visible:scale-100 group-focus-visible:opacity-100">
+   266→   266→            <Eye className="size-3" aria-hidden="true" />
+   267→   267→            Preview
+   268→   268→            <ArrowRight className="size-3" aria-hidden="true" />
+   269→   269→          </span>
+   270→   270→        </div>
+   271→   271→        <span className="absolute right-1.5 top-1.5 z-20 flex items-center gap-1">
+   272→   272→          {pages !== null && (
+   273→   273→            <span className="flex items-center gap-0.5 rounded bg-background/90 px-1.5 py-0.5 font-mono-forge text-[8px] font-bold text-foreground shadow-sm">
+   274→   274→              <FileText className="size-2.5" aria-hidden="true" />
+   275→   275→              {pages === 1 ? "1 pg" : `${pages} pgs`}
+   276→   276→            </span>
+   277→   277→          )}
+   278→   278→          <span
+   279→   279→            className={cn(
+   280→   280→              "rounded px-1.5 py-0.5 font-mono-forge text-[8px] font-bold text-white shadow-sm",
+   281→   281→              tierInfo.badge
+   282→   282→            )}
+   283→   283→          >
+   284→   284→            {tierInfo.short}
+   285→   285→          </span>
+   286→   286→        </span>
+   287→   287→        {familyShort && (
+   288→   288→          <span
+   289→   289→            className={cn(
+   290→   290→              "absolute bottom-1.5 left-1.5 z-20 rounded px-1.5 py-0.5 font-mono-forge text-[7px] font-semibold",
+   291→   291→              familyChip
+   292→   292→            )}
+   293→   293→          >
+   294→   294→            {familyShort}
+   295→   295→          </span>
+   296→   296→        )}
+   297→   297→      </div>
+   298→   298→      <div className="p-2.5">
+   299→   299→        <div className="mb-0.5 truncate text-[11px] font-bold text-foreground">
+   300→   300→          {example.exampleName}
+   301→   301→        </div>
+   302→   302→        <p className="line-clamp-2 text-[10px] leading-snug text-muted-foreground">
+   303→   303→          {example.exampleDescription}
+   304→   304→        </p>
+   305→   305→      </div>
+   306→   306→    </motion.button>
+   307→   307→  );
+   308→   308→}
+   309→   309→
+   310→   310→/* ── ProductListingCard — full end-product listing ────────────────── */
+   311→   311→/* Expandable blocks reveal these: live-presentation previews plus a   */
+   312→   312→/* complete offer — numbered manifest, formats, license, price, and    */
+   313→   313→/* a one-click demo checkout with instant downloads.                   */
+   314→   314→
+   315→   315→function ProductListingCard({
+   316→   316→  example,
+   317→   317→  fp,
+   318→   318→  onPreview,
+   319→   319→  index,
+   320→   320→  familyShort,
+   321→   321→  familyChip,
+   322→   322→}: {
+   323→   323→  example: ProductExample;
+   324→   324→  fp: FamilyProduct;
+   325→   325→  onPreview: PreviewFn;
+   326→   326→  index: number;
+   327→   327→  familyShort: string;
+   328→   328→  familyChip: string;
+   329→   329→}) {
+   330→   330→  const offer = useMemo(
+   331→   331→    () =>
+   332→   332→      deriveOffer({
+   333→   333→        tierLetter: fp.tierLetter,
+   334→   334→        productTypeId: fp.product.id,
+   335→   335→        exampleName: example.exampleName,
+   336→   336→        features: example.features,
+   337→   337→      }),
+   338→   338→    [fp.tierLetter, fp.product.id, example.exampleName, example.features]
+   339→   339→  );
+   340→   340→
+   341→   341→  const td = example.tier;
+   342→   342→  const tierInfo =
+   343→   343→    td === "low"
+   344→   344→      ? { short: "STR", badge: "bg-amber-500" }
+   345→   345→      : td === "mid"
+   346→   346→        ? { short: "GRO", badge: "bg-sky-500" }
+   347→   347→        : td === "high"
+   348→   348→          ? { short: "PRO", badge: "bg-emerald-500" }
+   349→   349→          : { short: "ENT", badge: "bg-violet-600" };
+   350→   350→
+   351→   351→  const openPresentation = () =>
+   352→   352→    onPreview(example, fp.product.name, example, {
+   353→   353→      tierLetter: fp.tierLetter,
+   354→   354→      productTypeId: fp.product.id,
+   355→   355→    });
+   356→   356→
+   357→   357→  return (
+   358→   358→    <motion.article
+   359→   359→      variants={riseIn}
+   360→   360→      className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-shadow duration-200 hover:shadow-lg sm:flex-row"
+   361→   361→      aria-label={`${example.exampleName} — end-product listing`}
+   362→   362→    >
+   363→   363→      {/* Live-presentation preview */}
+   364→   364→      <button
+   365→   365→        onClick={openPresentation}
+   366→   366→        className="relative aspect-[16/10] w-full shrink-0 overflow-hidden bg-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-primary sm:aspect-auto sm:w-52"
+   367→   367→        aria-label={`Open ${example.exampleName} live presentation`}
+   368→   368→      >
+   369→   369→        <MiniPreview config={example} />
+   370→   370→        <span className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/25 group-focus-visible:bg-black/25">
+   371→   371→          <span className="flex translate-y-1 scale-95 items-center gap-1.5 rounded-lg bg-background/95 px-3 py-1.5 text-[11px] font-semibold text-foreground opacity-0 shadow-lg backdrop-blur transition-all duration-150 group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100">
+   372→   372→            <MonitorPlay className="size-3.5" aria-hidden="true" />
+   373→   373→            Live presentation
+   374→   374→          </span>
+   375→   375→        </span>
+   376→   376→        <span
+   377→   377→          className={cn(
+   378→   378→            "absolute left-1.5 top-1.5 z-20 rounded px-1.5 py-0.5 font-mono-forge text-[7px] font-semibold",
+   379→   379→            familyChip
+   380→   380→          )}
+   381→   381→        >
+   382→   382→          {familyShort}
+   383→   383→        </span>
+   384→   384→        <span
+   385→   385→          className={cn(
+   386→   386→            "absolute right-1.5 top-1.5 z-20 rounded px-1.5 py-0.5 font-mono-forge text-[8px] font-bold text-white shadow-sm",
+   387→   387→            tierInfo.badge
+   388→   388→          )}
+   389→   389→        >
+   390→   390→          {tierInfo.short}
+   391→   391→        </span>
+   392→   392→      </button>
+   393→   393→
+   394→   394→      {/* Offer body */}
+   395→   395→      <div className="flex min-w-0 flex-1 flex-col gap-3 p-3.5 sm:p-4">
+   396→   396→        {/* Name + description */}
+   397→   397→        <div>
+   398→   398→          <h4 className="truncate text-sm font-bold text-foreground">{example.exampleName}</h4>
+   399→   399→          <p className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
+   400→   400→            {example.exampleDescription}
+   401→   401→          </p>
+   402→   402→        </div>
+   403→   403→
+   404→   404→        {/* What's included — numbered manifest */}
+   405→   405→        <div className="rounded-lg border border-border/70 bg-muted/30 p-2.5">
+   406→   406→          <span className="font-mono-forge text-[9px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
+   407→   407→            What&apos;s included
+   408→   408→          </span>
+   409→   409→          <ol className="mt-2 grid grid-cols-1 gap-x-4 gap-y-2 min-[420px]:grid-cols-2">
+   410→   410→            {offer.manifest.map((item, i) => (
+   411→   411→              <li key={item} className="flex min-w-0 items-baseline gap-2">
+   412→   412→                <span className="shrink-0 font-mono-forge text-[9px] font-bold tabular-nums text-primary/80">
+   413→   413→                  {String(i + 1).padStart(2, "0")}
+   414→   414→                </span>
+   415→   415→                <span className="text-[11px] leading-snug text-foreground/90">{item}</span>
+   416→   416→              </li>
+   417→   417→            ))}
+   418→   418→          </ol>
+   419→   419→        </div>
+   420→   420→
+   421→   421→        {/* Meta chips */}
+   422→   422→        <div className="flex flex-wrap items-center gap-1.5">
+   423→   423→          {offer.formats.map((f) => (
+   424→   424→            <span
+   425→   425→              key={f}
+   426→   426→              className="inline-flex items-center gap-1 rounded border border-border bg-background px-1.5 py-0.5 font-mono-forge text-[9px] font-semibold text-muted-foreground"
+   427→   427→            >
+   428→   428→              <FileArchive className="size-2.5" aria-hidden="true" />
+   429→   429→              {f}
+   430→   430→            </span>
+   431→   431→          ))}
+   432→   432→          <span className="inline-flex items-center gap-1 rounded px-1 py-0.5 text-[10px] text-muted-foreground">
+   433→   433→            <ShieldCheck className="size-3 text-emerald-500" aria-hidden="true" />
+   434→   434→            {offer.license}
+   435→   435→          </span>
+   436→   436→        </div>
+   437→   437→
+   438→   438→        {/* Price + actions */}
+   439→   439→        <div className="mt-auto flex flex-col gap-3 border-t border-border/60 pt-3 min-[480px]:flex-row min-[480px]:flex-wrap min-[480px]:items-end min-[480px]:justify-between">
+   440→   440→          <div className="min-w-0">
+   441→   441→            <div className="flex items-baseline gap-1.5">
+   442→   442→              <span className="font-display text-xl font-bold leading-none text-foreground">
+   443→   443→                {offer.price === null ? "Custom quote" : formatPrice(offer.price)}
+   444→   444→                {offer.price !== null && offer.period && (
+   445→   445→                  <span className="text-xs font-semibold text-muted-foreground">{offer.period}</span>
+   446→   446→                )}
+   447→   447→              </span>
+   448→   448→              {offer.compareAt !== null && (
+   449→   449→                <s className="text-xs font-medium text-muted-foreground/70">
+   450→   450→                  {formatPrice(offer.compareAt)}
+   451→   451→                </s>
+   452→   452→              )}
+   453→   453→            </div>
+   454→   454→            <span className="mt-1 flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-[10px] text-muted-foreground">
+   455→   455→              <span className="flex items-center gap-1">
+   456→   456→                <Zap className="size-3 text-amber-500" aria-hidden="true" />
+   457→   457→                {offer.delivery}
+   458→   458→              </span>
+   459→   459→              <span className="flex items-center gap-1">
+   460→   460→                <RefreshCw className="size-3 text-sky-500" aria-hidden="true" />
+   461→   461→                {offer.updates}
+   462→   462→              </span>
+   463→   463→            </span>
+   464→   464→          </div>
+   465→   465→          <div className="flex shrink-0 flex-wrap items-center gap-2">
+   466→   466→            <button
+   467→   467→              onClick={openPresentation}
+   468→   468→              className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-border bg-background px-3.5 text-xs font-semibold text-foreground transition-colors hover:bg-muted active:translate-y-px"
+   469→   469→            >
+   470→   470→              <Eye className="size-3.5" aria-hidden="true" />
+   471→   471→              Live presentation
+   472→   472→            </button>
+   473→   473→            <PurchaseButton offer={offer} exampleName={example.exampleName} />
+   474→   474→          </div>
+   475→   475→        </div>
+   476→   476→      </div>
+   477→   477→    </motion.article>
+   478→   478→  );
+   479→   479→}
+   480→   480→
+   481→   481→/* ── ProductSection — accordion block, minimized by default ───────── */
+   482→   482→
+   483→   483→export function ProductSection({
+   484→   484→  fp,
+   485→   485→  onPreview,
+   486→   486→  expanded,
+   487→   487→  onToggle,
+   488→   488→  index,
+   489→   489→  familyShort,
+   490→   490→  familyChip,
+   491→   491→}: {
+   492→   492→  fp: FamilyProduct;
+   493→   493→  onPreview: PreviewFn;
+   494→   494→  expanded: boolean;
+   495→   495→  onToggle: () => void;
+   496→   496→  index: number;
+   497→   497→  familyShort: string;
+   498→   498→  familyChip: string;
+   499→   499→}) {
+   500→   500→  const tc = tierColorMap[fp.tierColor] ?? tierColorMap.amber;
+   501→   501→  const exampleNames = fp.product.examples.map((e) => e.exampleName);
+   502→   502→  return (
+   503→   503→    <motion.div
+   504→   504→      variants={riseIn}
+   505→   505→      className={cn(
+   506→   506→        "overflow-hidden rounded-xl border bg-card transition-colors",
+   507→   507→        expanded ? "border-border" : "border-border/70 hover:border-border"
+   508→   508→      )}
+   509→   509→    >
+   510→   510→      <button
+   511→   511→        onClick={onToggle}
+   512→   512→        aria-expanded={expanded}
+   513→   513→        className="flex w-full items-center justify-between gap-3 p-3.5 text-left transition-colors hover:bg-muted/40 sm:p-4"
+   514→   514→      >
+   515→   515→        <div className="flex min-w-0 flex-1 items-center gap-3">
+   516→   516→          <span
+   517→   517→            className={cn(
+   518→   518→              "flex size-6 shrink-0 items-center justify-center rounded font-mono-forge text-[10px] font-bold",
+   519→   519→              tc.chip
+   520→   520→            )}
+   521→   521→          >
+   522→   522→            {fp.tierLetter}
+   523→   523→          </span>
+   524→   524→          <div className="min-w-0">
+   525→   525→            <h3 className="text-sm font-bold text-foreground">{fp.product.name}</h3>
+   526→   526→            <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">
+   527→   527→              {fp.product.description}
+   528→   528→            </p>
+   529→   529→            {/* Scent of the minimized contents — example names */}
+   530→   530→            {!expanded && (
+   531→   531→              <p className="mt-1 truncate font-mono-forge text-[9px] uppercase tracking-[0.1em] text-muted-foreground/60">
+   532→   532→                {exampleNames.slice(0, 3).join(" · ")}
+   533→   533→                {exampleNames.length > 3 ? ` · +${exampleNames.length - 3}` : ""}
+   534→   534→              </p>
+   535→   535→            )}
+   536→   536→          </div>
+   537→   537→        </div>
+   538→   538→        <div className="flex shrink-0 items-center gap-2.5">
+   539→   539→          <span className="hidden items-center gap-1 rounded-full border border-border/80 bg-background/60 px-2 py-0.5 font-mono-forge text-[9px] font-semibold text-muted-foreground sm:inline-flex">
+   540→   540→            {fp.product.examples.length} products
+   541→   541→            <span className="text-muted-foreground/50">
+   542→   542→              · {fp.tierLetter === "E" ? "scoped quotes" : "buy instantly"}
+   543→   543→            </span>
+   544→   544→          </span>
+   545→   545→          <motion.span
+   546→   546→            animate={{ rotate: expanded ? 180 : 0 }}
+   547→   547→            transition={{ duration: 0.2 }}
+   548→   548→            className="flex size-6 items-center justify-center rounded-md border border-border/70 bg-background text-muted-foreground"
+   549→   549→          >
+   550→   550→            <ChevronDown className="size-3.5" aria-hidden="true" />
+   551→   551→          </motion.span>
+   552→   552→        </div>
+   553→   553→      </button>
+   554→   554→      <AnimatePresence initial={false}>
+   555→   555→        {expanded && (
+   556→   556→          <motion.div
+   557→   557→            initial={{ height: 0, opacity: 0 }}
+   558→   558→            animate={{ height: "auto", opacity: 1 }}
+   559→   559→            exit={{ height: 0, opacity: 0 }}
+   560→   560→            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+   561→   561→            className="overflow-hidden"
+   562→   562→          >
+   563→   563→            <div className="border-t border-border/60 px-3.5 pb-4 pt-3 sm:px-4">
+   564→   564→              <motion.div
+   565→   565→                initial="hidden"
+   566→   566→                animate="show"
+   567→   567→                variants={staggerParent(0.04)}
+   568→   568→                className="mt-1 grid grid-cols-1 gap-3 xl:grid-cols-2"
+   569→   569→              >
+   570→   570→                {fp.product.examples.map((ex, i) => (
+   571→   571→                  <ProductListingCard
+   572→   572→                    key={i}
+   573→   573→                    example={ex}
+   574→   574→                    fp={fp}
+   575→   575→                    onPreview={onPreview}
+   576→   576→                    index={i}
+   577→   577→                    familyShort={familyShort}
+   578→   578→                    familyChip={familyChip}
+   579→   579→                  />
+   580→   580→                ))}
+   581→   581→              </motion.div>
+   582→   582→              <p className="mt-3 flex items-center gap-1.5 font-mono-forge text-[9px] uppercase tracking-[0.12em] text-muted-foreground/60">
+   583→   583→                <BadgeCheck className="size-3" aria-hidden="true" />
+   584→   584→                Sample catalog · demo checkout — purchases and downloads are simulated
+   585→   585→              </p>
+   586→   586→            </div>
+   587→   587→          </motion.div>
+   588→   588→        )}
+   589→   589→      </AnimatePresence>
+   590→   590→    </motion.div>
+   591→   591→  );
+   592→   592→}
+   593→   593→
+   594→   594→/* ── FamilyView ───────────────────────────────────────────────────── */
+   595→   595→
+   596→   596→export function FamilyView({
+   597→   597→  familyId,
+   598→   598→  items,
+   599→   599→  onPreview,
+   600→   600→}: {
+   601→   601→  familyId: string;
+   602→   602→  items: FamilyProduct[];
+   603→   603→  onPreview: PreviewFn;
+   604→   604→}) {
+   605→   605→  const fm = familyMeta[familyId] ?? familyMeta.micro;
+   606→   606→  const tokens = familyTokens[familyId as keyof typeof familyTokens] ?? familyTokens.micro;
+   607→   607→  const exampleCount = items.reduce((n, fp) => n + fp.product.examples.length, 0);
+   608→   608→
+   609→   609→  /* Every product block starts minimized */
+   610→   610→  const [openIds, setOpenIds] = useState<ReadonlySet<string>>(() => new Set());
+   611→   611→  const allOpen = items.length > 0 && items.every((fp) => openIds.has(fp.product.id));
+   612→   612→  const someOpen = items.some((fp) => openIds.has(fp.product.id));
+   613→   613→
+   614→   614→  const toggleSection = (id: string) =>
+   615→   615→    setOpenIds((prev) => {
+   616→   616→      const next = new Set(prev);
+   617→   617→      if (next.has(id)) next.delete(id);
+   618→   618→      else next.add(id);
+   619→   619→      return next;
+   620→   620→    });
+   621→   621→
+   622→   622→  const toggleAll = () =>
+   623→   623→    setOpenIds(allOpen ? new Set() : new Set(items.map((fp) => fp.product.id)));
+   624→   624→
+   625→   625→  const byTier = useMemo(() => {
+   626→   626→    const groups: Record<string, FamilyProduct[]> = {};
+   627→   627→    for (const fp of items) {
+   628→   628→      (groups[fp.tierLetter] ||= []).push(fp);
+   629→   629→    }
+   630→   630→    return Object.entries(groups).sort(([a], [b]) => a.localeCompare(b));
+   631→   631→  }, [items]);
+   632→   632→
+   633→   633→  return (
+   634→   634→    <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+   635→   635→      <motion.div
+   636→   636→        initial="hidden"
+   637→   637→        animate="show"
+   638→   638→        variants={staggerParent(0.06)}
+   639→   639→        className="space-y-6"
+   640→   640→      >
+   641→   641→        {/* Header */}
+   642→   642→        <motion.div
+   643→   643→          variants={riseIn}
+   644→   644→          className={cn("relative overflow-hidden rounded-xl border p-4 sm:p-5", fm.border, fm.bg)}
+   645→   645→        >
+   646→   646→          <div
+   647→   647→            className="pointer-events-none absolute inset-0 opacity-50"
+   648→   648→            style={{ background: `radial-gradient(90% 120% at 100% 0%, ${fm.glow}, transparent 60%)` }}
+   649→   649→            aria-hidden="true"
+   650→   650→          />
+   651→   651→          <div className="relative flex flex-wrap items-start justify-between gap-3">
+   652→   652→            <div className="flex items-center gap-3">
+   653→   653→              <fm.icon className={cn("size-5", fm.text)} aria-hidden="true" />
+   654→   654→              <h2 className="font-display text-xl font-bold text-foreground sm:text-2xl">
+   655→   655→                {fm.label}
+   656→   656→              </h2>
+   657→   657→            </div>
+   658→   658→            <div className="flex flex-wrap items-center gap-2">
+   659→   659→              <span className={cn("rounded px-2 py-1 font-mono-forge text-[10px] font-semibold", fm.chip)}>
+   660→   660→                {items.length} products · {exampleCount} examples
+   661→   661→              </span>
+   662→   662→              <button
+   663→   663→                onClick={toggleAll}
+   664→   664→                className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-border bg-background/80 px-3 text-[11px] font-semibold text-foreground backdrop-blur transition-colors hover:bg-muted active:translate-y-px"
+   665→   665→                aria-label={allOpen ? "Collapse all product blocks" : "Expand all product blocks"}
+   666→   666→              >
+   667→   667→                {allOpen ? (
+   668→   668→                  <FoldVertical className="size-3.5" aria-hidden="true" />
+   669→   669→                ) : (
+   670→   670→                  <UnfoldVertical className="size-3.5" aria-hidden="true" />
+   671→   671→                )}
+   672→   672→                {allOpen ? "Collapse all" : "Expand all"}
+   673→   673→              </button>
+   674→   674→            </div>
+   675→   675→          </div>
+   676→   676→          <p className="relative mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+   677→   677→            {fm.blurb}
+   678→   678→          </p>
+   679→   679→          <div className="relative mt-3 flex flex-wrap items-center gap-3 font-mono-forge text-[10px] text-muted-foreground">
+   680→   680→            <span>Recipe: {fm.recipe}</span>
+   681→   681→            <span aria-hidden="true">·</span>
+   682→   682→            <span>{tokens.radius.md}px radius</span>
+   683→   683→            <span aria-hidden="true">·</span>
+   684→   684→            <span>{tokens.sectionStyle} sections</span>
+   685→   685→            <span aria-hidden="true">·</span>
+   686→   686→            <span className="text-muted-foreground/70">
+   687→   687→              blocks start minimized {someOpen ? "· some expanded" : ""}
+   688→   688→            </span>
+   689→   689→          </div>
+   690→   690→        </motion.div>
+   691→   691→
+   692→   692→        {/* Tier groups */}
+   693→   693→        {byTier.map(([tierLetter, tierProducts]) => {
+   694→   694→          const tc = tierColorMap[tierProducts[0].tierColor] ?? tierColorMap.amber;
+   695→   695→          return (
+   696→   696→            <section key={tierLetter} aria-label={tierProducts[0].tierName} className="space-y-2.5">
+   697→   697→              <div className="flex flex-wrap items-center gap-2">
+   698→   698→                <span
+   699→   699→                  className={cn(
+   700→   700→                    "flex size-6 items-center justify-center rounded font-mono-forge text-[10px] font-bold",
+   701→   701→                    tc.chip
+   702→   702→                  )}
+   703→   703→                >
+   704→   704→                  {tierLetter}
+   705→   705→                </span>
+   706→   706→                <h3 className="font-display text-base font-bold text-foreground">
+   707→   707→                  {tierProducts[0].tierName}
+   708→   708→                </h3>
+   709→   709→                <span className="font-mono-forge text-[11px] text-muted-foreground">
+   710→   710→                  {tierProducts[0].priceRange}
+   711→   711→                </span>
+   712→   712→                <span className="font-mono-forge text-[10px] text-muted-foreground">
+   713→   713→                  · {tierProducts.length} products
+   714→   714→                </span>
+   715→   715→              </div>
+   716→   716→              <motion.div
+   717→   717→                initial="hidden"
+   718→   718→                animate="show"
+   719→   719→                variants={staggerParent(0.05)}
+   720→   720→                className="space-y-2.5"
+   721→   721→              >
+   722→   722→                {tierProducts.map((fp, i) => (
+   723→   723→                  <ProductSection
+   724→   724→                    key={fp.product.id}
+   725→   725→                    fp={fp}
+   726→   726→                    onPreview={onPreview}
+   727→   727→                    expanded={openIds.has(fp.product.id)}
+   728→   728→                    onToggle={() => toggleSection(fp.product.id)}
+   729→   729→                    index={i}
+   730→   730→                    familyShort={fm.short}
+   731→   731→                    familyChip={fm.chip}
+   732→   732→                  />
+   733→   733→                ))}
+   734→   734→              </motion.div>
+   735→   735→            </section>
+   736→   736→          );
+   737→   737→        })}
+   738→   738→      </motion.div>
+   739→   739→    </main>
+   740→   740→  );
+   741→   741→}
+   742→   742→

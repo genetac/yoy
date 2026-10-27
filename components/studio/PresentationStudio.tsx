@@ -6,13 +6,18 @@
  */
 import { useCallback, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { X, Eye, Package, GitCompare, PlayCircle, Star, Quote, BadgeCheck } from 'lucide-react';
+import { X, Eye, Package, GitCompare, PlayCircle, Star, Quote, BadgeCheck, ChevronDown, ExternalLink } from 'lucide-react';
 import type { MockupConfig } from '@/data/businessTypes';
 import type { ProductExample } from '@/data/exampleProducts';
 import { getPackage, tierOrder, tierDisplay, type Tier } from '@/data/servicePackages';
 import { offerStats, type OfferV2 } from '@/data/product-catalog';
+import { DESIGN_STYLES, useStyle } from '@/lib/style-registry';
 import { ManifestExplorer } from './ManifestExplorer';
 import { PurchaseFlow } from './PurchaseFlow';
+import { StyleSwitcher } from '@/components/style/StyleSwitcher';
+import { ModeToggle } from '@/components/style/EngineSignature';
+import { GenomeConsole } from '@/components/genome/GenomeConsole';
+import { siteSlugForLabel, findSiteEntryBySlug } from '@/lib/site-preview';
 import { FamilyPreview } from '@/components/FamilyPreview';
 import { MockupRenderer } from '@/components/MockupRenderer';
 import { MotionMedia, posterFrom } from '@/components/MotionMedia';
@@ -47,6 +52,9 @@ export function PresentationStudio({
   const [tab, setTab] = useState<Tab>(offer.demo ? 'try' : 'preview');
   const [demoDone, setDemoDone] = useState(false);
   const stats = offerStats(offer);
+  const engine = DESIGN_STYLES[useStyle()];
+  /* the genome entry for this example — the console restyles THIS site live */
+  const genomeEntry = example ? findSiteEntryBySlug(siteSlugForLabel(example.label)) : null;
 
   // Escape to close, scroll lock, focus return (GUIDE #8)
   useEffect(() => {
@@ -89,9 +97,10 @@ export function PresentationStudio({
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="of-plate-num !text-[#f3dfa6]">{offer.offerId} · {offer.edition}</span>
+                  <span className="of-plate-num" style={{ color: 'var(--color-brass-300)' }}>{offer.offerId} · {offer.edition}</span>
                   {offer.authored && <span className="of-chip">Hand-authored</span>}
                   <span className="of-chip">{offer.proof.version}</span>
+                  <span className="of-chip">{engine.short} · {engine.label}</span>
                 </div>
                 <h2 className="mt-1 font-display text-xl font-semibold tracking-tight text-white drop-shadow-sm sm:text-2xl">{offer.title}</h2>
                 <p className="mt-0.5 line-clamp-1 max-w-2xl text-[12px] text-white/80">{offer.promise}</p>
@@ -138,6 +147,20 @@ export function PresentationStudio({
             )}
             {tab === 'preview' && (
               <div className="of-slide-up">
+                <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                  <p className="font-mono text-[9.5px] uppercase tracking-[0.14em] text-zinc-400">
+                    the real site — scaled · {businessName} · genome-resolved (identical to the full-size review)
+                  </p>
+                  {example && (
+                    <a
+                      href={`/preview/${siteSlugForLabel(example.label)}`}
+                      className="of-btn !px-3.5 !py-2 text-[11px]"
+                      title="Open this example as a real, full-size, scrollable website — same engine, same mode"
+                    >
+                      <ExternalLink className="h-3.5 w-3.5" /> Open the real-size website
+                    </a>
+                  )}
+                </div>
                 <div className="of-hairline overflow-hidden rounded-t-xl bg-zinc-100 px-3 py-2 dark:bg-zinc-800">
                   <div className="flex items-center gap-2">
                     <span className="h-2.5 w-2.5 rounded-full bg-red-400/80" />
@@ -150,7 +173,7 @@ export function PresentationStudio({
                   {example ? <FamilyPreview example={example} /> : <MockupRenderer config={config} />}
                 </div>
                 <p className="mt-2 text-center font-mono text-[9.5px] text-zinc-400">
-                  {businessName} · rendered by the {offer.archetype} renderer — the same code that ships in the kit
+                  this is the real product site — flip engines, modes or genome switches and it re-dresses live
                 </p>
               </div>
             )}
@@ -176,6 +199,23 @@ export function PresentationStudio({
 
           {/* purchase rail */}
           <aside className="min-h-0 overflow-y-auto border-t border-brass-500/20 bg-zinc-50/50 p-4 dark:bg-zinc-900/30 lg:border-l lg:border-t-0">
+            <div className="of-hairline mb-3 rounded-xl bg-[var(--of-plate-bg-2)]/60 p-3">
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <StyleSwitcher variant="rail" />
+                <ModeToggle compact />
+              </div>
+              <details className="group" data-testid="studio-genome">
+                <summary className="mt-2 flex cursor-pointer list-none items-center justify-between gap-2 font-mono text-[9px] font-bold uppercase tracking-[0.14em] text-zinc-400 transition-colors hover:text-brass-600 dark:hover:text-brass-300">
+                  <span className="flex items-center gap-1.5">
+                    <span className="h-1.5 w-1.5 rounded-full" style={{ background: '#8b5cf6' }} /> design genome — 7 switches
+                  </span>
+                  <ChevronDown className="h-3 w-3 transition-transform group-open:rotate-180" />
+                </summary>
+                <div className="mt-3">
+                  <GenomeConsole compact entry={genomeEntry} />
+                </div>
+              </details>
+            </div>
             <PurchaseFlow offer={offer} />
           </aside>
         </div>

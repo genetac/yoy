@@ -1,0 +1,1489 @@
+[
+ {
+  "id": "B:template-pack:Email Template Pack",
+  "block": "B · Template Packs",
+  "example": "Email Template Pack",
+  "price": 34,
+  "compareAt": 49,
+  "reviews": 65,
+  "sold": "562",
+  "version": "v2.3",
+  "updated": "Jun 2025",
+  "files": 23,
+  "folders": 5,
+  "size": "2.7 MB",
+  "manifest": [
+   "Welcome series",
+   "Cold outreach",
+   "Follow-up templates",
+   "Quick-start guide (PDF)",
+   "Lifetime free updates"
+  ],
+  "tree": [
+   {
+    "folder": "01-welcome-series",
+    "files": [
+     "day-0-welcome-quick-win.docx (145 KB)",
+     "day-2-founder-story.docx (155 KB)",
+     "day-4-customer-proof.docx (129 KB)",
+     "day-6-soft-pitch.docx (191 KB)"
+    ]
+   },
+   {
+    "folder": "02-cold-outreach",
+    "files": [
+     "3-opening-variants-a-b-c.docx (85 KB)",
+     "personalization-merge-fields.docx (140 KB)",
+     "objection-crusher-reply.docx (53 KB)",
+     "break-up-send.docx (52 KB)"
+    ]
+   },
+   {
+    "folder": "03-follow-up-templates",
+    "files": [
+     "day-3-gentle-nudge.docx (146 KB)",
+     "day-7-value-add.docx (186 KB)",
+     "day-14-last-call.docx (182 KB)",
+     "quarterly-win-back.docx (216 KB)"
+    ]
+   },
+   {
+    "folder": "04-quick-start-guide-pdf",
+    "files": [
+     "light-dark-variants.docx (48 KB)",
+     "copy-paste-prompts.docx (155 KB)",
+     "bonus-mini-pack.docx (149 KB)"
+    ]
+   },
+   {
+    "folder": "05-lifetime-free-updates",
+    "files": [
+     "dashboard-view-preset.json (15 KB)",
+     "sample-data-csv.csv (36 KB)",
+     "progress-formulas.docx (151 KB)",
+     "mobile-layout-preset.json (2 KB)"
+    ]
+   }
+  ],
+  "root": [
+   "README.md",
+   "LICENSE.txt",
+   "CHANGELOG.md",
+   "quick-start-guide.pdf"
+  ],
+  "testimonial": "Sofia Marchetti (Ops manager): Our team adopted it in one afternoon. The docs are better than tools we pay 10× for."
+ },
+ {
+  "id": "B:template-pack:Proposal Template Pack",
+  "block": "B · Template Packs",
+  "example": "Proposal Template Pack",
+  "price": 34,
+  "compareAt": 49,
+  "reviews": 167,
+  "sold": "576",
+  "version": "v1.1",
+  "updated": "Jun 2025",
+  "files": 23,
+  "folders": 5,
+  "size": "2.6 MB",
+  "manifest": [
+   "Service proposals",
+   "Pricing tables",
+   "Terms + conditions",
+   "Quick-start guide (PDF)",
+   "Lifetime free updates"
+  ],
+  "tree": [
+   {
+    "folder": "01-service-proposals",
+    "files": [
+     "scope-timeline-blocks.docx (219 KB)",
+     "3-tier-pricing-table.md (3 KB)",
+     "e-signature-fields.docx (122 KB)",
+     "case-study-insert.docx (94 KB)"
+    ]
+   },
+   {
+    "folder": "02-pricing-tables",
+    "files": [
+     "3-tier-price-table.md (4 KB)",
+     "value-stack-builder.docx (123 KB)",
+     "faq-objection-handling.pdf (648 KB)",
+     "comparison-sheet.xlsx (55 KB)"
+    ]
+   },
+   {
+    "folder": "03-terms-conditions",
+    "files": [
+     "plain-english-summary.pdf (248 KB)",
+     "fill-in-bracket-system.docx (105 KB)",
+     "2-layouts-letter-legal.docx (33 KB)",
+     "jurisdiction-variant-notes.pdf (120 KB)"
+    ]
+   },
+   {
+    "folder": "04-quick-start-guide-pdf",
+    "files": [
+     "editable-master-files.docx (92 KB)",
+     "subject-copy-bank.eml (8 KB)",
+     "quick-start-pdf.docx (85 KB)"
+    ]
+   },
+   {
+    "folder": "05-lifetime-free-updates",
+    "files": [
+     "dashboard-view-preset.json (15 KB)",
+     "sample-data-csv.csv (36 KB)",
+     "progress-formulas.docx (151 KB)",
+     "mobile-layout-preset.json (2 KB)"
+    ]
+   }
+  ],
+  "root": [
+   "README.md",
+   "LICENSE.txt",
+   "CHANGELOG.md",
+   "quick-start-guide.pdf"
+  ],
+  "testimonial": "Sofia Marchetti (Ops manager): Our team adopted it in one afternoon. The docs are better than tools we pay 10× for."
+ },
+ {
+  "id": "B:template-pack:Presentation Template Pack",
+  "block": "B · Template Packs",
+  "example": "Presentation Template Pack",
+  "price": 79,
+  "compareAt": 99,
+  "reviews": 25,
+  "sold": "418",
+  "version": "v2.2",
+  "updated": "Aug 2025",
+  "files": 21,
+  "folders": 5,
+  "size": "3.7 MB",
+  "manifest": [
+   "20 slide layouts",
+   "Pitch deck",
+   "Report slides",
+   "Quick-start guide (PDF)",
+   "Lifetime free updates"
+  ],
+  "tree": [
+   {
+    "folder": "01-20-slide-layouts",
+    "files": [
+     "20-master-layouts.docx (54 KB)",
+     "chart-data-slides.pptx (1.3 MB)",
+     "dark-light-themes.docx (142 KB)",
+     "speaker-notes.pdf (501 KB)"
+    ]
+   },
+   {
+    "folder": "02-pitch-deck",
+    "files": [
+     "editable-master-files.docx (92 KB)",
+     "subject-copy-bank.eml (8 KB)",
+     "quick-start-pdf.docx (85 KB)"
+    ]
+   },
+   {
+    "folder": "03-report-slides",
+    "files": [
+     "light-dark-variants.docx (48 KB)",
+     "copy-paste-prompts.docx (155 KB)",
+     "bonus-mini-pack.docx (149 KB)"
+    ]
+   },
+   {
+    "folder": "04-quick-start-guide-pdf",
+    "files": [
+     "modular-sections.docx (89 KB)",
+     "brand-token-slots.json (3 KB)",
+     "usage-license-guide.pdf (457 KB)"
+    ]
+   },
+   {
+    "folder": "05-lifetime-free-updates",
+    "files": [
+     "dashboard-view-preset.json (15 KB)",
+     "sample-data-csv.csv (36 KB)",
+     "progress-formulas.docx (151 KB)",
+     "mobile-layout-preset.json (2 KB)"
+    ]
+   }
+  ],
+  "root": [
+   "README.md",
+   "LICENSE.txt",
+   "CHANGELOG.md",
+   "quick-start-guide.pdf"
+  ],
+  "testimonial": "Sofia Marchetti (Ops manager): Our team adopted it in one afternoon. The docs are better than tools we pay 10× for."
+ },
+ {
+  "id": "B:template-pack:Contract Template Pack",
+  "block": "B · Template Packs",
+  "example": "Contract Template Pack",
+  "price": 49,
+  "compareAt": 69,
+  "reviews": 195,
+  "sold": "1.1k",
+  "version": "v3.2",
+  "updated": "Aug 2025",
+  "files": 22,
+  "folders": 5,
+  "size": "2.3 MB",
+  "manifest": [
+   "Service agreements",
+   "NDAs",
+   "SOW templates",
+   "Quick-start guide (PDF)",
+   "Lifetime free updates"
+  ],
+  "tree": [
+   {
+    "folder": "01-service-agreements",
+    "files": [
+     "plain-english-summary.pdf (248 KB)",
+     "fill-in-bracket-system.docx (105 KB)",
+     "2-layouts-letter-legal.docx (33 KB)",
+     "jurisdiction-variant-notes.pdf (120 KB)"
+    ]
+   },
+   {
+    "folder": "02-ndas",
+    "files": [
+     "editable-master-files.docx (92 KB)",
+     "subject-copy-bank.eml (8 KB)",
+     "quick-start-pdf.docx (85 KB)"
+    ]
+   },
+   {
+    "folder": "03-sow-templates",
+    "files": [
+     "scope-timeline-blocks.docx (219 KB)",
+     "3-tier-pricing-table.md (3 KB)",
+     "e-signature-fields.docx (122 KB)",
+     "case-study-insert.docx (94 KB)"
+    ]
+   },
+   {
+    "folder": "04-quick-start-guide-pdf",
+    "files": [
+     "modular-sections.docx (89 KB)",
+     "brand-token-slots.json (3 KB)",
+     "usage-license-guide.pdf (457 KB)"
+    ]
+   },
+   {
+    "folder": "05-lifetime-free-updates",
+    "files": [
+     "dashboard-view-preset.json (15 KB)",
+     "sample-data-csv.csv (36 KB)",
+     "progress-formulas.docx (151 KB)",
+     "mobile-layout-preset.json (2 KB)"
+    ]
+   }
+  ],
+  "root": [
+   "README.md",
+   "LICENSE.txt",
+   "CHANGELOG.md",
+   "quick-start-guide.pdf"
+  ],
+  "testimonial": "Hanna Lindqvist (HR business partner): The attention to edge cases is what sold me. It's clearly built by people who do the work."
+ },
+ {
+  "id": "B:toolkit:SEO Toolkit",
+  "block": "B · Toolkits",
+  "example": "SEO Toolkit",
+  "price": 34,
+  "compareAt": 49,
+  "reviews": 153,
+  "sold": "918",
+  "version": "v2.3",
+  "updated": "Aug 2025",
+  "files": 21,
+  "folders": 5,
+  "size": "5.2 MB",
+  "manifest": [
+   "Keyword checker",
+   "Meta generator",
+   "Sitemap tool",
+   "Setup guide + docs",
+   "Free minor updates"
+  ],
+  "tree": [
+   {
+    "folder": "01-keyword-checker",
+    "files": [
+     "scoring-sheet-formulas.xlsx (57 KB)",
+     "generator-with-presets.json (4 KB)",
+     "copy-and-go-checklist.pdf (521 KB)",
+     "worked-examples-5.pdf (824 KB)"
+    ]
+   },
+   {
+    "folder": "02-meta-generator",
+    "files": [
+     "dry-run-mode.sh (7 KB)",
+     "output-templates.docx (183 KB)",
+     "troubleshooting-guide.pdf (695 KB)"
+    ]
+   },
+   {
+    "folder": "03-sitemap-tool",
+    "files": [
+     "hero-variant-set-3.sh (7 KB)",
+     "cta-block-library.sh (3 KB)",
+     "mobile-first-layout.docx (76 KB)",
+     "deploy-checklist.pdf (896 KB)"
+    ]
+   },
+   {
+    "folder": "04-setup-guide-docs",
+    "files": [
+     "one-command-install.sh (4 KB)",
+     "sample-fixtures.csv (31 KB)",
+     "changelog-semver.pdf (842 KB)"
+    ]
+   },
+   {
+    "folder": "05-free-minor-updates",
+    "files": [
+     "cross-platform-scripts.sh (5 KB)",
+     "config-presets-3.json (7 KB)",
+     "setup-docs.pdf (661 KB)"
+    ]
+   }
+  ],
+  "root": [
+   "README.md",
+   "LICENSE.txt",
+   "CHANGELOG.md",
+   "quick-start-guide.pdf"
+  ],
+  "testimonial": "Hanna Lindqvist (HR business partner): The attention to edge cases is what sold me. It's clearly built by people who do the work."
+ },
+ {
+  "id": "B:toolkit:Designer's Toolkit",
+  "block": "B · Toolkits",
+  "example": "Designer's Toolkit",
+  "price": 49,
+  "compareAt": 69,
+  "reviews": 27,
+  "sold": "172",
+  "version": "v1.0",
+  "updated": "Oct 2025",
+  "files": 20,
+  "folders": 5,
+  "size": "4.4 MB",
+  "manifest": [
+   "Color generator",
+   "Font pairer",
+   "Grid tool",
+   "Setup guide + docs",
+   "Free minor updates"
+  ],
+  "tree": [
+   {
+    "folder": "01-color-generator",
+    "files": [
+     "token-export-json.json (5 KB)",
+     "contrast-checked-pairings-12.docx (62 KB)",
+     "grid-spacing-sheet.xlsx (96 KB)",
+     "usage-examples.pdf (505 KB)"
+    ]
+   },
+   {
+    "folder": "02-font-pairer",
+    "files": [
+     "dry-run-mode.sh (7 KB)",
+     "output-templates.docx (183 KB)",
+     "troubleshooting-guide.pdf (695 KB)"
+    ]
+   },
+   {
+    "folder": "03-grid-tool",
+    "files": [
+     "cross-platform-scripts.sh (5 KB)",
+     "config-presets-3.json (7 KB)",
+     "setup-docs.pdf (661 KB)"
+    ]
+   },
+   {
+    "folder": "04-setup-guide-docs",
+    "files": [
+     "one-command-install.sh (4 KB)",
+     "sample-fixtures.csv (31 KB)",
+     "changelog-semver.pdf (842 KB)"
+    ]
+   },
+   {
+    "folder": "05-free-minor-updates",
+    "files": [
+     "dry-run-mode-2.sh (7 KB)",
+     "output-templates-2.docx (183 KB)",
+     "troubleshooting-guide-2.pdf (695 KB)"
+    ]
+   }
+  ],
+  "root": [
+   "README.md",
+   "LICENSE.txt",
+   "CHANGELOG.md",
+   "quick-start-guide.pdf"
+  ],
+  "testimonial": "Hanna Lindqvist (HR business partner): The attention to edge cases is what sold me. It's clearly built by people who do the work."
+ },
+ {
+  "id": "B:toolkit:Developer's Toolkit",
+  "block": "B · Toolkits",
+  "example": "Developer's Toolkit",
+  "price": 34,
+  "compareAt": 49,
+  "reviews": 32,
+  "sold": "451",
+  "version": "v3.4",
+  "updated": "Sep 2025",
+  "files": 21,
+  "folders": 5,
+  "size": "3.9 MB",
+  "manifest": [
+   "Snippet library",
+   "Regex tester",
+   "JSON formatter",
+   "Setup guide + docs",
+   "Free minor updates"
+  ],
+  "tree": [
+   {
+    "folder": "01-snippet-library",
+    "files": [
+     "ready-to-paste-snippets-40.sh (7 KB)",
+     "test-fixtures-included.csv (23 KB)",
+     "cheat-sheet-pdf.xlsx (37 KB)",
+     "changelog-semver.pdf (842 KB)"
+    ]
+   },
+   {
+    "folder": "02-regex-tester",
+    "files": [
+     "one-command-install.sh (4 KB)",
+     "sample-fixtures.csv (31 KB)",
+     "changelog-semver-2.pdf (842 KB)"
+    ]
+   },
+   {
+    "folder": "03-json-formatter",
+    "files": [
+     "form-block-validation.sh (10 KB)",
+     "thank-you-page.sh (4 KB)",
+     "anti-spam-honeypot.sh (5 KB)",
+     "integration-guide.pdf (123 KB)"
+    ]
+   },
+   {
+    "folder": "04-setup-guide-docs",
+    "files": [
+     "cross-platform-scripts.sh (5 KB)",
+     "config-presets-3.json (7 KB)",
+     "setup-docs.pdf (661 KB)"
+    ]
+   },
+   {
+    "folder": "05-free-minor-updates",
+    "files": [
+     "dry-run-mode.sh (7 KB)",
+     "output-templates.docx (183 KB)",
+     "troubleshooting-guide.pdf (695 KB)"
+    ]
+   }
+  ],
+  "root": [
+   "README.md",
+   "LICENSE.txt",
+   "CHANGELOG.md",
+   "quick-start-guide.pdf"
+  ],
+  "testimonial": "Tom Beaulieu (Startup founder): Absurdly complete. Every file I opened had a reason to exist — zero filler."
+ },
+ {
+  "id": "B:toolkit:Content Writer's Toolkit",
+  "block": "B · Toolkits",
+  "example": "Content Writer's Toolkit",
+  "price": 34,
+  "compareAt": 49,
+  "reviews": 82,
+  "sold": "579",
+  "version": "v1.0",
+  "updated": "Sep 2025",
+  "files": 20,
+  "folders": 5,
+  "size": "5.1 MB",
+  "manifest": [
+   "Headline analyzer",
+   "Outline generator",
+   "Readability checker",
+   "Setup guide + docs",
+   "Free minor updates"
+  ],
+  "tree": [
+   {
+    "folder": "01-headline-analyzer",
+    "files": [
+     "scoring-sheet-formulas.xlsx (57 KB)",
+     "generator-with-presets.json (4 KB)",
+     "copy-and-go-checklist.pdf (521 KB)",
+     "worked-examples-5.pdf (824 KB)"
+    ]
+   },
+   {
+    "folder": "02-outline-generator",
+    "files": [
+     "one-command-install.sh (4 KB)",
+     "sample-fixtures.csv (31 KB)",
+     "changelog-semver.pdf (842 KB)"
+    ]
+   },
+   {
+    "folder": "03-readability-checker",
+    "files": [
+     "dry-run-mode.sh (7 KB)",
+     "output-templates.docx (183 KB)",
+     "troubleshooting-guide.pdf (695 KB)"
+    ]
+   },
+   {
+    "folder": "04-setup-guide-docs",
+    "files": [
+     "cross-platform-scripts.sh (5 KB)",
+     "config-presets-3.json (7 KB)",
+     "setup-docs.pdf (661 KB)"
+    ]
+   },
+   {
+    "folder": "05-free-minor-updates",
+    "files": [
+     "one-command-install-2.sh (4 KB)",
+     "sample-fixtures-2.csv (31 KB)",
+     "changelog-semver-2.pdf (842 KB)"
+    ]
+   }
+  ],
+  "root": [
+   "README.md",
+   "LICENSE.txt",
+   "CHANGELOG.md",
+   "quick-start-guide.pdf"
+  ],
+  "testimonial": "Daniel Kovač (Agency owner): The structure alone was worth the price — it felt like borrowing a senior operator's brain."
+ },
+ {
+  "id": "B:notion-system:Project Management OS",
+  "block": "B · Notion Systems",
+  "example": "Project Management OS",
+  "price": 34,
+  "compareAt": 49,
+  "reviews": 91,
+  "sold": "578",
+  "version": "v3.1",
+  "updated": "Oct 2025",
+  "files": 22,
+  "folders": 5,
+  "size": "36.8 MB",
+  "manifest": [
+   "Task database",
+   "Sprint board",
+   "Timeline view",
+   "Setup video walkthrough",
+   "Free duplicate link"
+  ],
+  "tree": [
+   {
+    "folder": "01-task-database",
+    "files": [
+     "task-database-schema.tsx (25 KB)",
+     "sprint-board-template.docx (176 KB)",
+     "timeline-view.md (4 KB)",
+     "weekly-review-ritual.pdf (740 KB)"
+    ]
+   },
+   {
+    "folder": "02-sprint-board",
+    "files": [
+     "progress-rollups.md (8 KB)",
+     "template-buttons.docx (207 KB)",
+     "mobile-layout-preset.json (17 KB)"
+    ]
+   },
+   {
+    "folder": "03-timeline-view",
+    "files": [
+     "dashboard-view-preset.json (16 KB)",
+     "sample-data-csv.csv (13 KB)",
+     "progress-formulas.docx (66 KB)",
+     "mobile-layout-preset-2.json (17 KB)"
+    ]
+   },
+   {
+    "folder": "04-setup-video-walkthrough",
+    "files": [
+     "relation-linked-databases.md (4 KB)",
+     "board-calendar-views.md (5 KB)",
+     "6-min-setup-video.mp4 (34.9 MB)"
+    ]
+   },
+   {
+    "folder": "05-free-duplicate-link",
+    "files": [
+     "duplicate-ready-workspace.md (6 KB)",
+     "dashboard-views-4.md (3 KB)",
+     "formula-reference.pdf (147 KB)"
+    ]
+   }
+  ],
+  "root": [
+   "README.md",
+   "LICENSE.txt",
+   "CHANGELOG.md",
+   "quick-start-guide.pdf",
+   "duplicate-link.txt"
+  ],
+  "testimonial": "Ibrahim Diallo (Solo founder): Worth 10× the price. The bonus materials alone replaced three other tools I was paying for."
+ },
+ {
+  "id": "B:notion-system:Sales CRM System",
+  "block": "B · Notion Systems",
+  "example": "Sales CRM System",
+  "price": 79,
+  "compareAt": 99,
+  "reviews": 52,
+  "sold": "409",
+  "version": "v3.3",
+  "updated": "May 2025",
+  "files": 23,
+  "folders": 5,
+  "size": "36.6 MB",
+  "manifest": [
+   "CRM database",
+   "Pipeline board",
+   "Meeting notes",
+   "Setup video walkthrough",
+   "Free duplicate link"
+  ],
+  "tree": [
+   {
+    "folder": "01-crm-database",
+    "files": [
+     "pipeline-stages-5.md (5 KB)",
+     "contact-company-tables.md (9 KB)",
+     "deal-review-dashboard.md (2 KB)",
+     "follow-up-reminders.md (8 KB)"
+    ]
+   },
+   {
+    "folder": "02-pipeline-board",
+    "files": [
+     "task-database-schema.tsx (25 KB)",
+     "sprint-board-template.docx (176 KB)",
+     "timeline-view.md (4 KB)",
+     "weekly-review-ritual.pdf (740 KB)"
+    ]
+   },
+   {
+    "folder": "03-meeting-notes",
+    "files": [
+     "agenda-template.docx (88 KB)",
+     "decision-log.md (2 KB)",
+     "action-items-table.md (2 KB)",
+     "rollup-dashboard.md (8 KB)"
+    ]
+   },
+   {
+    "folder": "04-setup-video-walkthrough",
+    "files": [
+     "duplicate-ready-workspace.md (6 KB)",
+     "dashboard-views-4.md (3 KB)",
+     "formula-reference.pdf (147 KB)"
+    ]
+   },
+   {
+    "folder": "05-free-duplicate-link",
+    "files": [
+     "relation-linked-databases.md (4 KB)",
+     "board-calendar-views.md (5 KB)",
+     "6-min-setup-video.mp4 (34.9 MB)"
+    ]
+   }
+  ],
+  "root": [
+   "README.md",
+   "LICENSE.txt",
+   "CHANGELOG.md",
+   "quick-start-guide.pdf",
+   "duplicate-link.txt"
+  ],
+  "testimonial": "Renée Laurent (E-commerce director): Clear, fast, and it never fights you. Onboarding my team took one short call."
+ },
+ {
+  "id": "B:notion-system:Content Planning System",
+  "block": "B · Notion Systems",
+  "example": "Content Planning System",
+  "price": 79,
+  "compareAt": 99,
+  "reviews": 28,
+  "sold": "397",
+  "version": "v3.1",
+  "updated": "May 2025",
+  "files": 22,
+  "folders": 5,
+  "size": "37.2 MB",
+  "manifest": [
+   "Editorial calendar",
+   "Content database",
+   "Idea backlog",
+   "Setup video walkthrough",
+   "Free duplicate link"
+  ],
+  "tree": [
+   {
+    "folder": "01-editorial-calendar",
+    "files": [
+     "plain-english-summary.pdf (147 KB)",
+     "fill-in-bracket-system.md (6 KB)",
+     "2-layouts-letter-legal.docx (128 KB)",
+     "jurisdiction-variant-notes.pdf (275 KB)"
+    ]
+   },
+   {
+    "folder": "02-content-database",
+    "files": [
+     "12-month-calendar-view.md (5 KB)",
+     "content-database.md (2 KB)",
+     "idea-backlog-board.md (4 KB)",
+     "publishing-checklist.pdf (885 KB)"
+    ]
+   },
+   {
+    "folder": "03-idea-backlog",
+    "files": [
+     "relation-linked-databases.md (4 KB)",
+     "board-calendar-views.md (5 KB)",
+     "6-min-setup-video.mp4 (34.9 MB)"
+    ]
+   },
+   {
+    "folder": "04-setup-video-walkthrough",
+    "files": [
+     "progress-rollups.md (8 KB)",
+     "template-buttons.docx (207 KB)",
+     "mobile-layout-preset.json (17 KB)"
+    ]
+   },
+   {
+    "folder": "05-free-duplicate-link",
+    "files": [
+     "duplicate-ready-workspace.md (6 KB)",
+     "dashboard-views-4.md (3 KB)",
+     "formula-reference.pdf (147 KB)"
+    ]
+   }
+  ],
+  "root": [
+   "README.md",
+   "LICENSE.txt",
+   "CHANGELOG.md",
+   "quick-start-guide.pdf",
+   "duplicate-link.txt"
+  ],
+  "testimonial": "Sofia Marchetti (Ops manager): Our team adopted it in one afternoon. The docs are better than tools we pay 10× for."
+ },
+ {
+  "id": "B:notion-system:Personal Life OS",
+  "block": "B · Notion Systems",
+  "example": "Personal Life OS",
+  "price": 79,
+  "compareAt": 99,
+  "reviews": 105,
+  "sold": "534",
+  "version": "v2.4",
+  "updated": "Aug 2025",
+  "files": 23,
+  "folders": 5,
+  "size": "36.3 MB",
+  "manifest": [
+   "Habit tracker",
+   "Reading list",
+   "Budget tracker",
+   "Setup video walkthrough",
+   "Free duplicate link"
+  ],
+  "tree": [
+   {
+    "folder": "01-habit-tracker",
+    "files": [
+     "streak-dashboard.md (8 KB)",
+     "weekly-review-template.docx (67 KB)",
+     "monthly-rollup-view.md (6 KB)",
+     "reminders-preset.json (14 KB)"
+    ]
+   },
+   {
+    "folder": "02-reading-list",
+    "files": [
+     "reading-queue-database.md (6 KB)",
+     "notes-highlights-template.pdf (619 KB)",
+     "progress-dashboard.md (5 KB)",
+     "yearly-recap-view.md (6 KB)"
+    ]
+   },
+   {
+    "folder": "03-budget-tracker",
+    "files": [
+     "monthly-budget-dashboard.md (4 KB)",
+     "category-presets.json (14 KB)",
+     "savings-goal-tracker.md (4 KB)",
+     "yearly-rollup-view.md (3 KB)"
+    ]
+   },
+   {
+    "folder": "04-setup-video-walkthrough",
+    "files": [
+     "duplicate-ready-workspace.md (6 KB)",
+     "dashboard-views-4.md (3 KB)",
+     "formula-reference.pdf (147 KB)"
+    ]
+   },
+   {
+    "folder": "05-free-duplicate-link",
+    "files": [
+     "relation-linked-databases.md (4 KB)",
+     "board-calendar-views.md (5 KB)",
+     "6-min-setup-video.mp4 (34.9 MB)"
+    ]
+   }
+  ],
+  "root": [
+   "README.md",
+   "LICENSE.txt",
+   "CHANGELOG.md",
+   "quick-start-guide.pdf",
+   "duplicate-link.txt"
+  ],
+  "testimonial": "Tom Beaulieu (Startup founder): Absurdly complete. Every file I opened had a reason to exist — zero filler."
+ },
+ {
+  "id": "B:assessment-tool:Skill Assessment Quiz",
+  "block": "B · Assessment Tools",
+  "example": "Skill Assessment Quiz",
+  "price": 64,
+  "compareAt": 89,
+  "reviews": 61,
+  "sold": "337",
+  "version": "v1.2",
+  "updated": "Oct 2025",
+  "files": 20,
+  "folders": 5,
+  "size": "2.3 MB",
+  "manifest": [
+   "10 questions",
+   "Score result",
+   "Skill breakdown",
+   "Scoring logic included",
+   "Result page template"
+  ],
+  "tree": [
+   {
+    "folder": "01-10-questions",
+    "files": [
+     "scored-question-bank.docx (216 KB)",
+     "result-mapping-logic.md (3 KB)",
+     "shareable-result-page.html (9 KB)",
+     "pdf-report-layout.pdf (628 KB)"
+    ]
+   },
+   {
+    "folder": "02-score-result",
+    "files": [
+     "weighted-scoring.html (28 KB)",
+     "outcome-badges.html (20 KB)",
+     "analytics-events.html (19 KB)"
+    ]
+   },
+   {
+    "folder": "03-skill-breakdown",
+    "files": [
+     "scored-question-bank-2.docx (216 KB)",
+     "result-mapping-logic-2.md (3 KB)",
+     "shareable-result-page-2.html (9 KB)"
+    ]
+   },
+   {
+    "folder": "04-scoring-logic-included",
+    "files": [
+     "pdf-report-layout-2.pdf (628 KB)",
+     "lead-capture-wiring.html (12 KB)",
+     "retake-flow.html (18 KB)"
+    ]
+   },
+   {
+    "folder": "05-result-page-template",
+    "files": [
+     "weighted-scoring-2.html (28 KB)",
+     "outcome-badges-2.html (20 KB)",
+     "analytics-events-2.html (19 KB)"
+    ]
+   }
+  ],
+  "root": [
+   "README.md",
+   "LICENSE.txt",
+   "CHANGELOG.md",
+   "quick-start-guide.pdf"
+  ],
+  "testimonial": "Ibrahim Diallo (Solo founder): Worth 10× the price. The bonus materials alone replaced three other tools I was paying for."
+ },
+ {
+  "id": "B:assessment-tool:Personality Assessment",
+  "block": "B · Assessment Tools",
+  "example": "Personality Assessment",
+  "price": 64,
+  "compareAt": 89,
+  "reviews": 191,
+  "sold": "514",
+  "version": "v1.1",
+  "updated": "Aug 2025",
+  "files": 21,
+  "folders": 5,
+  "size": "4.7 MB",
+  "manifest": [
+   "Scenario questions",
+   "Type result",
+   "Strengths report",
+   "Scoring logic included",
+   "Result page template"
+  ],
+  "tree": [
+   {
+    "folder": "01-scenario-questions",
+    "files": [
+     "scored-question-bank.docx (216 KB)",
+     "result-mapping-logic.md (3 KB)",
+     "shareable-result-page.html (9 KB)",
+     "pdf-report-layout.pdf (628 KB)"
+    ]
+   },
+   {
+    "folder": "02-type-result",
+    "files": [
+     "scored-question-bank-2.docx (216 KB)",
+     "result-mapping-logic-2.md (3 KB)",
+     "shareable-result-page-2.html (9 KB)"
+    ]
+   },
+   {
+    "folder": "03-strengths-report",
+    "files": [
+     "20-master-layouts.docx (107 KB)",
+     "chart-data-slides.pptx (1.6 MB)",
+     "dark-light-themes.html (25 KB)",
+     "speaker-notes.pdf (732 KB)"
+    ]
+   },
+   {
+    "folder": "04-scoring-logic-included",
+    "files": [
+     "weighted-scoring.html (28 KB)",
+     "outcome-badges.html (20 KB)",
+     "analytics-events.html (19 KB)"
+    ]
+   },
+   {
+    "folder": "05-result-page-template",
+    "files": [
+     "pdf-report-layout-2.pdf (628 KB)",
+     "lead-capture-wiring.html (12 KB)",
+     "retake-flow.html (18 KB)"
+    ]
+   }
+  ],
+  "root": [
+   "README.md",
+   "LICENSE.txt",
+   "CHANGELOG.md",
+   "quick-start-guide.pdf"
+  ],
+  "testimonial": "Ibrahim Diallo (Solo founder): Worth 10× the price. The bonus materials alone replaced three other tools I was paying for."
+ },
+ {
+  "id": "B:assessment-tool:Business Health Check",
+  "block": "B · Assessment Tools",
+  "example": "Business Health Check",
+  "price": 19,
+  "compareAt": 29,
+  "reviews": 121,
+  "sold": "451",
+  "version": "v1.1",
+  "updated": "Oct 2025",
+  "files": 20,
+  "folders": 5,
+  "size": "2.3 MB",
+  "manifest": [
+   "20 questions",
+   "Health score",
+   "Action items",
+   "Scoring logic included",
+   "Result page template"
+  ],
+  "tree": [
+   {
+    "folder": "01-20-questions",
+    "files": [
+     "scored-question-bank.docx (216 KB)",
+     "result-mapping-logic.md (3 KB)",
+     "shareable-result-page.html (9 KB)",
+     "pdf-report-layout.pdf (628 KB)"
+    ]
+   },
+   {
+    "folder": "02-health-score",
+    "files": [
+     "weighted-scoring.html (28 KB)",
+     "outcome-badges.html (20 KB)",
+     "analytics-events.html (19 KB)"
+    ]
+   },
+   {
+    "folder": "03-action-items",
+    "files": [
+     "scored-question-bank-2.docx (216 KB)",
+     "result-mapping-logic-2.md (3 KB)",
+     "shareable-result-page-2.html (9 KB)"
+    ]
+   },
+   {
+    "folder": "04-scoring-logic-included",
+    "files": [
+     "pdf-report-layout-2.pdf (628 KB)",
+     "lead-capture-wiring.html (12 KB)",
+     "retake-flow.html (18 KB)"
+    ]
+   },
+   {
+    "folder": "05-result-page-template",
+    "files": [
+     "weighted-scoring-2.html (28 KB)",
+     "outcome-badges-2.html (20 KB)",
+     "analytics-events-2.html (19 KB)"
+    ]
+   }
+  ],
+  "root": [
+   "README.md",
+   "LICENSE.txt",
+   "CHANGELOG.md",
+   "quick-start-guide.pdf"
+  ],
+  "testimonial": "Diego Fuentes (Growth marketer): Copy, structure, formatting — all done. I just swapped the logo and went live."
+ },
+ {
+  "id": "B:assessment-tool:Launch Readiness Quiz",
+  "block": "B · Assessment Tools",
+  "example": "Launch Readiness Quiz",
+  "price": 49,
+  "compareAt": 69,
+  "reviews": 47,
+  "sold": "438",
+  "version": "v3.2",
+  "updated": "Oct 2025",
+  "files": 20,
+  "folders": 5,
+  "size": "2.3 MB",
+  "manifest": [
+   "Pre-launch checklist quiz",
+   "Readiness score",
+   "Gap analysis",
+   "Scoring logic included",
+   "Result page template"
+  ],
+  "tree": [
+   {
+    "folder": "01-pre-launch-checklist-quiz",
+    "files": [
+     "scored-question-bank.docx (216 KB)",
+     "result-mapping-logic.md (3 KB)",
+     "shareable-result-page.html (9 KB)",
+     "pdf-report-layout.pdf (628 KB)"
+    ]
+   },
+   {
+    "folder": "02-readiness-score",
+    "files": [
+     "weighted-scoring.html (28 KB)",
+     "outcome-badges.html (20 KB)",
+     "analytics-events.html (19 KB)"
+    ]
+   },
+   {
+    "folder": "03-gap-analysis",
+    "files": [
+     "scored-question-bank-2.docx (216 KB)",
+     "result-mapping-logic-2.md (3 KB)",
+     "shareable-result-page-2.html (9 KB)"
+    ]
+   },
+   {
+    "folder": "04-scoring-logic-included",
+    "files": [
+     "pdf-report-layout-2.pdf (628 KB)",
+     "lead-capture-wiring.html (12 KB)",
+     "retake-flow.html (18 KB)"
+    ]
+   },
+   {
+    "folder": "05-result-page-template",
+    "files": [
+     "weighted-scoring-2.html (28 KB)",
+     "outcome-badges-2.html (20 KB)",
+     "analytics-events-2.html (19 KB)"
+    ]
+   }
+  ],
+  "root": [
+   "README.md",
+   "LICENSE.txt",
+   "CHANGELOG.md",
+   "quick-start-guide.pdf"
+  ],
+  "testimonial": "Jonas Weber (Consultant): I've bought a dozen of these over the years. This is the first one I didn't have to fix before using."
+ },
+ {
+  "id": "C:website-kit:Dental Practice Kit",
+  "block": "C · Niche Website Kits",
+  "example": "Dental Practice Kit",
+  "price": 244,
+  "compareAt": 299,
+  "reviews": 269,
+  "sold": "768",
+  "version": "v3.4",
+  "updated": "Jun 2025",
+  "files": 25,
+  "folders": 6,
+  "size": "10.0 MB",
+  "manifest": [
+   "5 pages",
+   "Appointment form",
+   "Service pages",
+   "Insurance info",
+   "Content model (MDX)",
+   "Deploy checklist"
+  ],
+  "tree": [
+   {
+    "folder": "01-5-pages",
+    "files": [
+     "next-js-starter-typescript.sh (8 KB)",
+     "mdx-content-model.tsx (10 KB)",
+     "figma-source.fig (7.5 MB)"
+    ]
+   },
+   {
+    "folder": "02-appointment-form",
+    "files": [
+     "form-block-validation.tsx (12 KB)",
+     "thank-you-page.tsx (8 KB)",
+     "anti-spam-honeypot.tsx (11 KB)",
+     "integration-guide.pdf (457 KB)"
+    ]
+   },
+   {
+    "folder": "03-service-pages",
+    "files": [
+     "blog-docs-layouts.pdf (436 KB)",
+     "dark-mode-tokens.json (16 KB)",
+     "vercel-one-click.sh (11 KB)"
+    ]
+   },
+   {
+    "folder": "04-insurance-info",
+    "files": [
+     "deploy-checklist.pdf (266 KB)",
+     "seo-pre-wired.tsx (23 KB)",
+     "image-pipeline-configured.json (12 KB)"
+    ]
+   },
+   {
+    "folder": "05-content-model-mdx",
+    "files": [
+     "12-month-calendar-view.md (4 KB)",
+     "content-database.md (3 KB)",
+     "idea-backlog-board.md (7 KB)",
+     "publishing-checklist.pdf (670 KB)"
+    ]
+   },
+   {
+    "folder": "06-deploy-checklist",
+    "files": [
+     "phased-checklists.pdf (129 KB)",
+     "owner-due-date-columns.tsx (15 KB)",
+     "progress-tracker.md (2 KB)",
+     "sign-off-row.tsx (8 KB)"
+    ]
+   }
+  ],
+  "root": [
+   "README.md",
+   "LICENSE.txt",
+   "CHANGELOG.md",
+   "quick-start-guide.pdf"
+  ],
+  "testimonial": "Maya Reyes (Freelance designer): Saved me a full weekend. I edited it Monday morning and shipped by Tuesday lunch."
+ },
+ {
+  "id": "C:website-kit:Gym & Fitness Kit",
+  "block": "C · Niche Website Kits",
+  "example": "Gym & Fitness Kit",
+  "price": 299,
+  "compareAt": 379,
+  "reviews": 199,
+  "sold": "894",
+  "version": "v3.4",
+  "updated": "Jun 2025",
+  "files": 26,
+  "folders": 6,
+  "size": "2.9 MB",
+  "manifest": [
+   "Class schedule",
+   "Membership tiers",
+   "Trainer profiles",
+   "Progress gallery",
+   "Content model (MDX)",
+   "Deploy checklist"
+  ],
+  "tree": [
+   {
+    "folder": "01-class-schedule",
+    "files": [
+     "blog-docs-layouts.pdf (436 KB)",
+     "dark-mode-tokens.json (16 KB)",
+     "vercel-one-click.sh (11 KB)"
+    ]
+   },
+   {
+    "folder": "02-membership-tiers",
+    "files": [
+     "3-tier-price-table.md (8 KB)",
+     "value-stack-builder.tsx (21 KB)",
+     "faq-objection-handling.pdf (252 KB)",
+     "comparison-sheet.xlsx (59 KB)"
+    ]
+   },
+   {
+    "folder": "03-trainer-profiles",
+    "files": [
+     "deploy-checklist.pdf (266 KB)",
+     "seo-pre-wired.tsx (23 KB)",
+     "image-pipeline-configured.json (12 KB)"
+    ]
+   },
+   {
+    "folder": "04-progress-gallery",
+    "files": [
+     "hero-variant-set-3.tsx (11 KB)",
+     "cta-block-library.tsx (21 KB)",
+     "mobile-first-layout.docx (202 KB)",
+     "deploy-checklist-2.pdf (266 KB)"
+    ]
+   },
+   {
+    "folder": "05-content-model-mdx",
+    "files": [
+     "12-month-calendar-view.md (4 KB)",
+     "content-database.md (3 KB)",
+     "idea-backlog-board.md (7 KB)",
+     "publishing-checklist.pdf (670 KB)"
+    ]
+   },
+   {
+    "folder": "06-deploy-checklist",
+    "files": [
+     "phased-checklists.pdf (129 KB)",
+     "owner-due-date-columns.tsx (15 KB)",
+     "progress-tracker.md (2 KB)",
+     "sign-off-row.tsx (8 KB)"
+    ]
+   }
+  ],
+  "root": [
+   "README.md",
+   "LICENSE.txt",
+   "CHANGELOG.md",
+   "quick-start-guide.pdf"
+  ],
+  "testimonial": "Maya Reyes (Freelance designer): Saved me a full weekend. I edited it Monday morning and shipped by Tuesday lunch."
+ },
+ {
+  "id": "C:website-kit:Law Firm Kit",
+  "block": "C · Niche Website Kits",
+  "example": "Law Firm Kit",
+  "price": 189,
+  "compareAt": 239,
+  "reviews": 86,
+  "sold": "213",
+  "version": "v2.3",
+  "updated": "Sep 2025",
+  "files": 25,
+  "folders": 6,
+  "size": "10.0 MB",
+  "manifest": [
+   "Practice areas",
+   "Attorney bios",
+   "Case results",
+   "Consultation form",
+   "Content model (MDX)",
+   "Deploy checklist"
+  ],
+  "tree": [
+   {
+    "folder": "01-practice-areas",
+    "files": [
+     "blog-docs-layouts.pdf (436 KB)",
+     "dark-mode-tokens.json (16 KB)",
+     "vercel-one-click.sh (11 KB)"
+    ]
+   },
+   {
+    "folder": "02-attorney-bios",
+    "files": [
+     "next-js-starter-typescript.sh (8 KB)",
+     "mdx-content-model.tsx (10 KB)",
+     "figma-source.fig (7.5 MB)"
+    ]
+   },
+   {
+    "folder": "03-case-results",
+    "files": [
+     "deploy-checklist.pdf (266 KB)",
+     "seo-pre-wired.tsx (23 KB)",
+     "image-pipeline-configured.json (12 KB)"
+    ]
+   },
+   {
+    "folder": "04-consultation-form",
+    "files": [
+     "form-block-validation.tsx (12 KB)",
+     "thank-you-page.tsx (8 KB)",
+     "anti-spam-honeypot.tsx (11 KB)",
+     "integration-guide.pdf (457 KB)"
+    ]
+   },
+   {
+    "folder": "05-content-model-mdx",
+    "files": [
+     "12-month-calendar-view.md (4 KB)",
+     "content-database.md (3 KB)",
+     "idea-backlog-board.md (7 KB)",
+     "publishing-checklist.pdf (670 KB)"
+    ]
+   },
+   {
+    "folder": "06-deploy-checklist",
+    "files": [
+     "phased-checklists.pdf (129 KB)",
+     "owner-due-date-columns.tsx (15 KB)",
+     "progress-tracker.md (2 KB)",
+     "sign-off-row.tsx (8 KB)"
+    ]
+   }
+  ],
+  "root": [
+   "README.md",
+   "LICENSE.txt",
+   "CHANGELOG.md",
+   "quick-start-guide.pdf"
+  ],
+  "testimonial": "Marcus Chen (Product manager): Genuinely production-grade. We shipped it to customers with only brand changes."
+ },
+ {
+  "id": "C:website-kit:Restaurant Kit",
+  "block": "C · Niche Website Kits",
+  "example": "Restaurant Kit",
+  "price": 244,
+  "compareAt": 299,
+  "reviews": 91,
+  "sold": "432",
+  "version": "v3.0",
+  "updated": "Jun 2025",
+  "files": 25,
+  "folders": 6,
+  "size": "10.0 MB",
+  "manifest": [
+   "Full menu",
+   "Reservation widget",
+   "Photo gallery",
+   "Events page",
+   "Content model (MDX)",
+   "Deploy checklist"
+  ],
+  "tree": [
+   {
+    "folder": "01-full-menu",
+    "files": [
+     "next-js-starter-typescript.sh (8 KB)",
+     "mdx-content-model.tsx (10 KB)",
+     "figma-source.fig (7.5 MB)"
+    ]
+   },
+   {
+    "folder": "02-reservation-widget",
+    "files": [
+     "deploy-checklist.pdf (266 KB)",
+     "seo-pre-wired.tsx (23 KB)",
+     "image-pipeline-configured.json (12 KB)"
+    ]
+   },
+   {
+    "folder": "03-photo-gallery",
+    "files": [
+     "hero-variant-set-3.tsx (11 KB)",
+     "cta-block-library.tsx (21 KB)",
+     "mobile-first-layout.docx (202 KB)",
+     "deploy-checklist-2.pdf (266 KB)"
+    ]
+   },
+   {
+    "folder": "04-events-page",
+    "files": [
+     "blog-docs-layouts.pdf (436 KB)",
+     "dark-mode-tokens.json (16 KB)",
+     "vercel-one-click.sh (11 KB)"
+    ]
+   },
+   {
+    "folder": "05-content-model-mdx",
+    "files": [
+     "12-month-calendar-view.md (4 KB)",
+     "content-database.md (3 KB)",
+     "idea-backlog-board.md (7 KB)",
+     "publishing-checklist.pdf (670 KB)"
+    ]
+   },
+   {
+    "folder": "06-deploy-checklist",
+    "files": [
+     "phased-checklists.pdf (129 KB)",
+     "owner-due-date-columns.tsx (15 KB)",
+     "progress-tracker.md (2 KB)",
+     "sign-off-row.tsx (8 KB)"
+    ]
+   }
+  ],
+  "root": [
+   "README.md",
+   "LICENSE.txt",
+   "CHANGELOG.md",
+   "quick-start-guide.pdf"
+  ],
+  "testimonial": "Hanna Lindqvist (HR business partner): The attention to edge cases is what sold me. It's clearly built by people who do the work."
+ }
+]

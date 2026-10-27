@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>OMNIFORGE OS — Template Operating System</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="Agency OS — one production system, six design families, four tiers, 25 modules. Proof-of-concept preview."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<style>
+  :root {
+    --bg:#0a0a0c; --bg-2:#111114; --bg-3:#18181c;
+    --fg:#f5f5f0; --fg-dim:#a8a49c; --muted:#6b6860;
+    --accent:#ff5722; --accent-bright:#ff7a4d; --accent-dim:rgba(255,87,34,.15);
+    --border:rgba(245,245,240,.1); --border-strong:rgba(245,245,240,.22);
+    --card:rgba(255,255,255,.025);
+    --font-display:'Space Grotesk',sans-serif; --font-body:'DM Sans',sans-serif; --font-mono:'JetBrains Mono',monospace;
+    --radius:10px;
+  }
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { margin:0; background:var(--bg); color:var(--fg); font-family:var(--font-body); -webkit-font-smoothing:antialiased; line-height:1.6; overflow-x:hidden; }
+  ::selection { background:var(--accent); color:#fff; }
+  .font-display { font-family:var(--font-display); letter-spacing:-.02em; }
+  .font-mono { font-family:var(--font-mono); }
+  ::-webkit-scrollbar { width:8px; }
+  ::-webkit-scrollbar-track { background:var(--bg); }
+  ::-webkit-scrollbar-thumb { background:var(--bg-3); }
+  ::-webkit-scrollbar-thumb:hover { background:var(--accent); }
+
+  .eyebrow { font-family:var(--font-mono); font-size:.72rem; text-transform:uppercase; letter-spacing:.2em; color:var(--muted); display:inline-flex; align-items:center; gap:.6rem; }
+  .eyebrow::before { content:''; width:24px; height:1px; background:var(--accent); }
+  .section-h2 { font-family:var(--font-display); font-weight:700; font-size:clamp(2.2rem,5.5vw,4.5rem); line-height:1; letter-spacing:-.03em; }
+  .text-ember { color:var(--accent); }
+  .text-dim { color:var(--fg-dim); }
+  .text-muted { color:var(--muted); }
+
+  .btn { display:inline-flex; align-items:center; gap:.6rem; padding:.9rem 1.6rem; font-weight:600; font-size:.82rem; letter-spacing:.04em; text-transform:uppercase; border:1px solid transparent; cursor:pointer; transition:all .25s ease; border-radius:var(--radius); }
+  .btn-primary { background:var(--accent); color:#fff; }
+  .btn-primary:hover { background:var(--accent-bright); transform:translateY(-2px); }
+  .btn-ghost { background:transparent; color:var(--fg); border-color:var(--border-strong); }
+  .btn-ghost:hover { border-color:var(--accent); color:var(--accent); }
+
+  .card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); transition:all .3s ease; }
+  .card:hover { border-color:var(--accent); background:rgba(255,87,34,.03); }
+
+  .reveal { opacity:0; transform:translateY(30px); transition:opacity .8s ease, transform .8s ease; }
+  .reveal.in { opacity:1; transform:translateY(0); }
+
+  /* Pipeline diagram */
+  .pipeline { display:flex; flex-direction:column; align-items:center; gap:.5rem; }
+  .pipeline-stage {
+    background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+    padding:1rem 2rem; font-family:var(--font-mono); font-size:.85rem;
+    text-align:center; min-width:280px; transition:all .3s ease;
+  }
+  .pipeline-stage:hover { border-color:var(--accent); background:var(--accent-dim); }
+  .pipeline-arrow { color:var(--accent); font-size:1rem; }
+
+  /* Configurator */
+  .chip {
+    padding:.5rem 1rem; border-radius:999px; font-size:.78rem; font-weight:600;
+    border:1.5px solid var(--border-strong); cursor:pointer; transition:all .2s ease;
+    background:transparent; color:var(--fg); font-family:var(--font-mono);
+  }
+  .chip:hover { border-color:var(--accent); color:var(--accent); }
+  .chip.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+
+  .module-chip {
+    display:inline-flex; align-items:center; gap:.4rem; padding:.4rem .8rem;
+    border:1px solid var(--border); border-radius:6px; font-size:.75rem;
+    font-family:var(--font-mono); background:var(--bg-2);
+  }
+  .module-chip.locked { opacity:.35; text-decoration:line-through; }
+  .module-chip .lock { font-size:.6rem; color:var(--muted); }
+
+  .preview-card {
+    position:relative; overflow:hidden; border-radius:var(--radius);
+    border:1px solid var(--border); transition:all .4s cubic-bezier(.16,1,.3,1);
+  }
+  .preview-card:hover { transform:translateY(-6px); border-color:var(--accent); box-shadow:0 20px 50px rgba(0,0,0,.5); }
+  .preview-card .preview-img { aspect-ratio:16/10; overflow:hidden; }
+  .preview-card .preview-img img { width:100%; height:100%; object-fit:cover; transition:transform .8s ease; }
+  .preview-card:hover .preview-img img { transform:scale(1.06); }
+  .preview-card .preview-overlay {
+    position:absolute; inset:0;
+    background:linear-gradient(to top, rgba(10,10,12,.95) 0%, rgba(10,10,12,.3) 50%, transparent 100%);
+    display:flex; flex-direction:column; justify-content:flex-end; padding:1.5rem;
+  }
+
+  .glow { position:absolute; border-radius:50%; filter:blur(120px); pointer-events:none; opacity:.15; }
+  .code-block {
+    background:var(--bg-2); border:1px solid var(--border); border-radius:var(--radius);
+    padding:1.5rem; font-family:var(--font-mono); font-size:.8rem; line-height:1.7;
+    overflow-x:auto; white-space:pre;
+  }
+  .code-key { color:var(--accent); }
+  .code-str { color:#7dd3fc; }
+  .code-type { color:#a5b4fc; }
+
+  .stat-pill { font-family:var(--font-mono); font-size:.72rem; padding:.35rem .7rem; border-radius:999px; border:1px solid var(--border-strong); }
+
+  .toast { position:fixed; bottom:2rem; right:2rem; background:var(--accent); color:#fff; padding:1rem 1.5rem; font-weight:600; font-size:.82rem; border-radius:var(--radius); transform:translateY(160%); transition:transform .4s cubic-bezier(.16,1,.3,1); z-index:1000; max-width:90vw; }
+  .toast.show { transform:translateY(0); }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration:.01ms !important; transition-duration:.01ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<div style="position:fixed;top:0;left:0;height:2px;width:0;background:var(--accent);z-index:200;" id="progress"></div>
+
+<!-- Nav -->
+<nav style="position:fixed;top:0;left:0;right:0;z-index:100;transition:all .35s ease;" id="nav">
+  <div class="max-w-[1400px] mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="#" class="flex items-center gap-3">
+      <div style="width:2.2rem;height:2.2rem;border:2px solid var(--accent);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;">
+        <i class="fas fa-fire text-sm" style="color:var(--accent);"></i>
+      </div>
+      <div>
+        <div class="font-display font-bold text-lg leading-none">OMNIFORGE OS</div>
+        <div class="font-mono text-[9px] uppercase tracking-[0.2em] text-muted mt-0.5">Template Operating System</div>
+      </div>
+    </a>
+    <div class="hidden lg:flex items-center gap-8 text-sm font-medium">
+      <a href="#families" class="hover:text-ember transition">Families</a>
+      <a href="#tiers" class="hover:text-ember transition">Tiers</a>
+      <a href="#modules" class="hover:text-ember transition">Modules</a>
+      <a href="#flagships" class="hover:text-ember transition">Flagships</a>
+      <a href="#configurator" class="hover:text-ember transition">Configurator</a>
+      <a href="#stack" class="hover:text-ember transition">Stack</a>
+    </div>
+    <a href="#configurator" class="btn btn-primary !py-2 !px-4 !text-xs">Build a Project</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="relative min-h-screen flex items-center overflow-hidden pt-24">
+  <div class="glow" style="background:var(--accent);width:600px;height:600px;top:-200px;left:-200px;"></div>
+  <div class="glow" style="background:#6366f1;width:400px;height:400px;bottom:-100px;right:-100px;opacity:.08;"></div>
+
+  <div class="relative max-w-[1400px] mx-auto px-6 w-full py-24">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      <div class="reveal">
+        <div class="eyebrow mb-6">Proof of Concept / v0.1</div>
+        <h1 class="font-display font-bold text-5xl lg:text-7xl leading-[0.95] mb-6">
+          One system.<br/>
+          <span class="text-ember">Six voices.</span><br/>
+          Four tiers.
+        </h1>
+        <p class="text-lg text-dim leading-relaxed mb-8 max-w-xl">
+          The Template Operating System for an agency that sells structured design + AI-implementation packages. Every flagship, even Starter, ships as a near-finished product — not a template pile.
+        </p>
+        <div class="flex flex-wrap gap-3 mb-10">
+          <a href="#flagships" class="btn btn-primary">See the Flagships <i class="fas fa-arrow-right text-xs"></i></a>
+          <a href="#configurator" class="btn btn-ghost">Try the Configurator</a>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <span class="stat-pill text-dim">6 families</span>
+          <span class="stat-pill text-dim">4 tiers</span>
+          <span class="stat-pill text-dim">25 modules</span>
+          <span class="stat-pill text-dim">3 flagships shipped</span>
+          <span class="stat-pill text-dim">WCAG 2.2 AA</span>
+        </div>
+      </div>
+
+      <div class="reveal">
+        <div class="card p-8" style="background:var(--bg-2);">
+          <div class="font-mono text-xs uppercase tracking-widest text-muted mb-6">/ The pipeline</div>
+          <div class="pipeline">
+            <div class="pipeline-stage"><span class="text-ember">Brand data</span> + <span class="text-ember">Content data</span> + <span class="text-ember">Commerce data</span></div>
+            <i class="fas fa-arrow-down pipeline-arrow"></i>
+            <div class="pipeline-stage">Template schema</div>
+            <i class="fas fa-arrow-down pipeline-arrow"></i>
+            <div class="pipeline-stage">Reusable modules library</div>
+            <i class="fas fa-arrow-down pipeline-arrow"></i>
+            <div class="pipeline-stage">Family visual rules + tier limits</div>
+            <i class="fas fa-arrow-down pipeline-arrow"></i>
+            <div class="pipeline-stage" style="border-color:var(--accent);background:var(--accent-dim);">Website / app / catalog / experience</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Families -->
+<section id="families" class="py-24 border-t" style="border-color:var(--border);">
+  <div class="max-w-[1400px] mx-auto px-6">
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 reveal">
+      <div>
+        <div class="eyebrow mb-6">01 — Families</div>
+        <h2 class="section-h2">Six grammars,<br/><span class="text-ember">one system.</span></h2>
+      </div>
+      <p class="text-dim max-w-md mt-6 md:mt-0">Families stay distinct through design grammar — density, motion, type, photography-vs-data — not just colors.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 reveal" id="families-grid"></div>
+  </div>
+</section>
+
+<!-- Tiers -->
+<section id="tiers" class="py-24 border-t" style="border-color:var(--border);">
+  <div class="max-w-[1400px] mx-auto px-6">
+    <div class="mb-12 reveal">
+      <div class="eyebrow mb-6">02 — Tiers</div>
+      <h2 class="section-h2">Gated by <span class="text-ember">capability</span>,<br/>not polish.</h2>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 reveal" id="tiers-grid"></div>
+  </div>
+</section>
+
+<!-- Flagships -->
+<section id="flagships" class="py-24 border-t" style="border-color:var(--border);">
+  <div class="max-w-[1400px] mx-auto px-6">
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 reveal">
+      <div>
+        <div class="eyebrow mb-6">03 — Flagships</div>
+        <h2 class="section-h2">Proof, not <span class="text-ember">promises.</span></h2>
+      </div>
+      <p class="text-dim max-w-md mt-6 md:mt-0">Three shipped flagships. Each is a row in the <code class="font-mono text-sm text-ember">templates</code> table. Click to open the live preview.</p>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 reveal" id="flagships-grid"></div>
+  </div>
+</section>
+
+<!-- Modules -->
+<section id="modules" class="py-24 border-t" style="border-color:var(--border);">
+  <div class="max-w-[1400px] mx-auto px-6">
+    <div class="mb-12 reveal">
+      <div class="eyebrow mb-6">04 — Module Library</div>
+      <h2 class="section-h2">25 building blocks.</h2>
+    </div>
+    <div class="flex flex-wrap gap-2 mb-8 reveal" id="module-filters">
+      <button class="chip active" data-cat="all">All</button>
+      <button class="chip" data-cat="ui">UI</button>
+      <button class="chip" data-cat="commerce">Commerce</button>
+      <button class="chip" data-cat="data">Data</button>
+      <button class="chip" data-cat="booking">Booking</button>
+      <button class="chip" data-cat="states">States</button>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 reveal" id="modules-grid"></div>
+  </div>
+</section>
+
+<!-- Configurator -->
+<section id="configurator" class="py-24 border-t" style="border-color:var(--border);">
+  <div class="max-w-[1200px] mx-auto px-6">
+    <div class="text-center mb-12 reveal">
+      <div class="eyebrow mb-6 justify-center" style="display:inline-flex">05 — Configurator</div>
+      <h2 class="section-h2 mb-4">What you get at <span class="text-ember">your tier.</span></h2>
+      <p class="text-dim max-w-xl mx-auto">Pick a family and a tier. The configurator queries the module library and shows exactly which modules you'd receive — locked ones stay locked.</p>
+    </div>
+    <div class="card p-8 reveal" style="background:var(--bg-2);">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <div>
+          <div class="font-mono text-xs uppercase tracking-widest text-muted mb-4">Family</div>
+          <div class="flex flex-wrap gap-2" id="config-families"></div>
+        </div>
+        <div>
+          <div class="font-mono text-xs uppercase tracking-widest text-muted mb-4">Tier</div>
+          <div class="flex flex-wrap gap-2" id="config-tiers"></div>
+        </div>
+      </div>
+      <div class="border-t pt-6" style="border-color:var(--border);">
+        <div class="font-mono text-xs uppercase tracking-widest text-muted mb-4">Included modules</div>
+        <div class="flex flex-wrap gap-2" id="config-modules"></div>
+      </div>
+      <div class="border-t pt-6 mt-6" style="border-color:var(--border);">
+        <div class="font-mono text-xs uppercase tracking-widest text-muted mb-4">Locked (upgrade to unlock)</div>
+        <div class="flex flex-wrap gap-2" id="config-locked"></div>
+      </div>
+      <div class="mt-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div class="font-mono text-xs text-dim" id="config-summary">—</div>
+        <button class="btn btn-primary" onclick="alert('In production: this saves to Supabase `projects` table and generates a live preview URL.')">Save & Preview <i class="fas fa-external-link-alt text-xs"></i></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stack -->
+<section id="stack" class="py-24 border-t" style="border-color:var(--border);">
+  <div class="max-w-[1400px] mx-auto px-6">
+    <div class="mb-12 reveal">
+      <div class="eyebrow mb-6">06 — Free AI Production Stack</div>
+      <h2 class="section-h2">Zero to <span class="text-ember">production</span> for $0.</h2>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 reveal" id="tools-grid"></div>
+  </div>
+</section>
+
+<!-- Database -->
+<section class="py-24 border-t" style="border-color:var(--border);">
+  <div class="max-w-[1400px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+    <div class="reveal">
+      <div class="eyebrow mb-6">07 — The OS as its own database</div>
+      <h2 class="section-h2 mb-6">Every flagship is a <span class="text-ember">row.</span></h2>
+      <p class="text-dim text-lg mb-6">The system documents itself. Schemas live in code, and every family, tier, module, template, project, and QA check becomes a queryable row in Supabase. The configurator reads from these tables to assemble new projects from existing modules.</p>
+      <div class="space-y-3 text-sm text-dim">
+        <div class="flex gap-3"><i class="fas fa-database text-ember mt-1"></i><span><strong class="text-[var(--fg)]">7 tables</strong> — families, tiers, modules, templates, projects, tools, qa_releases</span></div>
+        <div class="flex gap-3"><i class="fas fa-shield-alt text-ember mt-1"></i><span><strong class="text-[var(--fg)]">Row-level security</strong> — public read for showcase, authenticated write for staff</span></div>
+        <div class="flex gap-3"><i class="fas fa-code-branch text-ember mt-1"></i><span><strong class="text-[var(--fg)]">Versioned modules</strong> — AI agents can compose pages by selecting modules + applying a family theme</span></div>
+      </div>
+    </div>
+    <div class="reveal">
+      <div class="code-block"><span class="code-key">SELECT</span> m.name, m.category, m.min_tier
+<span class="code-key">FROM</span> modules m
+<span class="code-key">JOIN</span> tiers t <span class="code-key">ON</span> t.id = m.min_tier
+<span class="code-key">WHERE</span> m.families <span class="code-key">&&</span> ARRAY[<span class="code-str">'consumer-goods'</span>]
+  <span class="code-key">AND</span> t.position <= <span class="code-str">2</span>   <span class="code-type">-- Growth or below</span>
+<span class="code-key">ORDER BY</span> m.category;
+
+<span class="code-type">-- 12 rows returned → these are the modules
+-- a Growth-tier consumer-goods client gets.</span></div>
+      <p class="font-mono text-xs text-muted mt-4">↑ The query the configurator runs when you pick "Consumer Goods / Growth" above.</p>
+    </div>
+  </div>
+</section>
+
+<!-- QA -->
+<section class="py-24 border-t" style="border-color:var(--border);">
+  <div class="max-w-[1200px] mx-auto px-6">
+    <div class="text-center mb-12 reveal">
+      <div class="eyebrow mb-6 justify-center" style="display:inline-flex">08 — Quality Gate</div>
+      <h2 class="section-h2 mb-4">Tested, not <span class="text-ember">assumed.</span></h2>
+      <p class="text-dim max-w-xl mx-auto">Every template ships with a QA pass. No exceptions, even for Starter.</p>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 reveal">
+      <div class="card p-5 text-center"><i class="fas fa-mobile-alt text-2xl text-ember mb-3"></i><div class="text-sm font-medium">Mobile screens</div></div>
+      <div class="card p-5 text-center"><i class="fas fa-wifi text-2xl text-ember mb-3"></i><div class="text-sm font-medium">Slow network</div></div>
+      <div class="card p-5 text-center"><i class="fas fa-keyboard text-2xl text-ember mb-3"></i><div class="text-sm font-medium">Keyboard-only</div></div>
+      <div class="card p-5 text-center"><i class="fas fa-low-vision text-2xl text-ember mb-3"></i><div class="text-sm font-medium">Reduced motion</div></div>
+      <div class="card p-5 text-center"><i class="fas fa-box-open text-2xl text-ember mb-3"></i><div class="text-sm font-medium">Empty catalog</div></div>
+      <div class="card p-5 text-center"><i class="fas fa-times-circle text-2xl text-ember mb-3"></i><div class="text-sm font-medium">Failed payment</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="py-24 border-t relative overflow-hidden" style="border-color:var(--border);">
+  <div class="glow" style="background:var(--accent);width:500px;height:500px;top:0;left:50%;transform:translateX(-50%);opacity:.1;"></div>
+  <div class="max-w-[800px] mx-auto px-6 text-center relative reveal">
+    <h2 class="section-h2 mb-6">Ready to <span class="text-ember">forge?</span></h2>
+    <p class="text-dim text-lg mb-10 max-w-xl mx-auto">Three flagships shipped. Twenty-five modules in the library. One system. This is the proof — the rest is composition.</p>
+    <div class="flex flex-wrap gap-3 justify-center">
+      <a href="../flagships/oak-and-iron/index.html" class="btn btn-primary">Open OAK & IRON <i class="fas fa-external-link-alt text-xs"></i></a>
+      <a href="../flagships/vanta-athletic/index.html" class="btn btn-ghost">Open VANTA <i class="fas fa-external-link-alt text-xs"></i></a>
+      <a href="../flagships/meridian-roast/index.html" class="btn btn-ghost">Open MERIDIAN ROAST <i class="fas fa-external-link-alt text-xs"></i></a>
+    </div>
+  </div>
+</section>
+
+<footer class="border-t py-16" style="border-color:var(--border);">
+  <div class="max-w-[1400px] mx-auto px-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+    <div>
+      <div class="flex items-center gap-3 mb-2">
+        <div style="width:2rem;height:2rem;border:2px solid var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;"><i class="fas fa-fire text-xs text-ember"></i></div>
+        <span class="font-display font-bold text-xl">OMNIFORGE OS</span>
+      </div>
+      <div class="font-mono text-xs text-muted">Template Operating System / Proof of Concept v0.1</div>
+    </div>
+    <div class="font-mono text-xs text-muted">db/schema.sql · tokens/theme.ts · 3 flagships · Supabase-ready</div>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===== Data ===== */
+const families = [
+  { id:'micro-products', name:'Micro Products', grammar:'Bold type, short sections, decisive CTA', need:'Buy / download quickly', icon:'fa-bolt', theme:'volt green on carbon' },
+  { id:'industry-hospitality', name:'Industry & Hospitality', grammar:'Editorial grid, serif support, photography-led', need:'Trust, atmosphere, booking', icon:'fa-store', theme:'brass on espresso' },
+  { id:'data-dashboards', name:'Data Dashboards', grammar:'Dense panels, mono type, tables, status colors', need:'Monitor and decide', icon:'fa-chart-line', theme:'status colors on slate' },
+  { id:'saas-products', name:'SaaS Products', grammar:'Product UI, clear hierarchy, feature proof', need:'Understand and trial', icon:'fa-layer-group', theme:'indigo on near-black' },
+  { id:'enterprise-platforms', name:'Enterprise Platforms', grammar:'Structured nav, evidence, permissions, KPIs', need:'Evaluate risk and capability', icon:'fa-building', theme:'cyan on graphite' },
+  { id:'consumer-goods', name:'Consumer Goods Catalog', grammar:'Product-first photography, benefit-led copy, fast retail + separate wholesale', need:'Fast retail purchase, trust, tracking', icon:'fa-shopping-bag', theme:'copper on cream' },
+];
+
+const tiers = [
+  { id:'starter', name:'Starter', price:'$1.5k–3k', pos:1,
+    includes:'1 proven layout, 1 visual theme, 4–6 modules, mobile-ready, content swap, basic SEO',
+    limits:'No custom flow, no integrations, no bespoke motion',
+    modules:['navigation','hero','cta','cards','pricing','faq','contact'] },
+  { id:'growth', name:'Growth', price:'$3k–8k', pos:2,
+    includes:'Chosen family template, 6–10 modules, CMS content, conversion sections, 1–2 integrations, custom theme',
+    limits:'Limited custom components + predefined interactions',
+    modules:['navigation','hero','cta','cards','pricing','faq','contact','cart','checkout','reviews','tracking','analytics'] },
+  { id:'professional', name:'Professional', price:'$8k–25k', pos:3,
+    includes:'Custom module composition, tailored user flow, commerce/booking integration, analytics, motion direction, QA',
+    limits:'Uses the system; only selected components built from scratch',
+    modules:['navigation','hero','cta','cards','pricing','faq','contact','cart','checkout','product-grid','product-detail','booking','quote-request','reviews','tracking','analytics','dashboard-panels'] },
+  { id:'enterprise', name:'Enterprise', price:'Quote', pos:4,
+    includes:'Bespoke strategy, brand direction, original components, advanced integrations, dashboards/roles, audit trails, ongoing support',
+    limits:'Quote-led, no artificial scope',
+    modules:['*'] },
+];
+
+const modules = [
+  { id:'navigation', name:'Navigation', cat:'ui', minTier:1 },
+  { id:'hero', name:'Hero', cat:'ui', minTier:1 },
+  { id:'cta', name:'CTA Block', cat:'ui', minTier:1 },
+  { id:'cards', name:'Card Grid', cat:'ui', minTier:1 },
+  { id:'pricing', name:'Pricing Tiers', cat:'ui', minTier:1 },
+  { id:'faq', name:'FAQ Accordion', cat:'ui', minTier:1 },
+  { id:'contact', name:'Contact Form', cat:'booking', minTier:1 },
+  { id:'empty-state', name:'Empty State', cat:'states', minTier:1 },
+  { id:'error-state', name:'Error State', cat:'states', minTier:1 },
+  { id:'loading-state', name:'Loading State', cat:'states', minTier:1 },
+  { id:'product-grid', name:'Product Grid', cat:'commerce', minTier:2 },
+  { id:'product-detail', name:'Product Detail', cat:'commerce', minTier:2 },
+  { id:'cart', name:'Cart', cat:'commerce', minTier:2 },
+  { id:'checkout', name:'Checkout', cat:'commerce', minTier:2 },
+  { id:'reviews', name:'Reviews', cat:'commerce', minTier:2 },
+  { id:'tracking', name:'Order Tracking', cat:'commerce', minTier:2 },
+  { id:'booking', name:'Booking Flow', cat:'booking', minTier:2 },
+  { id:'analytics', name:'Analytics Events', cat:'data', minTier:2 },
+  { id:'out-of-stock', name:'Out of Stock', cat:'states', minTier:2 },
+  { id:'quote-request', name:'Wholesale Quote', cat:'booking', minTier:3 },
+  { id:'dashboard-panels', name:'Dashboard Panels', cat:'data', minTier:3 },
+  { id:'data-table', name:'Data Table', cat:'data', minTier:3 },
+  { id:'charts', name:'Charts', cat:'data', minTier:3 },
+  { id:'auth', name:'Authentication', cat:'ui', minTier:3 },
+  { id:'settings', name:'Settings', cat:'ui', minTier:3 },
+];
+
+const tools = [
+  { name:'GLM-5.3-Flash', cat:'codegen', icon:'fa-robot' },
+  { name:'Gemini 1.5 Flash', cat:'codegen', icon:'fa-brain' },
+  { name:'Vercel', cat:'hosting', icon:'fa-server' },
+  { name:'GitHub Pages', cat:'hosting', icon:'fa-github' },
+  { name:'Tensor.Art', cat:'raster', icon:'fa-image' },
+  { name:'Recraft.ai', cat:'vector', icon:'fa-vector-square' },
+  { name:'Payload CMS', cat:'cms', icon:'fa-database' },
+  { name:'Sanity', cat:'cms', icon:'fa-folder' },
+  { name:'Stripe', cat:'commerce', icon:'fa-credit-card' },
+  { name:'Medusa', cat:'commerce', icon:'fa-shopping-cart' },
+  { name:'PostHog', cat:'analytics', icon:'fa-chart-pie' },
+  { name:'Plausible', cat:'analytics', icon:'fa-chart-bar' },
+  { name:'Resend', cat:'email', icon:'fa-envelope' },
+  { name:'Playwright', cat:'testing', icon:'fa-vial' },
+  { name:'Three.js', cat:'3d', icon:'fa-cube' },
+  { name:'Tailwind + tokens', cat:'design', icon:'fa-palette' },
+];
+
+/* ===== Render: families ===== */
+document.getElementById('families-grid').innerHTML = families.map(f=>`
+  <div class="card p-6">
+    <div class="flex items-start justify-between mb-4">
+      <div style="width:2.5rem;height:2.5rem;border:1.5px solid var(--accent);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;">
+        <i class="fas ${f.icon} text-ember"></i>
+      </div>
+      <span class="font-mono text-[10px] uppercase tracking-widest text-muted">${f.theme}</span>
+    </div>
+    <h3 class="font-display font-bold text-lg mb-2">${f.name}</h3>
+    <p class="text-sm text-dim mb-3">${f.grammar}</p>
+    <div class="font-mono text-xs text-muted"><span class="text-ember">→</span> ${f.need}</div>
+  </div>`).join('');
+
+/* ===== Render: tiers ===== */
+document.getElementById('tiers-grid').innerHTML = tiers.map(t=>`
+  <div class="card p-6 ${t.pos===2 ? 'featured' : ''}" style="${t.pos===2 ? 'border-color:var(--accent);background:rgba(255,87,34,.04);position:relative;' : ''}">
+    ${t.pos===2 ? '<div style="position:absolute;top:-10px;right:1rem;background:var(--accent);color:#fff;font-size:.6rem;font-weight:700;letter-spacing:.1em;padding:.3rem .7rem;border-radius:999px;font-family:var(--font-mono);">MOST POPULAR</div>' : ''}
+    <div class="font-mono text-xs text-muted uppercase tracking-widest mb-2">Tier ${t.pos}</div>
+    <h3 class="font-display font-bold text-xl mb-1">${t.name}</h3>
+    <div class="font-display font-bold text-2xl text-ember mb-4">${t.price}</div>
+    <p class="text-sm text-dim mb-3">${t.includes}</p>
+    <div class="font-mono text-[11px] text-muted border-t pt-3" style="border-color:var(--border);"><span class="text-ember">⚡</span> ${t.limits}</div>
+  </div>`).join('');
+
+/* ===== Render: flagships ===== */
+const flagships = [
+  { slug:'oak-and-iron', name:'OAK & IRON Barber Co.', family:'Industry & Hospitality', tier:'Growth → Professional',
+    desc:'Editorial barbershop with 3D scissors, animated street scene, hanging barber pole, booking flow, before/after slider, click-to-snip effect.',
+    seed:'omniforge-oak-iron-preview', tags:['3D','SVG scene','booking','shaders'] },
+  { slug:'vanta-athletic', name:'VANTA Athletic', family:'Consumer Goods', tier:'Starter → Growth',
+    desc:'Performance apparel store with kinetic 3D hero core, orbiting elements, product grid with filters, cart, member tiers, count-up stats.',
+    seed:'omniforge-vanta-preview', tags:['3D','commerce','filters'] },
+  { slug:'meridian-roast', name:'MERIDIAN ROAST Co.', family:'Consumer Goods', tier:'Growth',
+    desc:'Specialty coffee roaster with Theme token contract, roast filter, cart drawer, reviews, order-tracking timeline, wholesale enquiry path.',
+    seed:'omniforge-meridian-preview', tags:['tokens','commerce','tracking'] },
+];
+document.getElementById('flagships-grid').innerHTML = flagships.map(f=>`
+  <a href="../flagships/${f.slug}/index.html" class="preview-card block" style="text-decoration:none;color:inherit;">
+    <div class="preview-img">
+      <img src="https://picsum.photos/seed/${f.seed}/800/500" alt="${f.name}" loading="lazy"/>
+      <div class="preview-overlay">
+        <div class="font-mono text-[10px] uppercase tracking-widest text-ember mb-1">${f.family}</div>
+        <h3 class="font-display font-bold text-xl mb-1">${f.name}</h3>
+        <div class="text-xs text-dim mb-3">${f.tier}</div>
+        <p class="text-xs text-dim mb-4" style="min-height:3em;">${f.desc}</p>
+        <div class="flex flex-wrap gap-1.5">
+          ${f.tags.map(t=>`<span class="font-mono text-[10px] px-2 py-0.5 rounded" style="background:rgba(255,87,34,.15);color:var(--accent-bright);">${t}</span>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div class="p-4 flex items-center justify-between" style="background:var(--bg-2);">
+      <span class="font-mono text-xs text-muted">Live preview</span>
+      <i class="fas fa-arrow-right text-ember"></i>
+    </div>
+  </a>`).join('');
+
+/* ===== Render: modules ===== */
+function renderModules(cat='all'){
+  const list = cat==='all' ? modules : modules.filter(m=>m.cat===cat);
+  document.getElementById('modules-grid').innerHTML = list.map(m=>{
+    const tier = tiers.find(t=>t.pos===m.minTier);
+    return `<div class="card p-4">
+      <div class="flex items-start justify-between mb-2">
+        <div class="font-mono text-xs text-ember">${m.id}</div>
+        <span class="font-mono text-[9px] uppercase tracking-widest text-muted">${m.cat}</span>
+      </div>
+      <div class="font-display font-bold text-sm mb-2">${m.name}</div>
+      <div class="font-mono text-[10px] text-muted">min tier: <span class="text-ember">${tier.name}</span></div>
+    </div>`;
+  }).join('');
+}
+renderModules();
+document.querySelectorAll('#module-filters .chip').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('#module-filters .chip').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active'); renderModules(b.dataset.cat);
+}));
+
+/* ===== Render: tools ===== */
+document.getElementById('tools-grid').innerHTML = tools.map(t=>`
+  <div class="card p-4">
+    <i class="fas ${t.icon} text-xl text-ember mb-3"></i>
+    <div class="font-medium text-sm mb-0.5">${t.name}</div>
+    <div class="font-mono text-[10px] text-muted uppercase tracking-widest">${t.cat}</div>
+  </div>`).join('');
+
+/* ===== Configurator ===== */
+let configFamily = families[0].id;
+let configTier = tiers[1].id;
+function renderConfig(){
+  document.getElementById('config-families').innerHTML = families.map(f=>
+    `<button class="chip ${f.id===configFamily?'active':''}" data-f="${f.id}">${f.name}</button>`).join('');
+  document.getElementById('config-tiers').innerHTML = tiers.map(t=>
+    `<button class="chip ${t.id===configTier?'active':''}" data-t="${t.id}">${t.name}</button>`).join('');
+
+  const fam = families.find(f=>f.id===configFamily);
+  const tier = tiers.find(t=>t.id===configTier);
+  const tierPos = tier.pos;
+  const included = modules.filter(m => m.minTier <= tierPos);
+  const locked = modules.filter(m => m.minTier > tierPos);
+
+  document.getElementById('config-modules').innerHTML = included.map(m=>{
+    const tierObj = tiers.find(t=>t.pos===m.minTier);
+    return `<span class="module-chip"><i class="fas fa-check text-xs text-ember"></i>${m.name}<span class="text-muted text-[10px]">${tierObj.name}+</span></span>`;
+  }).join('') || '<span class="text-muted text-sm">—</span>';
+
+  document.getElementById('config-locked').innerHTML = locked.map(m=>{
+    const tierObj = tiers.find(t=>t.pos===m.minTier);
+    return `<span class="module-chip locked"><i class="fas fa-lock lock"></i>${m.name}<span class="text-[10px]">${tierObj.name}+</span></span>`;
+  }).join('') || '<span class="text-ember text-sm">All modules unlocked at this tier</span>';
+
+  const count = configFamily==='consumer-goods' ? included.length : Math.ceil(included.length * 0.7);
+  document.getElementById('config-summary').innerHTML =
+    `<span class="text-ember">${fam.name}</span> × <span class="text-ember">${tier.name}</span> → ~${count} modules · ${tier.price}`;
+}
+renderConfig();
+document.addEventListener('click',e=>{
+  const f = e.target.closest('[data-f]');
+  const t = e.target.closest('[data-t]');
+  if (f) { configFamily = f.dataset.f; renderConfig(); }
+  if (t) { configTier = t.dataset.t; renderConfig(); }
+});
+
+/* ===== Nav scroll + progress + reveal ===== */
+const nav = document.getElementById('nav');
+addEventListener('scroll',()=>{
+  nav.style.background = scrollY>50 ? 'rgba(10,10,12,.85)' : '';
+  nav.style.backdropFilter = scrollY>50 ? 'blur(20px)' : '';
+  nav.style.borderBottom = scrollY>50 ? '1px solid var(--border)' : '';
+  document.getElementById('progress').style.width = (scrollY/(document.body.scrollHeight-innerHeight))*100+'%';
+});
+const obs = new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){e.target.classList.add('in'); obs.unobserve(e.target);} }),{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+</script>
+</body>
+</html>

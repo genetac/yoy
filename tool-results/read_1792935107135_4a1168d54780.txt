@@ -1,0 +1,775 @@
+     1→"use client";
+     2→
+     3→import { useMemo, useState } from "react";
+     4→import {
+     5→  Zap,
+     6→  ArrowRight,
+     7→  ArrowUpRight,
+     8→  Eye,
+     9→  Check,
+    10→  Layers,
+    11→  ChevronDown,
+    12→  Tag,
+    13→  FileText,
+    14→  LayoutGrid,
+    15→  Boxes,
+    16→  type LucideIcon,
+    17→} from "lucide-react";
+    18→import type { MockupConfig } from "@/data/businessTypes";
+    19→import { BrowserFrame } from "@/components/BrowserFrame";
+    20→import {
+    21→  productTierCategories,
+    22→  subscriptionSection,
+    23→  type ProductType,
+    24→  type ProductExample,
+    25→} from "@/data/exampleProducts";
+    26→import { tierOrder, tierDisplay, getPackage } from "@/data/servicePackages";
+    27→import { familyTokens, getFamilyForProductType, type DesignFamilyId } from "@/data/designFamilies";
+    28→
+    29→// ─── Family metadata ──────────────────────────────────────────────
+    30→
+    31→const familyMeta: Record<DesignFamilyId, {
+    32→  label: string;
+    33→  short: string;
+    34→  recipe: string;
+    35→  blurb: string;
+    36→  chip: string;
+    37→  text: string;
+    38→  border: string;
+    39→  bg: string;
+    40→  icon: LucideIcon;
+    41→}> = {
+    42→  micro: {
+    43→    label: "Micro Products",
+    44→    short: "Micro",
+    45→    recipe: "Pentagram + Raycast",
+    46→    blurb: "Small, focused digital products — landing templates, calculators, resume kits, checklists, template packs. Bold typographic heroes, numbered feature lists, instant-buy CTAs.",
+    47→    chip: "text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800",
+    48→    text: "text-zinc-700 dark:text-zinc-300",
+    49→    border: "border-zinc-300 dark:border-zinc-700",
+    50→    bg: "bg-zinc-50 dark:bg-zinc-900",
+    51→    icon: Zap,
+    52→  },
+    53→  "industry-warm": {
+    54→    label: "Industry & Hospitality",
+    55→    short: "Industry",
+    56→    recipe: "Aesop + Stripe Press",
+    57→    blurb: "Website kits for dental clinics, gyms, law firms, restaurants. Serif body copy, editorial layouts, full-bleed photography, small-caps section labels.",
+    58→    chip: "text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40",
+    59→    text: "text-amber-700 dark:text-amber-400",
+    60→    border: "border-amber-300 dark:border-amber-800",
+    61→    bg: "bg-amber-50 dark:bg-amber-950/30",
+    62→    icon: LayoutGrid,
+    63→  },
+    64→  "data-dense": {
+    65→    label: "Data Dashboards",
+    66→    short: "Data",
+    67→    recipe: "Bloomberg Terminal",
+    68→    blurb: "Dashboards, design systems, inventory tools, monitoring platforms. Monospaced type, tabular data, hairline panels, ticker strips, zero radius.",
+    69→    chip: "text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40",
+    70→    text: "text-emerald-700 dark:text-emerald-400",
+    71→    border: "border-emerald-300 dark:border-emerald-800",
+    72→    bg: "bg-emerald-50 dark:bg-emerald-950/30",
+    73→    icon: Boxes,
+    74→  },
+    75→  "saas-product": {
+    76→    label: "SaaS Products",
+    77→    short: "SaaS",
+    78→    recipe: "Linear",
+    79→    blurb: "Appointment systems, client portals, CRMs, booking platforms, SaaS tools. Hairline borders, gradient-mesh heroes, feature grids, keyboard-chip UI.",
+    80→    chip: "text-sky-700 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/40",
+    81→    text: "text-sky-700 dark:text-sky-400",
+    82→    border: "border-sky-300 dark:border-sky-800",
+    83→    bg: "bg-sky-50 dark:bg-sky-950/30",
+    84→    icon: Layers,
+    85→  },
+    86→  "enterprise-platform": {
+    87→    label: "Enterprise Platforms",
+    88→    short: "Enterprise",
+    89→    recipe: "Bloomberg + Linear",
+    90→    blurb: "Custom SaaS, marketplaces, multi-tenant apps, enterprise systems. Dashboard interfaces with sidebar rails, KPI panels, activity feeds, and request-demo funnels.",
+    91→    chip: "text-violet-700 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/40",
+    92→    text: "text-violet-700 dark:text-violet-400",
+    93→    border: "border-violet-300 dark:border-violet-800",
+    94→    bg: "bg-violet-50 dark:bg-violet-950/30",
+    95→    icon: Eye,
+    96→  },
+    97→};
+    98→
+    99→const familyOrder: DesignFamilyId[] = ["micro", "industry-warm", "data-dense", "saas-product", "enterprise-platform"];
+   100→
+   101→const tierColorMap: Record<string, { text: string; chip: string; badge: string; dot: string }> = {
+   102→  amber: { text: "text-amber-600 dark:text-amber-400", chip: "text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40", badge: "bg-amber-500", dot: "bg-amber-400" },
+   103→  sky: { text: "text-sky-600 dark:text-sky-400", chip: "text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/40", badge: "bg-sky-500", dot: "bg-sky-400" },
+   104→  emerald: { text: "text-emerald-600 dark:text-emerald-400", chip: "text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40", badge: "bg-emerald-500", dot: "bg-emerald-400" },
+   105→  violet: { text: "text-violet-600 dark:text-violet-400", chip: "text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/40", badge: "bg-violet-600", dot: "bg-violet-400" },
+   106→};
+   107→
+   108→// ─── Aggregate data: products grouped by family, with tier info ──
+   109→
+   110→type FamilyProduct = {
+   111→  product: ProductType;
+   112→  tierLetter: string;
+   113→  tierName: string;
+   114→  tierColor: string;
+   115→  priceRange: string;
+   116→};
+   117→
+   118→const allTierSections = [
+   119→  ...productTierCategories.map((c) => ({ letter: c.letter, name: c.name, priceRange: c.priceRange, color: c.color, products: c.products })),
+   120→  { letter: "S", name: subscriptionSection.name, priceRange: subscriptionSection.priceRange, color: "emerald", products: subscriptionSection.products },
+   121→];
+   122→
+   123→const familyProductMap: Record<DesignFamilyId, FamilyProduct[]> = {
+   124→  micro: [],
+   125→  "industry-warm": [],
+   126→  "data-dense": [],
+   127→  "saas-product": [],
+   128→  "enterprise-platform": [],
+   129→};
+   130→for (const section of allTierSections) {
+   131→  for (const product of section.products) {
+   132→    const fid = getFamilyForProductType(product.id);
+   133→    familyProductMap[fid].push({
+   134→      product,
+   135→      tierLetter: section.letter,
+   136→      tierName: section.name,
+   137→      tierColor: section.color,
+   138→      priceRange: section.priceRange,
+   139→    });
+   140→  }
+   141→}
+   142→
+   143→const totalProducts = familyOrder.reduce((n, f) => n + familyProductMap[f].length, 0);
+   144→const totalExamples = familyOrder.reduce(
+   145→  (n, f) => n + familyProductMap[f].reduce((m, fp) => m + fp.product.examples.length, 0),
+   146→  0
+   147→);
+   148→
+   149→// ─── Label → productId lookup for ExampleCard family badges ──────
+   150→
+   151→const labelToProductId: Record<string, string> = {};
+   152→for (const section of allTierSections) {
+   153→  for (const product of section.products) {
+   154→    for (const ex of product.examples) labelToProductId[ex.label] = product.id;
+   155→  }
+   156→}
+   157→function guessProductId(example: ProductExample): string {
+   158→  return labelToProductId[example.label] ?? "landing-template";
+   159→}
+   160→
+   161→// ─── MiniPreview (unchanged) ──────────────────────────────────────
+   162→
+   163→function MiniPreview({ config }: { config: MockupConfig }) {
+   164→  const t = config.theme;
+   165→  const isElevated = config.layout === "premium" || config.layout === "standard";
+   166→  const isPremium = config.layout === "premium";
+   167→  const [imgFailed, setImgFailed] = useState(false);
+   168→  const showImg = config.heroImage && !imgFailed;
+   169→  return (
+   170→    <div style={{ fontFamily: t.font }} className="w-full h-full overflow-hidden flex flex-col pointer-events-none select-none">
+   171→      <div
+   172→        className="flex items-center justify-between px-2 py-1.5 shrink-0"
+   173→        style={{
+   174→          background: showImg ? "rgba(0,0,0,0.25)" : t.nav,
+   175→          borderBottom: showImg ? "none" : `1px solid ${t.border}`,
+   176→          position: showImg ? "absolute" : "relative",
+   177→          top: 0, left: 0, right: 0, zIndex: 10,
+   178→        }}
+   179→      >
+   180→        <div className="flex items-center gap-1">
+   181→          <div className="w-2 h-2" style={{ background: t.accent, borderRadius: isElevated ? 3 : 999 }} />
+   182→          <span className="text-[7px] font-bold" style={{ color: showImg ? "#fff" : t.text }}>{config.label}</span>
+   183→        </div>
+   184→        <div className="flex gap-1">
+   185→          {[0, 1, 2].map((i) => (
+   186→            <div key={i} className="w-2.5 h-0.5 rounded-full" style={{ background: showImg ? "rgba(255,255,255,0.4)" : t.muted, opacity: 0.5 }} />
+   187→          ))}
+   188→        </div>
+   189→      </div>
+   190→      <div className="relative flex-1 min-h-0" style={{ backgroundColor: t.bg, marginTop: isElevated ? 0 : undefined }}>
+   191→        {showImg ? (
+   192→          <img src={config.heroImage} alt="" onError={() => setImgFailed(true)} className="absolute inset-0 w-full h-full object-cover" />
+   193→        ) : (
+   194→          <div className="absolute inset-0" style={{ background: `linear-gradient(135deg, ${t.accent}, ${t.surface})` }} />
+   195→        )}
+   196→        {showImg && (
+   197→          <div className="absolute inset-0" style={{ background: isPremium ? "linear-gradient(135deg, rgba(0,0,0,0.65), rgba(0,0,0,0.25))" : "linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.55))" }} />
+   198→        )}
+   199→        <div className={`relative p-2.5 h-full flex flex-col justify-center ${isPremium ? "" : "items-center text-center"}`}>
+   200→          <div className="text-[6px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded mb-1 inline-block w-fit" style={{ background: t.accent, color: "#fff" }}>
+   201→            {tierDisplay[config.tier].label}
+   202→          </div>
+   203→          <div className="text-[9px] font-bold leading-tight max-w-[92%]" style={{ color: showImg ? "#fff" : t.text, textShadow: showImg ? "0 1px 6px rgba(0,0,0,0.5)" : "none" }}>
+   204→            {config.tagline.length > 36 ? config.tagline.slice(0, 36) + "…" : config.tagline}
+   205→          </div>
+   206→          {showImg && (
+   207→            <div className="mt-1.5 inline-block text-[6px] font-semibold px-1.5 py-0.5 rounded w-fit" style={{ background: t.accent, color: "#fff" }}>
+   208→              {config.tier === "enterprise" ? "Request Demo" : "Get Started"}
+   209→            </div>
+   210→          )}
+   211→        </div>
+   212→      </div>
+   213→      <div className="px-2 py-1.5 space-y-1 shrink-0" style={{ background: t.bg }}>
+   214→        <div className="flex gap-1">
+   215→          {[0, 1, 2].map((i) => (
+   216→            <div key={i} className="flex-1 h-3.5 rounded" style={{ background: t.surface, border: `1px solid ${t.border}` }} />
+   217→          ))}
+   218→        </div>
+   219→        <div className="h-1.5 rounded" style={{ background: t.accentSoft, opacity: 0.4 }} />
+   220→      </div>
+   221→    </div>
+   222→  );
+   223→}
+   224→
+   225→// ─── View type & preview fn ───────────────────────────────────────
+   226→
+   227→type View =
+   228→  | { kind: "home" }
+   229→  | { kind: "family"; familyId: DesignFamilyId }
+   230→  | { kind: "pricing" };
+   231→
+   232→type PreviewFn = (config: MockupConfig, name: string, example?: ProductExample) => void;
+   233→
+   234→// ─── TopNav: design families are the primary axis ─────────────────
+   235→
+   236→function TopNav({ view, onSelect }: { view: View; onSelect: (v: View) => void }) {
+   237→  return (
+   238→    <div className="sticky top-14 z-20 bg-zinc-50/95 dark:bg-zinc-950/95 backdrop-blur-md border-b border-zinc-200/80 dark:border-zinc-800">
+   239→      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5">
+   240→        <div className="flex items-center gap-1.5 overflow-x-auto">
+   241→          <button
+   242→            onClick={() => onSelect({ kind: "home" })}
+   243→            className={`group flex items-center gap-2 py-2 px-2.5 rounded-lg border transition-all duration-150 shrink-0 ${
+   244→              view.kind === "home"
+   245→                ? "bg-zinc-900 dark:bg-zinc-100 border-zinc-900 dark:border-zinc-100"
+   246→                : "bg-white dark:bg-zinc-900 border-zinc-200/70 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700"
+   247→            }`}
+   248→          >
+   249→            <Zap className={`w-4 h-4 ${view.kind === "home" ? "text-white dark:text-zinc-900" : "text-zinc-400 dark:text-zinc-500"}`} />
+   250→            <div className="text-left min-w-0 hidden sm:block">
+   251→              <div className={`text-[11px] font-semibold leading-tight truncate ${view.kind === "home" ? "text-white dark:text-zinc-900" : "text-zinc-600 dark:text-zinc-400"}`}>
+   252→                Home
+   253→              </div>
+   254→              <div className="font-mono text-[9px] text-zinc-400 dark:text-zinc-500 mt-0.5">All families</div>
+   255→            </div>
+   256→          </button>
+   257→          <div className="w-px h-8 bg-zinc-200 dark:bg-zinc-800 shrink-0 mx-0.5" />
+   258→          {familyOrder.map((fid) => {
+   259→            const fm = familyMeta[fid];
+   260→            const isActive = view.kind === "family" && view.familyId === fid;
+   261→            const count = familyProductMap[fid].length;
+   262→            return (
+   263→              <button
+   264→                key={fid}
+   265→                onClick={() => onSelect({ kind: "family", familyId: fid })}
+   266→                className={`group flex items-center gap-2 py-2 px-2.5 rounded-lg border transition-all duration-150 shrink-0 ${
+   267→                  isActive
+   268→                    ? `${fm.bg} ${fm.border}`
+   269→                    : "bg-white dark:bg-zinc-900 border-zinc-200/70 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700"
+   270→                }`}
+   271→              >
+   272→                <fm.icon className={`w-4 h-4 ${isActive ? fm.text : "text-zinc-400 dark:text-zinc-500"}`} />
+   273→                <div className="text-left min-w-0 hidden sm:block">
+   274→                  <div className={`text-[11px] font-semibold leading-tight truncate ${isActive ? "text-zinc-900 dark:text-zinc-50" : "text-zinc-600 dark:text-zinc-400"}`}>
+   275→                    {fm.short}
+   276→                  </div>
+   277→                  <div className="font-mono text-[9px] text-zinc-400 dark:text-zinc-500 mt-0.5">{count} products</div>
+   278→                </div>
+   279→              </button>
+   280→            );
+   281→          })}
+   282→          <div className="w-px h-8 bg-zinc-200 dark:bg-zinc-800 shrink-0 mx-0.5" />
+   283→          <button
+   284→            onClick={() => onSelect({ kind: "pricing" })}
+   285→            className={`group flex items-center gap-2 py-2 px-2.5 rounded-lg border transition-all duration-150 shrink-0 ${
+   286→              view.kind === "pricing"
+   287→                ? "bg-zinc-900 dark:bg-zinc-100 border-zinc-900 dark:border-zinc-100"
+   288→                : "bg-white dark:bg-zinc-900 border-zinc-200/70 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700"
+   289→            }`}
+   290→          >
+   291→            <Tag className={`w-4 h-4 ${view.kind === "pricing" ? "text-white dark:text-zinc-900" : "text-zinc-400 dark:text-zinc-500"}`} />
+   292→            <div className="text-left min-w-0 hidden sm:block">
+   293→              <div className={`text-[11px] font-semibold leading-tight truncate ${view.kind === "pricing" ? "text-white dark:text-zinc-900" : "text-zinc-600 dark:text-zinc-400"}`}>
+   294→                Pricing
+   295→              </div>
+   296→              <div className="font-mono text-[9px] text-zinc-400 dark:text-zinc-500 mt-0.5">4 plans</div>
+   297→            </div>
+   298→          </button>
+   299→        </div>
+   300→      </div>
+   301→    </div>
+   302→  );
+   303→}
+   304→
+   305→// ─── PricingView (unchanged) ──────────────────────────────────────
+   306→
+   307→function PricingView() {
+   308→  return (
+   309→    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+   310→      <div className="animate-slide-up">
+   311→        <div className="flex items-center gap-3 mb-4">
+   312→          <Tag className="w-5 h-5 text-zinc-900 dark:text-zinc-50" />
+   313→          <h2 className="font-display text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-50">Pricing Plans</h2>
+   314→        </div>
+   315→        <p className="text-sm text-zinc-600 dark:text-zinc-400 max-w-2xl">
+   316→          Four service tiers from a single-page Starter to a full Enterprise platform. Every product example maps to one of these tiers.
+   317→        </p>
+   318→      </div>
+   319→      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+   320→        {tierOrder.map((tier, i) => {
+   321→          const pkg = getPackage(tier);
+   322→          const td = tierDisplay[tier];
+   323→          const tc = tierColorMap[td.color];
+   324→          return (
+   325→            <div
+   326→              key={tier}
+   327→              className="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200/80 dark:border-zinc-800 p-4 animate-slide-up"
+   328→              style={{ animationDelay: `${i * 50}ms` }}
+   329→            >
+   330→              <div className="flex items-center justify-between mb-3">
+   331→                <div className="flex items-center gap-2">
+   332→                  <div className={`w-1.5 h-1.5 rounded-full ${tc.dot}`} />
+   333→                  <span className={`text-xs font-bold ${tc.text}`}>{td.label}</span>
+   334→                </div>
+   335→                <span className="font-mono text-[9px] text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">{td.short}</span>
+   336→              </div>
+   337→              <div className="font-mono text-base font-bold text-zinc-900 dark:text-zinc-50 mb-0.5">{pkg.priceRange}</div>
+   338→              <div className="text-[11px] text-zinc-500 dark:text-zinc-400 mb-3">{pkg.deliveryWeeks}</div>
+   339→              <div className="space-y-1.5 mb-3">
+   340→                {pkg.features.slice(0, 4).map((f, j) => (
+   341→                  <div key={j} className="flex items-start gap-1.5">
+   342→                    <Check className={`w-3 h-3 ${tc.text} shrink-0 mt-0.5`} strokeWidth={3} />
+   343→                    <span className="text-[10px] text-zinc-600 dark:text-zinc-400 leading-tight">{f}</span>
+   344→                  </div>
+   345→                ))}
+   346→                <div className="text-[10px] text-zinc-400 dark:text-zinc-500 pt-0.5">+{pkg.features.length - 4} more</div>
+   347→              </div>
+   348→              <div className="pt-2.5 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
+   349→                <span className="font-mono text-[9px] text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Modules</span>
+   350→                <span className={`font-mono text-[10px] font-bold ${tc.text}`}>{pkg.modules.length}/22</span>
+   351→              </div>
+   352→            </div>
+   353→          );
+   354→        })}
+   355→      </div>
+   356→    </main>
+   357→  );
+   358→}
+   359→
+   360→// ─── Helpers ──────────────────────────────────────────────────────
+   361→
+   362→function extractPageCount(features: string[]): number | null {
+   363→  for (const f of features) {
+   364→    const m = f.match(/(\d+)\s*pages?/i);
+   365→    if (m) return parseInt(m[1], 10);
+   366→  }
+   367→  for (const f of features) {
+   368→    if (/one-page|single-page|1-page/i.test(f)) return 1;
+   369→  }
+   370→  return null;
+   371→}
+   372→
+   373→// ─── ExampleCard ──────────────────────────────────────────────────
+   374→
+   375→function ExampleCard({ example, onPreview, index }: { example: ProductExample; onPreview: () => void; index: number }) {
+   376→  const td = tierDisplay[example.tier];
+   377→  const tc = tierColorMap[td.color];
+   378→  const pages = extractPageCount(example.features);
+   379→  const familyId = getFamilyForProductType(guessProductId(example));
+   380→  const fm = familyMeta[familyId];
+   381→  return (
+   382→    <button
+   383→      onClick={onPreview}
+   384→      className="group text-left bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200/80 dark:border-zinc-800 overflow-hidden hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-md transition-all duration-150 hover:-translate-y-0.5 animate-slide-up"
+   385→      style={{ animationDelay: `${index * 50}ms` }}
+   386→    >
+   387→      <div className="relative aspect-[16/10] overflow-hidden bg-zinc-100 dark:bg-zinc-800">
+   388→        <MiniPreview config={example} />
+   389→        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+   390→          <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-50 rounded-md px-2.5 py-1 text-[11px] font-semibold shadow-md flex items-center gap-1.5">
+   391→            <Eye className="w-3 h-3" /> Preview <ArrowRight className="w-3 h-3" />
+   392→          </div>
+   393→        </div>
+   394→        <div className="absolute top-1.5 right-1.5 z-20 flex items-center gap-1">
+   395→          {pages !== null && (
+   396→            <span className="font-mono px-1.5 py-0.5 rounded text-[8px] font-bold text-zinc-600 dark:text-zinc-300 bg-white/90 dark:bg-zinc-800/90 shadow-sm flex items-center gap-0.5">
+   397→              <FileText className="w-2.5 h-2.5" />
+   398→              {pages === 1 ? "1 pg" : `${pages} pgs`}
+   399→            </span>
+   400→          )}
+   401→          <span className={`font-mono px-1.5 py-0.5 rounded text-[8px] font-bold text-white shadow-sm ${tc.badge}`}>
+   402→            {td.short}
+   403→          </span>
+   404→        </div>
+   405→        <div className="absolute bottom-1.5 left-1.5 z-20">
+   406→          <span className={`font-mono px-1.5 py-0.5 rounded text-[7px] font-semibold ${fm.chip}`}>
+   407→            {fm.short}
+   408→          </span>
+   409→        </div>
+   410→      </div>
+   411→      <div className="p-2.5">
+   412→        <div className="text-[11px] font-bold text-zinc-900 dark:text-zinc-50 truncate mb-0.5">{example.exampleName}</div>
+   413→        <p className="text-[10px] text-zinc-500 dark:text-zinc-400 line-clamp-2 leading-snug">{example.exampleDescription}</p>
+   414→        <div className="mt-1.5 flex items-center justify-between">
+   415→          <span className="font-mono text-[8px] text-zinc-400 dark:text-zinc-500">{fm.recipe}</span>
+   416→          {pages !== null && (
+   417→            <div className="flex items-center gap-1 text-[9px] text-zinc-400 dark:text-zinc-500">
+   418→              <FileText className="w-2.5 h-2.5" />
+   419→              <span className="font-mono">{pages === 1 ? "Single page" : `${pages} pages`}</span>
+   420→            </div>
+   421→          )}
+   422→        </div>
+   423→      </div>
+   424→    </button>
+   425→  );
+   426→}
+   427→
+   428→// ─── ProductSection: expandable, shows tier badge ─────────────────
+   429→
+   430→function ProductSection({
+   431→  fp,
+   432→  onPreview,
+   433→  index,
+   434→}: {
+   435→  fp: FamilyProduct;
+   436→  onPreview: PreviewFn;
+   437→  index: number;
+   438→}) {
+   439→  const [expanded, setExpanded] = useState(true);
+   440→  const tc = tierColorMap[fp.tierColor] ?? tierColorMap.amber;
+   441→  return (
+   442→    <div
+   443→      className="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200/80 dark:border-zinc-800 overflow-hidden animate-slide-up"
+   444→      style={{ animationDelay: `${index * 60}ms` }}
+   445→    >
+   446→      <button
+   447→        onClick={() => setExpanded(!expanded)}
+   448→        className="w-full flex items-center justify-between p-3.5 sm:p-4 hover:bg-zinc-50 dark:hover:bg-zinc-850 transition-colors text-left"
+   449→      >
+   450→        <div className="flex items-center gap-3 min-w-0">
+   451→          <span className={`flex items-center justify-center w-6 h-6 rounded font-mono text-[10px] font-bold shrink-0 ${tc.chip}`}>
+   452→            {fp.tierLetter}
+   453→          </span>
+   454→          <div className="min-w-0">
+   455→            <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-50">{fp.product.name}</h3>
+   456→            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 line-clamp-1">{fp.product.description}</p>
+   457→          </div>
+   458→        </div>
+   459→        <div className="flex items-center gap-2.5 shrink-0">
+   460→          <span className="font-mono text-[9px] font-semibold text-zinc-400 dark:text-zinc-500 hidden sm:inline">{fp.product.examples.length} examples</span>
+   461→          <ChevronDown className={`w-4 h-4 text-zinc-400 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`} />
+   462→        </div>
+   463→      </button>
+   464→      {expanded && (
+   465→        <div className="px-3.5 sm:px-4 pb-4 pt-1 border-t border-zinc-100 dark:border-zinc-800 animate-expand">
+   466→          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 mt-3">
+   467→            {fp.product.examples.map((ex, i) => (
+   468→              <ExampleCard
+   469→                key={i}
+   470→                example={ex}
+   471→                index={i}
+   472→                onPreview={() => onPreview(ex, fp.product.name, ex)}
+   473→              />
+   474→            ))}
+   475→          </div>
+   476→        </div>
+   477→      )}
+   478→    </div>
+   479→  );
+   480→}
+   481→
+   482→// ─── FamilyView: all products in a family, grouped by tier ────────
+   483→
+   484→function FamilyView({ familyId, onPreview }: { familyId: DesignFamilyId; onPreview: PreviewFn }) {
+   485→  const fm = familyMeta[familyId];
+   486→  const tokens = familyTokens[familyId];
+   487→  const items = familyProductMap[familyId];
+   488→  const exampleCount = items.reduce((n, fp) => n + fp.product.examples.length, 0);
+   489→
+   490→  // Group by tier letter for sub-sections
+   491→  const byTier = useMemo(() => {
+   492→    const groups: Record<string, FamilyProduct[]> = {};
+   493→    for (const fp of items) {
+   494→      const key = fp.tierLetter;
+   495→      if (!groups[key]) groups[key] = [];
+   496→      groups[key].push(fp);
+   497→    }
+   498→    return Object.entries(groups).sort(([a], [b]) => a.localeCompare(b));
+   499→  }, [items]);
+   500→
+   501→  return (
+   502→    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+   503→      {/* Family header */}
+   504→      <div className={`rounded-lg ${fm.bg} border ${fm.border} p-4 sm:p-5 animate-slide-up`}>
+   505→        <div className="flex items-start justify-between flex-wrap gap-3 mb-2">
+   506→          <div className="flex items-center gap-3">
+   507→            <fm.icon className={`w-5 h-5 ${fm.text}`} />
+   508→            <h2 className="font-display text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-50">{fm.label}</h2>
+   509→          </div>
+   510→          <span className={`font-mono text-[10px] font-semibold px-2 py-1 rounded ${fm.chip}`}>
+   511→            {items.length} products · {exampleCount} examples
+   512→          </span>
+   513→        </div>
+   514→        <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed max-w-2xl mb-3">{fm.blurb}</p>
+   515→        <div className="flex items-center gap-3 font-mono text-[10px] text-zinc-500 dark:text-zinc-400">
+   516→          <span>Recipe: {fm.recipe}</span>
+   517→          <span>·</span>
+   518→          <span>{tokens.radius.md}px radius</span>
+   519→          <span>·</span>
+   520→          <span>{tokens.sectionStyle}</span>
+   521→        </div>
+   522→      </div>
+   523→
+   524→      {/* Products grouped by tier */}
+   525→      {byTier.map(([tierLetter, tierProducts]) => {
+   526→        const tc = tierColorMap[tierProducts[0].tierColor] ?? tierColorMap.amber;
+   527→        const tierName = tierProducts[0].tierName;
+   528→        const priceRange = tierProducts[0].priceRange;
+   529→        return (
+   530→          <div key={tierLetter} className="space-y-2.5">
+   531→            <div className="flex items-center gap-2 mb-1">
+   532→              <span className={`flex items-center justify-center w-6 h-6 rounded font-mono text-[10px] font-bold ${tc.chip}`}>
+   533→                {tierLetter}
+   534→              </span>
+   535→              <h3 className="font-display text-base font-bold text-zinc-900 dark:text-zinc-50">{tierName}</h3>
+   536→              <span className="font-mono text-[11px] text-zinc-400 dark:text-zinc-500">{priceRange}</span>
+   537→              <span className="font-mono text-[10px] text-zinc-400 dark:text-zinc-500">· {tierProducts.length} products</span>
+   538→            </div>
+   539→            <div className="space-y-2.5">
+   540→              {tierProducts.map((fp, i) => (
+   541→                <ProductSection key={fp.product.id} fp={fp} onPreview={onPreview} index={i} />
+   542→              ))}
+   543→            </div>
+   544→          </div>
+   545→        );
+   546→      })}
+   547→    </main>
+   548→  );
+   549→}
+   550→
+   551→// ─── HomeView: family picker + featured examples ──────────────────
+   552→
+   553→function HomeView({ onSelect, onPreview }: { onSelect: (v: View) => void; onPreview: PreviewFn }) {
+   554→  return (
+   555→    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+   556→      {/* Hero */}
+   557→      <section className="pt-8 pb-6 animate-slide-up">
+   558→        <div className="font-mono text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-3">
+   559→          <span className="text-zinc-400 dark:text-zinc-600">/</span> Product tier engine
+   560→        </div>
+   561→        <h1 className="font-display text-3xl sm:text-4xl lg:text-[2.75rem] font-bold tracking-tight mb-4 text-zinc-900 dark:text-zinc-50 leading-[1.08] max-w-3xl">
+   562→          Pick a design family. See every product we can build in it.
+   563→        </h1>
+   564→        <p className="text-sm sm:text-base text-zinc-600 dark:text-zinc-400 leading-relaxed max-w-2xl mb-4">
+   565→          {totalProducts} product types across {totalExamples} live examples. Each design family has its own visual language — typography, color, layout, and interaction patterns. Start with a family, then drill into its products and preview real examples.
+   566→        </p>
+   567→
+   568→        {/* Stat strip */}
+   569→        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-6">
+   570→          {[
+   571→            { label: "Design families", value: "5", sub: "Distinct visual languages" },
+   572→            { label: "Product types", value: String(totalProducts), sub: "Across all tiers" },
+   573→            { label: "Live examples", value: String(totalExamples), sub: "Previewable now" },
+   574→            { label: "Pricing tiers", value: "4", sub: "Starter → Enterprise" },
+   575→          ].map((s, i) => (
+   576→            <div
+   577→              key={s.label}
+   578→              className="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200/80 dark:border-zinc-800 p-3 animate-slide-up"
+   579→              style={{ animationDelay: `${i * 40}ms` }}
+   580→            >
+   581→              <div className="font-mono text-[9px] text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-1">{s.label}</div>
+   582→              <div className="font-display text-xl font-bold text-zinc-900 dark:text-zinc-50 leading-none mb-1">{s.value}</div>
+   583→              <div className="text-[10px] text-zinc-500 dark:text-zinc-400">{s.sub}</div>
+   584→            </div>
+   585→          ))}
+   586→        </div>
+   587→      </section>
+   588→
+   589→      {/* Family picker — the primary entry point */}
+   590→      <section className="pb-6">
+   591→        <div className="flex items-center gap-2 mb-4">
+   592→          <LayoutGrid className="w-4 h-4 text-zinc-900 dark:text-zinc-50" />
+   593→          <h2 className="font-display text-lg font-bold text-zinc-900 dark:text-zinc-50">Design families</h2>
+   594→          <span className="font-mono text-[11px] text-zinc-400 dark:text-zinc-500">click to browse products</span>
+   595→        </div>
+   596→        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+   597→          {familyOrder.map((fid, i) => {
+   598→            const fm = familyMeta[fid];
+   599→            const items = familyProductMap[fid];
+   600→            const exampleCount = items.reduce((n, fp) => n + fp.product.examples.length, 0);
+   601→            // Collect tier letters present in this family
+   602→            const tierLetters = [...new Set(items.map((fp) => fp.tierLetter))].sort();
+   603→            return (
+   604→              <button
+   605→                key={fid}
+   606→                onClick={() => onSelect({ kind: "family", familyId: fid })}
+   607→                className={`group text-left p-4 rounded-lg border ${fm.border} ${fm.bg} hover:shadow-md transition-all duration-150 animate-slide-up`}
+   608→                style={{ animationDelay: `${i * 50}ms` }}
+   609→              >
+   610→                <div className="flex items-center justify-between mb-3">
+   611→                  <div className="flex items-center gap-2">
+   612→                    <fm.icon className={`w-4 h-4 ${fm.text}`} />
+   613→                    <span className={`font-mono text-[9px] font-semibold ${fm.text}`}>FAMILY</span>
+   614→                  </div>
+   615→                  <ArrowUpRight className="w-4 h-4 text-zinc-400 dark:text-zinc-600 group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-colors" />
+   616→                </div>
+   617→                <h3 className="font-display text-base font-bold text-zinc-900 dark:text-zinc-50 mb-1">{fm.label}</h3>
+   618→                <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed mb-3 line-clamp-2">{fm.blurb}</p>
+   619→                <div className="flex items-center gap-1.5 mb-3 flex-wrap">
+   620→                  {tierLetters.map((l) => {
+   621→                    const fp = items.find((fp) => fp.tierLetter === l)!;
+   622→                    const tc = tierColorMap[fp.tierColor] ?? tierColorMap.amber;
+   623→                    return (
+   624→                      <span key={l} className={`font-mono text-[8px] font-bold px-1.5 py-0.5 rounded ${tc.chip}`}>{l}</span>
+   625→                    );
+   626→                  })}
+   627→                </div>
+   628→                <div className="flex items-center justify-between pt-2.5 border-t border-zinc-200/60 dark:border-zinc-800">
+   629→                  <span className="text-[11px] font-medium text-zinc-600 dark:text-zinc-400">{items.length} products · {exampleCount} examples</span>
+   630→                  <span className="font-mono text-[9px] text-zinc-400 dark:text-zinc-500">{fm.recipe}</span>
+   631→                </div>
+   632→              </button>
+   633→            );
+   634→          })}
+   635→          {/* Pricing card */}
+   636→          <button
+   637→            onClick={() => onSelect({ kind: "pricing" })}
+   638→            className="group text-left p-4 rounded-lg border border-zinc-900 dark:border-zinc-100 bg-zinc-900 dark:bg-zinc-100 hover:shadow-md transition-all duration-150 animate-slide-up"
+   639→            style={{ animationDelay: `${familyOrder.length * 50}ms` }}
+   640→          >
+   641→            <div className="flex items-center justify-between mb-3">
+   642→              <div className="flex items-center gap-2">
+   643→                <Tag className="w-4 h-4 text-white dark:text-zinc-900" />
+   644→                <span className="font-mono text-[9px] font-semibold text-white dark:text-zinc-900">PLANS</span>
+   645→              </div>
+   646→              <ArrowUpRight className="w-4 h-4 text-zinc-500 dark:text-zinc-500 group-hover:text-white dark:group-hover:text-zinc-900 transition-colors" />
+   647→            </div>
+   648→            <h3 className="font-display text-base font-bold text-white dark:text-zinc-900 mb-1">Pricing Plans</h3>
+   649→            <p className="text-xs text-zinc-400 dark:text-zinc-500 leading-relaxed mb-3 line-clamp-2">Starter, Growth, Professional, Enterprise — compare modules, deliverables, and support.</p>
+   650→            <div className="flex items-center gap-1.5 mb-3">
+   651→              {tierOrder.map((t) => (
+   652→                <span key={t} className="font-mono text-[8px] font-bold px-1.5 py-0.5 rounded text-white/70 dark:text-zinc-900/70 bg-white/10 dark:bg-zinc-900/10">
+   653→                  {tierDisplay[t].short}
+   654→                </span>
+   655→              ))}
+   656→            </div>
+   657→            <div className="flex items-center justify-between pt-2.5 border-t border-white/10 dark:border-zinc-900/10">
+   658→              <span className="text-[11px] font-medium text-zinc-300 dark:text-zinc-600">Compare all plans</span>
+   659→              <ArrowRight className="w-3 h-3 text-zinc-400 dark:text-zinc-500 group-hover:translate-x-0.5 transition-transform" />
+   660→            </div>
+   661→          </button>
+   662→        </div>
+   663→      </section>
+   664→
+   665→      {/* Featured examples — one from each family */}
+   666→      <section className="pb-12">
+   667→        <div className="flex items-center gap-2 mb-4">
+   668→          <Eye className="w-4 h-4 text-zinc-900 dark:text-zinc-50" />
+   669→          <h2 className="font-display text-lg font-bold text-zinc-900 dark:text-zinc-50">Featured examples</h2>
+   670→          <span className="font-mono text-[11px] text-zinc-400 dark:text-zinc-500">one from each family — click to preview</span>
+   671→        </div>
+   672→        <div className="grid grid-cols-2 lg:grid-cols-5 gap-2.5">
+   673→          {familyOrder.map((fid, i) => {
+   674→            const items = familyProductMap[fid];
+   675→            if (items.length === 0) return null;
+   676→            const product = items[0].product;
+   677→            const example = product.examples[0];
+   678→            return (
+   679→              <ExampleCard
+   680→                key={fid}
+   681→                example={example}
+   682→                index={i}
+   683→                onPreview={() => onPreview(example, product.name, example)}
+   684→              />
+   685→            );
+   686→          })}
+   687→        </div>
+   688→      </section>
+   689→    </main>
+   690→  );
+   691→}
+   692→
+   693→// ─── App ──────────────────────────────────────────────────────────
+   694→
+   695→function App() {
+   696→  const [view, setView] = useState<View>({ kind: "home" });
+   697→  const [selectedConfig, setSelectedConfig] = useState<{ config: MockupConfig; businessName: string; example?: ProductExample } | null>(null);
+   698→
+   699→  const activeFamily = view.kind === "family" ? view.familyId : null;
+   700→
+   701→  const handlePreview: PreviewFn = (config, businessName, example) =>
+   702→    setSelectedConfig({ config, businessName, example });
+   703→
+   704→  return (
+   705→    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50">
+   706→      {/* Header */}
+   707→      <header className="sticky top-0 z-30 bg-white/85 dark:bg-zinc-950/85 backdrop-blur-lg border-b border-zinc-200/80 dark:border-zinc-800">
+   708→        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+   709→          <div className="flex items-center justify-between h-14">
+   710→            <div className="flex items-center gap-2.5">
+   711→              <div className="w-8 h-8 rounded-lg bg-zinc-900 dark:bg-zinc-100 flex items-center justify-center">
+   712→                <Zap className="w-4 h-4 text-white dark:text-zinc-900" />
+   713→              </div>
+   714→              <div>
+   715→                <div className="font-display text-sm font-bold leading-tight tracking-tight">OMNIFORGE</div>
+   716→                <div className="font-mono text-[10px] text-zinc-400 dark:text-zinc-500 leading-tight">Design Family Engine</div>
+   717→              </div>
+   718→            </div>
+   719→            <div className="hidden sm:flex items-center gap-1.5 font-mono text-[11px] text-zinc-400 dark:text-zinc-500">
+   720→              <Layers className="w-3.5 h-3.5" />
+   721→              <span>5 families · {totalProducts} products · {totalExamples} examples</span>
+   722→            </div>
+   723→          </div>
+   724→        </div>
+   725→      </header>
+   726→
+   727→      {/* Top Navigation — design families are primary */}
+   728→      <TopNav view={view} onSelect={setView} />
+   729→
+   730→      {/* Home */}
+   731→      {view.kind === "home" && (
+   732→        <HomeView onSelect={setView} onPreview={handlePreview} />
+   733→      )}
+   734→
+   735→      {/* Family View */}
+   736→      {activeFamily && (
+   737→        <FamilyView familyId={activeFamily} onPreview={handlePreview} />
+   738→      )}
+   739→
+   740→      {/* Pricing View */}
+   741→      {view.kind === "pricing" && <PricingView />}
+   742→
+   743→      {/* Footer */}
+   744→      <footer className="border-t border-zinc-200/80 dark:border-zinc-800 py-7 mt-auto">
+   745→        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+   746→          <div className="flex items-center justify-between flex-wrap gap-3">
+   747→            <div className="flex items-center gap-2">
+   748→              <Zap className="w-3.5 h-3.5 text-zinc-400" />
+   749→              <span className="font-display text-sm font-bold text-zinc-600 dark:text-zinc-400">OMNIFORGE</span>
+   750→            </div>
+   751→            <p className="font-mono text-[11px] text-zinc-400 dark:text-zinc-500">
+   752→              {totalProducts} products · {totalExamples} examples · 5 design families · 4 plans · 22 modules
+   753→            </p>
+   754→          </div>
+   755→          <p className="font-mono text-[10px] text-zinc-300 dark:text-zinc-600 mt-3">
+   756→            Prices are illustrative starting hypotheses, not verified market rates.
+   757→          </p>
+   758→        </div>
+   759→      </footer>
+   760→
+   761→      {/* Preview modal */}
+   762→      {selectedConfig && (
+   763→        <BrowserFrame
+   764→          config={selectedConfig.config}
+   765→          businessName={selectedConfig.businessName}
+   766→          onClose={() => setSelectedConfig(null)}
+   767→          example={selectedConfig.example}
+   768→        />
+   769→      )}
+   770→    </div>
+   771→  );
+   772→}
+   773→
+   774→export default App;
+   775→

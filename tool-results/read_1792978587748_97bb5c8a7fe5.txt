@@ -1,0 +1,676 @@
+    40→    40→  signal-to-pause system we actually honour, and sedation options
+    41→    41→  when you need them.
+    42→    42→
+    43→    43→</Prose>
+    44→    44→
+    45→    45→<ServiceGrid
+    46→    46→  services={[
+    47→    47→    { name: "Check-ups & hygiene", price: "from $89", href: "/services#hygiene" },
+    48→    48→    { name: "Dental implants", price: "from $3,400", href: "/services#implants" },
+    49→    49→    { name: "Cosmetic dentistry", price: "from $290", href: "/services#cosmetic" },
+    50→    50→    { name: "Emergency care", price: "from $120", href: "/services#emergency" }
+    51→    51→  ]}
+    52→    52→/>
+    53→    53→
+    54→    54→<TestimonialBar
+    55→    55→  quote="They told me what I didn't need before what I did. I've sent four friends."
+    56→    56→  author="Dana R., patient since 2023"
+    57→    57→/>
+    58→    58→
+    59→    59→<HoursBlock
+    60→    60→  lines={[
+    61→    61→    ["Mon – Thu", "7:30 – 18:00"],
+    62→    62→    ["Friday", "8:00 – 15:00"],
+    63→    63→    ["Saturday", "9:00 – 13:00 (hygiene only)"],
+    64→    64→    ["Sunday", "Closed"]
+    65→    65→  ]}
+    66→    66→  note="Early mornings and Saturday slots exist for people who can't leave work — book 2–3 weeks ahead."
+    67→    67→/>
+    68→    68→
+    69→    69→<InsuranceStrip insurers={["Delta Dental", "Cigna", "Aetna", "MetLife", "Principal"]} note="+ in-network maximisation on every plan we accept" />
+    70→    70→`,
+    71→    71→
+    72→    72→  "01-pages/services.mdx": FM(
+    73→    73→    "Treatments & prices — Brightline Dental",
+    74→    74→    "Every treatment with a from-price, what changes it, and how many visits to expect. No surprise line items."
+    75→    75→  ) + `<Prose>
+    76→    76→
+    77→    77→## Prices, in the open
+    78→    78→
+    79→    79→We list from-prices because that's what you actually want to know.
+    80→    80→Each treatment below says exactly what moves the number — so the
+    81→    81→estimate you get at the consultation matches this page.
+    82→    82→
+    83→    83→</Prose>
+    84→    84→
+    85→    85→<ServiceSection id="hygiene" name="Check-ups & hygiene" from="$89" visits="1 visit · 45 min">
+    86→    86→  Comprehensive exam, x-rays when clinically needed, and a hygiene
+    87→    87→  appointment with a gum-health score you get to keep. What moves the
+    88→    88→  price: first-visit x-rays (+$40–60) and deep cleaning when gum
+    89→    89→  measurements call for it (quoted separately, always before we start).
+    90→    90→</ServiceSection>
+    91→    91→
+    92→    92→<ServiceSection id="implants" name="Dental implants" from="$3,400" visits="3–4 visits over 3–6 months">
+    93→    93→  Titanium root plus porcelain crown, with a **10-year guarantee**
+    94→    94→  covering the fixture. What moves the price: bone grafting when the
+    95→    95→  jaw needs width (+$600–1,200), and the crown material. The
+    96→    96→  consultation is free and includes a 3D scan — you leave with a
+    97→    97→  written plan and a fixed price, valid 60 days.
+    98→    98→</ServiceSection>
+    99→    99→
+   100→   100→<ServiceSection id="cosmetic" name="Cosmetic dentistry" from="$290" visits="1–2 visits">
+   101→   101→  Whitening, bonding, and veneer consultations that start with a
+   102→   102→  photo-simulation instead of a sales pitch. We'll tell you when
+   103→   103→  whitening alone gets you 80% of the result. What moves the price:
+   104→   104→  in-surgery vs home whitening, and veneer count.
+   105→   105→</ServiceSection>
+   106→   106→
+   107→   107→<ServiceSection id="emergency" name="Emergency care" from="$120" visits="same-day slots held daily">
+   108→   108→  We hold two emergency slots every weekday. Call before 10:00 and
+   109→   109→  we'll see you the same day. What moves the price: whether the visit
+   110→   110→  resolves the pain (most do) or schedules the follow-up treatment.
+   111→   111→</ServiceSection>
+   112→   112→
+   113→   113→<FAQAccordion
+   114→   114→  items={[
+   115→   115→    { q: "Do these prices include everything?", a: "The from-price includes the standard visit. Anything beyond it is quoted in writing before it happens — that's a policy, not a courtesy." },
+   116→   116→    { q: "Payment plans?", a: "Yes — 0% interest over 3–12 months on treatment over $500, via our finance partner. The implant page has the monthly math worked out." },
+   117→   117→    { q: "What if I need less than you quoted?", a: "You pay the lower amount. Quotes are ceilings, not targets." }
+   118→   118→  ]}
+   119→   119→/>
+   120→   120→`,
+   121→   121→
+   122→   122→  "01-pages/about.mdx": FM(
+   123→   123→    "About Brightline Dental",
+   124→   124→    "Founded 2016. Patient-first dentistry with published prices, honest treatment planning and a 4.9-star average across 800+ reviews."
+   125→   125→  ) + `<PageHero heading="Built around the appointment you'd want" sub="Brightline opened in 2016 with one rule: explain everything, including what not to spend on." />
+   126→   126→
+   127→   127→<Prose>
+   128→   128→
+   129→   129→## The practice
+   130→   130→
+   131→   131→Brightline Dental is an independent practice in Portland's Pearl
+   132→   132→District — two treatment rooms, one surgeon, one hygienist team, and
+   133→   133→a front desk that answers the phone. We chose small on purpose: the
+   134→   134→dentist who plans your treatment is the dentist who does it.
+   135→   135→
+   136→   136→## What we believe
+   137→   137→
+   138→   138→1. **Published prices are a trust decision.** You found us through
+   139→   139→   reviews, not a discount funnel; the least we can do is show you
+   140→   140→   numbers.
+   141→   141→2. **The best treatment plan is the smallest one that works.** Our
+   142→   142→   treatment planning template literally has a "what we're NOT
+   143→   143→   recommending and why" field.
+   144→   144→3. **Anxious patients are the norm, not the exception.** Roughly
+   145→   145→   40% of new patients tell us they're nervous. The pause signal,
+   146→   146→   the headphones and the sedation options aren't extras — they're
+   147→   147→   the baseline.
+   148→   148→
+   149→   149→## The numbers
+   150→   150→
+   151→   151→- 4.9-star average across 800+ patient reviews
+   152→   152→- 89% of treatment plans accepted without a second visit
+   153→   153→- Under 7-minute average wait, tracked monthly
+   154→   154→
+   155→   155→## The building
+   156→   156→
+   157→   157→Ground-floor, step-free access on NW 13th. Same-block parking, bike
+   158→   158→racks at the door, and the Green/Yellow line two blocks away.
+   159→   159→
+   160→   160→</Prose>
+   161→   161→`,
+   162→   162→
+   163→   163→  "01-pages/team.mdx": FM(
+   164→   164→    "Meet the team — Brightline Dental",
+   165→   165→    "Dr. Elena Marsh, DDS and the Brightline team. Credentials, specialties and the people you'll actually meet."
+   166→   166→  ) + `<TeamGrid>
+   167→   167→  <TeamMember
+   168→   168→    name="Dr. Elena Marsh, DDS"
+   169→   169→    role="Principal dentist · implants & restorative"
+   170→   170→    image="/images/team/dr-marsh.jpg"
+   171→   171→    bio="NYU College of Dentistry, 2009. Fifteen years in restorative work, 600+ implant placements, and the author of our treatment-planning policy — including the 'what we're not recommending' field. Teaches a monthly anxious-patient clinic."
+   172→   172→    credentials={["DDS, NYU 2009", "Fellow, International Congress of Oral Implantologists", "Invisalign-certified provider"]}
+   173→   173→  />
+   174→   174→  <TeamMember
+   175→   175→    name="Jonah Reyes, RDH"
+   176→   176→    role="Lead hygienist · periodontal health"
+   177→   177→    image="/images/team/jonah-reyes.jpg"
+   178→   178→    bio="Twelve years in hygiene, and the reason our gum-health scores go home with patients. Runs the Saturday hygiene clinic and our in-office whitening program."
+   179→   179→    credentials={["RDH, Pacific University 2013", "Certified in laser periodontal therapy"]}
+   180→   180→  />
+   181→   181→  <TeamMember
+   182→   182→    name="Amara Okafor"
+   183→   183→    role="Patient care coordinator"
+   184→   184→    image="/images/team/amara-okafor.jpg"
+   185→   185→    bio="The voice that answers before 10am, holds the daily emergency slots, and knows every insurance plan we accept by its exclusions, not its logo. Ask her about payment plans — she built the cheat sheet."
+   186→   186→    credentials={["Insurance maximisation certified", "Fluent in Spanish & English"]}
+   187→   187→  />
+   188→   188→  <TeamMember
+   189→   189→    name="Dr. Sofia Brandt, DMD"
+   190→   190→    role="Associate dentist · cosmetic & preventive"
+   191→   191→    image="/images/team/dr-brandt.jpg"
+   192→   192→    bio="University of Oregon DMD, 2018. Leads our cosmetic consults and the photo-simulation-first policy. Her whitening-vs-veneer honesty has been quoted in more than one review."
+   193→   193→    credentials={["DMD, University of Oregon 2018", "AACD member"]}
+   194→   194→  />
+   195→   195→</TeamGrid>
+   196→   196→
+   197→   197→<Prose>
+   198→   198→
+   199→   199→## Who you'll actually meet
+   200→   200→
+   201→   201→Two dentists, one hygiene team, one coordinator: five people, no
+   202→   202→rotating cast. If you're a nervous patient, note that we assign the
+   203→   203→same dentist from consult to completion — continuity is a clinical
+   204→   204→decision, not a scheduling accident.
+   205→   205→
+   206→   206→</Prose>
+   207→   207→`,
+   208→   208→
+   209→   209→  "01-pages/contact.mdx": FM(
+   210→   210→    "Book a visit — Brightline Dental, Portland",
+   211→   211→    "Same-week appointments, two emergency slots held daily, and a form that takes 60 seconds. 1213 NW 13th Ave, Portland."
+   212→   212→  ) + `<BookingForm
+   213→   213→  intro="Tell us what you need and when. We confirm by text within one business hour — and we never call to 'follow up' unless you ask."
+   214→   214→  fields={["name", "phone", "reason", "preferred-time"]}
+   215→   215→  emergencyNote="In pain right now? Call 503-555-0164 — two emergency slots are held every weekday."
+   216→   216→/>
+   217→   217→
+   218→   218→<Prose>
+   219→   219→
+   220→   220→## Where we are
+   221→   221→
+   222→   222→**1213 NW 13th Ave, Portland, OR 97209** — ground floor, step-free.
+   223→   223→Same-block parking (validated), bike racks at the door, MAX Green &
+   224→   224→Yellow to NW 12th & Glisan.
+   225→   225→
+   226→   226→## Hours
+   227→   227→
+   228→   228→| Day | Hours |
+   229→   229→| --- | --- |
+   230→   230→| Mon – Thu | 7:30 – 18:00 |
+   231→   231→| Friday | 8:00 – 15:00 |
+   232→   232→| Saturday | 9:00 – 13:00 (hygiene only) |
+   233→   233→| Sunday | Closed |
+   234→   234→
+   235→   235→## Insurance
+   236→   236→
+   237→   237→In-network with Delta Dental, Cigna, Aetna, MetLife and Principal —
+   238→   238→and we run a maximisation check on every plan we accept, including
+   239→   239→yours, before the first appointment. No insurance? Ask for the
+   240→   240→member pricing sheet; it's the same prices, minus the paperwork.
+   241→   241→
+   242→   242→</Prose>
+   243→   243→`,
+   244→   244→
+   245→   245→  "02-booking/booking-flow.mdx": FM(
+   246→   246→    "Booking flow — spec",
+   247→   247→    "The appointment flow shipped in this kit: fields, validation, states and confirmation copy."
+   248→   248→  ) + `## The flow
+   249→   249→
+   250→   250→\`\`\`
+   251→   251→choice: reason (exam | hygiene | implant consult | cosmetic | emergency)
+   252→   252→   ↓
+   253→   253→details: name, phone, preferred time (morning | afternoon | first available)
+   254→   254→   ↓
+   255→   255→submit → "Request received" state (no email required)
+   256→   256→   ↓
+   257→   257→SMS + email confirmation (see confirmation-emails.md)
+   258→   258→\`\`\`
+   259→   259→
+   260→   260→## Why this shape
+   261→   261→
+   262→   262→1. **Reason first** — it routes the request (implant consults get the
+   263→   263→   3D-scan slot; emergencies get the held slots).
+   264→   264→2. **Phone, not email-first** — 78% of dental bookings that convert
+   265→   265→   do so by text or call. Email is captured at the practice, not the
+   266→   266→   form.
+   267→   267→3. **Preferred time as a 3-option choice** — free-text time fields
+   268→   268→   generate un-answerable requests ("next Tuesday sometime morning or
+   269→   269→   maybe Thursday").
+   270→   270→
+   271→   271→## Form rules
+   272→   272→
+   273→   273→- Every field inline-validated on blur; errors in plain language
+   274→   274→  ("Add a phone number so we can confirm by text")
+   275→   275→- Submit disabled until valid — never punish with a submit-then-error
+   276→   276→- After submit: optimistic "Request received — we confirm within one
+   277→   277→  business hour" with the practice phone number visible
+   278→   278→- No account, no password, no newsletter checkbox. Bookings are not
+   279→   279→  a marketing funnel.
+   280→   280→
+   281→   281→## Spam
+   282→   282→
+   283→   283→A honeypot field (hidden, \`tabindex=-1\`, named \`company\`) plus
+   284→   284→rate-limit 3 per phone per day. No CAPTCHA — the practice phone
+   285→   285→number is public anyway; the cost of a fake booking is one held slot.
+   286→   286→
+   287→   287→## Embedding
+   288→   288→
+   289→   289→The flow is a self-contained component (\`BookingForm\`) driven by the
+   290→   290→\`fields\` prop — see content-model.md for the component contract.
+   291→   291→`,
+   292→   292→
+   293→   293→  "02-booking/confirmation-emails.md": `# Confirmation emails — appointment + reminder
+   294→   294→
+   295→   295→Two emails ship with the booking flow. Both are plain-text-first
+   296→   296→(mobile carriers and spam filters both prefer it), with the practice
+   297→   297→signature block as the only formatting.
+   298→   298→
+   299→   299→## 1 · Confirmation (sends within 60 seconds of booking)
+   300→   300→
+   301→   301→\`\`\`
+   302→   302→Subject: Confirmed: {{day}}, {{date}} at {{time}} — Brightline Dental
+   303→   303→
+   304→   304→Hi {{first_name}},
+   305→   305→
+   306→   306→You're booked. Here's everything in one place:
+   307→   307→
+   308→   308→  When:    {{day}}, {{date}} at {{time}}
+   309→   309→  Where:   1213 NW 13th Ave, Portland (ground floor, step-free)
+   310→   310→  Parking: Same-block lot — we validate
+   311→   311→  With:    {{dentist_name}}
+   312→   312→
+   313→   313→Your visit: {{reason_label}}. Plan for {{duration_minutes}} minutes.
+   314→   314→
+   315→   315→Need to move it? Reply to this email or call 503-555-0164 before
+   316→   316→{{cutoff_time}} the day before — no fee, no guilt.
+   317→   317→
+   318→   318→— The Brightline team
+   319→   319→  503-555-0164 · brightlinedental.example
+   320→   320→\`\`\`
+   321→   321→
+   322→   322→**Why it works:** every logistical answer in one screen (time, place,
+   323→   323→parking, duration, who), the reschedule path is stated *before* it's
+   324→   324→needed, and "no fee, no guilt" kills the no-show's best excuse —
+   325→   325→anxiety about calling.
+   326→   326→
+   327→   327→## 2 · Reminder (sends 24h before)
+   328→   328→
+   329→   329→\`\`\`
+   330→   330→Subject: Tomorrow at {{time}} — Brightline Dental
+   331→   331→
+   332→   332→Hi {{first_name}}, tomorrow at {{time}}.
+   333→   333→
+   334→   334→Two things worth knowing:
+   335→   335→1. If it's your first visit, bring your insurance card (if using one)
+   336→   336→   — otherwise, just yourself.
+   337→   337→2. Running early or late? Call 503-555-0164 and we'll flex within
+   338→   338→   the hour.
+   339→   339→
+   340→   340→See you tomorrow,
+   341→   341→Brightline Dental · 1213 NW 13th Ave
+   342→   342→\`\`\`
+   343→   343→
+   344→   344→**Why it works:** two bullets, zero marketing, one phone number. The
+   345→   345→goal is attendance, not engagement.
+   346→   346→
+   347→   347→## Anti-no-show stack (already configured)
+   348→   348→
+   349→   349→- T-24h reminder (this email) — cuts no-shows ~35% on its own
+   350→   350→- T-2h SMS (single line: "Today {{time}} — Brightline. Reply R to
+   351→   351→  reschedule.") — another ~15%
+   352→   352→- Confirmation email states the reschedule policy up front
+   353→   353→`,
+   354→   354→
+   355→   355→  "03-seo/local-seo-checklist.md": `# Local SEO checklist — dental practices (33 items)
+   356→   356→
+   357→   357→Work top to bottom. Section A is one afternoon; B and C are monthly
+   358→   358→habits. Every item is either done or not — no "partially".
+   359→   359→
+   360→   360→## A · Foundations (do once, ~3 hours)
+   361→   361→
+   362→   362→- [ ] Google Business Profile claimed, with the exact practice name
+   363→   363→      used consistently everywhere (NAP: name, address, phone)
+   364→   364→- [ ] GBP category set to *Dentist* + secondary *Cosmetic dentist*,
+   365→   365→      *Emergency dental service* if offered
+   366→   366→- [ ] GBP services list matches the services page verbatim (names,
+   367→   367→      not paraphrases)
+   368→   368→- [ ] Appointment link in GBP points at the booking page, not the
+   369→   369→      homepage
+   370→   370→- [ ] Practice hours in GBP match the site (including the Saturday
+   371→   371→      nuance — "hygiene only" belongs in the hours note)
+   372→   372→- [ ] 10+ real photos: reception, treatment rooms, the team, the
+   373→   373→      building exterior with the sign visible
+   374→   374→- [ ] LocalBusiness + Dentist JSON-LD (see json-ld.json) on the
+   375→   375→      homepage — address, geo, hours, priceRange
+   376→   376→- [ ] /services page lists from-prices (priceRanges in schema match)
+   377→   377→- [ ] robots.txt + sitemap.xml submitted in Search Console (files in
+   378→   378→      this folder)
+   379→   379→- [ ] Site displays phone number as clickable tel: link above the
+   380→   380→      fold on mobile
+   381→   381→- [ ] One page per core treatment (implants, hygiene, cosmetic,
+   382→   382→      emergency) — not one "services" mega-page
+   383→   383→- [ ] Treatment pages internally linked from GBP service items
+   384→   384→
+   385→   385→## B · Reviews (weekly, 20 minutes)
+   386→   386→
+   387→   387→- [ ] Review link shortlinked (e.g. brightlinedental.example/review)
+   388→   388→      and printed on the aftercare card
+   389→   389→- [ ] Every patient leaving the front desk hears the ask — script:
+   390→   390→      "If the visit earned it, a Google review helps neighbours find
+   391→   391→      us" (never incentivise; it violates GBP policy)
+   392→   392→- [ ] Reply to every review within 48h — 2 sentences, reference one
+   393→   393→      detail from the visit
+   394→   394→- [ ] Negative reviews: respond with the phone number, take the
+   395→   395→      conversation offline, never dispute details publicly
+   396→   396→- [ ] Track review velocity (reviews/month) — it's a top-3 local
+   397→   397→      ranking factor and the first thing to dip when the ask stops
+   398→   398→
+   399→   399→## C · Local signals (monthly, 30 minutes)
+   400→   400→
+   401→   401→- [ ] NAP audit: Bing Places, Apple Maps, Yelp, Healthgrades,
+   402→   402→      ZocDoc — identical to the letter, including "Ave" vs "Avenue"
+   403→   403→- [ ] Local citations consistent (chamber of commerce, local
+   404→   404→      directories)
+   405→   405→- [ ] One locally-relevant piece per month (e.g. "Cost of dental
+   406→   406→      implants in Portland — 2026 edition") — local + topical, not
+   407→   407→      keyword spam
+   408→   408→- [ ] Treatment pages mention the neighbourhoods you actually serve
+   409→   409→      (once, in prose — not a footer list of 30 cities)
+   410→   410→- [ ] Check GBP Q&A weekly; answer unanswered questions with real
+   411→   411→      detail (they rank)
+   412→   412→- [ ] Monitor position for "dentist near me" set at 5-mile radius in
+   413→   413→      a rank tracker (any tool — this is the one metric)
+   414→   414→- [ ] Verify the booking link still works after any site change (a
+   415→   415→      broken booking link silently burns the whole stack)
+   416→   416→- [ ] Add post-visit photos to GBP monthly (fresh media signals)
+   417→   417→- [ ] Review the competitor set: the 3 practices above you in maps —
+   418→   418→      their review count, velocity, and photo freshness
+   419→   419→- [ ] Confirm schema still validates after site updates (Rich
+   420→   420→      Results Test)
+   421→   421→
+   422→   422→## The honest note
+   423→   423→
+   424→   424→Local SEO for dental is 60% reviews, 25% GBP completeness, 15%
+   425→   425→everything on this page. If time is short, do section B forever and
+   426→   426→A once; C can wait a quarter.
+   427→   427→`,
+   428→   428→
+   429→   429→  "03-seo/json-ld.json": `{
+   430→   430→  "@context": "https://schema.org",
+   431→   431→  "@type": "Dentist",
+   432→   432→  "@id": "https://www.brightlinedental.example/#practice",
+   433→   433→  "name": "Brightline Dental",
+   434→   434→  "description": "Independent dental practice in Portland's Pearl District — published prices, same-week appointments, and a 10-year implant guarantee.",
+   435→   435→  "url": "https://www.brightlinedental.example/",
+   436→   436→  "telephone": "+1-503-555-0164",
+   437→   437→  "priceRange": "$$",
+   438→   438→  "image": "https://www.brightlinedental.example/images/og/practice.jpg",
+   439→   439→  "address": {
+   440→   440→    "@type": "PostalAddress",
+   441→   441→    "streetAddress": "1213 NW 13th Ave",
+   442→   442→    "addressLocality": "Portland",
+   443→   443→    "addressRegion": "OR",
+   444→   444→    "postalCode": "97209",
+   445→   445→    "addressCountry": "US"
+   446→   446→  },
+   447→   447→  "geo": { "@type": "GeoCoordinates", "latitude": 45.5301, "longitude": -122.6832 },
+   448→   448→  "hasMap": "https://maps.google.com/?q=Brightline+Dental,+1213+NW+13th+Ave,+Portland,+OR",
+   449→   449→  "openingHoursSpecification": [
+   450→   450→    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday"], "opens": "07:30", "closes": "18:00" },
+   451→   451→    { "@type": "OpeningHoursSpecification", "dayOfWeek": "Friday", "opens": "08:00", "closes": "15:00" },
+   452→   452→    { "@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "09:00", "closes": "13:00" }
+   453→   453→  ],
+   454→   454→  "areaServed": { "@type": "City", "name": "Portland" },
+   455→   455→  "sameAs": [
+   456→   456→    "https://www.google.com/maps/place/?q=Brightline+Dental+Portland",
+   457→   457→    "https://www.facebook.com/brightlinedental"
+   458→   458→  ],
+   459→   459→  "aggregateRating": {
+   460→   460→    "@type": "AggregateRating",
+   461→   461→    "ratingValue": "4.9",
+   462→   462→    "reviewCount": "812",
+   463→   463→    "bestRating": "5"
+   464→   464→  },
+   465→   465→  "availableService": [
+   466→   466→    { "@type": "MedicalProcedure", "name": "Dental implants", "url": "https://www.brightlinedental.example/services#implants" },
+   467→   467→    { "@type": "MedicalProcedure", "name": "Check-ups & hygiene", "url": "https://www.brightlinedental.example/services#hygiene" },
+   468→   468→    { "@type": "MedicalProcedure", "name": "Cosmetic dentistry", "url": "https://www.brightlinedental.example/services#cosmetic" },
+   469→   469→    { "@type": "MedicalProcedure", "name": "Emergency dental care", "url": "https://www.brightlinedental.example/services#emergency" }
+   470→   470→  ]
+   471→   471→}
+   472→   472→`,
+   473→   473→
+   474→   474→  "03-seo/robots.txt": `User-agent: *
+   475→   475→Allow: /
+   476→   476→Disallow: /api/
+   477→   477→
+   478→   478→Sitemap: https://www.brightlinedental.example/sitemap.xml
+   479→   479→`,
+   480→   480→
+   481→   481→  "03-seo/sitemap.xml": `<?xml version="1.0" encoding="UTF-8"?>
+   482→   482→<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+   483→   483→  <url><loc>https://www.brightlinedental.example/</loc><lastmod>2026-10-01</lastmod><priority>1.0</priority></url>
+   484→   484→  <url><loc>https://www.brightlinedental.example/services</loc><lastmod>2026-10-01</lastmod><priority>0.9</priority></url>
+   485→   485→  <url><loc>https://www.brightlinedental.example/services#implants</loc><lastmod>2026-10-01</lastmod><priority>0.8</priority></url>
+   486→   486→  <url><loc>https://www.brightlinedental.example/about</loc><lastmod>2026-10-01</lastmod><priority>0.7</priority></url>
+   487→   487→  <url><loc>https://www.brightlinedental.example/team</loc><lastmod>2026-10-01</lastmod><priority>0.6</priority></url>
+   488→   488→  <url><loc>https://www.brightlinedental.example/contact</loc><lastmod>2026-10-01</lastmod><priority>0.9</priority></url>
+   489→   489→</urlset>
+   490→   490→`,
+   491→   491→
+   492→   492→  "04-content-model/content-model.md": `# Content model — Brightline Dental
+   493→   493→
+   494→   494→Every page, section and component in this kit, and the fields each
+   495→   495→one owns. Edit copy in \`01-pages/*.mdx\`; the model below is the map.
+   496→   496→
+   497→   497→## Pages
+   498→   498→
+   499→   499→| Page | File | Sections (in order) |
+   500→   500→| --- | --- | --- |
+   501→   501→| Home | \`01-pages/home.mdx\` | PageHero → Prose → ServiceGrid → TestimonialBar → HoursBlock → InsuranceStrip |
+   502→   502→| Services | \`01-pages/services.mdx\` | Prose → ServiceSection ×4 → FAQAccordion |
+   503→   503→| About | \`01-pages/about.mdx\` | PageHero → Prose |
+   504→   504→| Team | \`01-pages/team.mdx\` | TeamGrid → Prose |
+   505→   505→| Contact | \`01-pages/contact.mdx\` | BookingForm → Prose (location/hours/insurance) |
+   506→   506→
+   507→   507→## Components & their fields
+   508→   508→
+   509→   509→\`\`\`
+   510→   510→PageHero       heading · sub · primaryCta · primaryHref · secondaryCta? · secondaryHref?
+   511→   511→Prose          children (markdown)
+   512→   512→ServiceGrid    services[{ name · price · href }]
+   513→   513→ServiceSection id · name · from · visits · children (markdown: what's included + what moves the price)
+   514→   514→FAQAccordion   items[{ q · a }]
+   515→   515→TestimonialBar quote · author
+   516→   516→HoursBlock     lines[[day, hours]] · note?
+   517→   517→InsuranceStrip insurers[] · note?
+   518→   518→TeamGrid       wraps TeamMember
+   519→   519→TeamMember     name · role · image · bio · credentials[]
+   520→   520→BookingForm    intro · fields[] · emergencyNote?
+   521→   521→\`\`\`
+   522→   522→
+   523→   523→## Field-level rules
+   524→   524→
+   525→   525→- **Prices**: always "from $X" — matches the priceRange policy and
+   526→   526→  the schema's \`priceRange\`. Never bare numbers (they read as
+   527→   527→  quotes, not anchors).
+   528→   528→- **Hours**: strings exactly as they should render; HoursBlock owns
+   529→   529→  the note field for nuance ("hygiene only").
+   530→   530→- **Team bios**: 40–70 words, one credential-flavoured sentence, one
+   531→   531→  human sentence. No third-person puffery.
+   532→   532→- **ServiceSection children**: mandatory structure — what's included,
+   533→   533→  then "What moves the price:" (the phrase is load-bearing: it's why
+   534→   534→  estimates match the page).
+   535→   535→
+   536→   536→## Copy conventions
+   537→   537→
+   538→   538→- US English, sentence case headings, no exclamation marks
+   539→   539→- Phone number always tel:-linked: 503-555-0164
+   540→   540→- Address always the full form with the accessibility note once per
+   541→   541→  page max (Contact owns the full block)
+   542→   542→- Sample-data honesty: names/numbers here are clearly fictional
+   543→   543→  (555 numbers) — swap in the real practice's before launch
+   544→   544→`,
+   545→   545→
+   546→   546→  "04-content-model/insurance-faq.mdx": FM(
+   547→   547→    "Insurance & payment — Brightline Dental",
+   548→   548→    "Which plans we accept, how maximisation works, and what things cost without insurance."
+   549→   549→  ) + `<Prose>
+   550→   550→
+   551→   551→## Insurance, plainly
+   552→   552→
+   553→   553→We're in-network with **Delta Dental, Cigna, Aetna, MetLife and
+   554→   554→Principal**. Before your first visit we run a maximisation check —
+   555→   555→which procedures your plan covers this benefit year, at what
+   556→   556→percentage, and what your remaining deductible is. You get that in
+   557→   557→writing before anything is scheduled.
+   558→   558→
+   559→   559→</Prose>
+   560→   560→
+   561→   561→<FAQAccordion
+   562→   562→  items={[
+   563→   563→    { q: "What if you're out of network for my plan?", a: "We'll still file the claim for you. Out-of-network reimbursement is usually 10–30% lower — we'll estimate the difference in writing before you decide anything." },
+   564→   564→    { q: "Do you take DCO/Medicaid plans?", a: "Not currently. The Oregon Dental Association maintains a live list of practices that do — we'll help you find one, even though it costs us the visit." },
+   565→   565→    { q: "No insurance — what do I actually pay?", a: "The same from-prices on the services page, minus the paperwork. Ask for the member pricing sheet at the front desk — it's one page, no membership program, no gimmick." },
+   566→   566→    { q: "Payment plans?", a: "0% interest over 3–12 months on any treatment over $500, through our finance partner. Approval takes about four minutes and doesn't affect your credit score to check." },
+   567→   567→    { q: "What does 'maximisation' mean?", a: "Timing procedures against your benefit year so you use what you've already paid for. Example: split a treatment across December and January to use two years' of coverage instead of one." },
+   568→   568→    { q: "Hidden fees I should ask about?", a: "There's a checklist question for this on purpose: our answer is that the written estimate is the ceiling. If the treatment turns out smaller, you pay less." },
+   569→   569→    { q: "Emergency visit — insurance later?", a: "Yes. We'll treat first and file after; the front desk photographs your card on arrival if you have one." },
+   570→   570→    { q: "Do you charge for cancelled appointments?", a: "No fee if you let us know by phone or reply before close of business the day before. The confirmation email says this too — no fine print exceptions." },
+   571→   571→    { q: "Implant guarantee — what's covered?", a: "The fixture is guaranteed 10 years. If it fails in that window, we replace it — parts and labour. The written warranty ships with your treatment plan." },
+   572→   572→    { q: "Can I get a second opinion from you?", a: "Gladly. Bring the other plan; we'll compare it line by line with ours and tell you honestly if theirs is better for you. It sometimes is." }
+   573→   573→  ]}
+   574→   574→/>
+   575→   575→`,
+   576→   576→
+   577→   577→  "05-deploy/deploy-guide.md": `# Deploy guide — Dental Practice Kit
+   578→   578→
+   579→   579→This kit is MDX pages + static assets. Any Next.js MDX setup runs it;
+   580→   580→the fastest path is Vercel.
+   581→   581→
+   582→   582→## The 45-minute path
+   583→   583→
+   584→   584→1. **Create the project** (10 min) — the kit's content model expects
+   585→   585→   a Next.js App Router site with MDX. Drop \`01-pages/*.mdx\` into
+   586→   586→   \`src/content/pages/\` and map each to a route, or use the starter
+   587→   587→   referenced in the walkthrough video.
+   588→   588→2. **Register the components** (10 min) — every component in
+   589→   589→   content-model.md (\`PageHero\`, \`ServiceSection\`, …) needs an MDX
+   590→   590→   provider mapping. The reference implementation is ~120 lines; the
+   591→   591→   component contract (props in, semantic HTML out) is in the model
+   592→   592→   doc.
+   593→   593→3. **Swap the sample data** (15 min) — practice name, address,
+   594→   594→   phone, hours, insurers, team bios, from-prices. The content model
+   595→   595→   marks every fictional value (555 numbers, sample names). Grep for
+   596→   596→   \`Brightline\` to catch them all.
+   597→   597→4. **Wire the booking form** (5 min) — the flow spec is in
+   598→   598→   \`02-booking/booking-flow.mdx\`: reason → details → optimistic
+   599→   599→   confirmation. Point the submit at your handler (or the practice
+   600→   600→   SMS number to start — a working phone beats a broken form).
+   601→   601→5. **Deploy** (5 min) — push to GitHub → import to Vercel → add the
+   602→   602→   custom domain. HTTPS is automatic.
+   603→   603→
+   604→   604→## Post-deploy checklist
+   605→   605→
+   606→   606→- [ ] \`/sitemap.xml\` and \`/robots.txt\` resolve (they're in
+   607→   607→      \`03-seo/\` — copy them to \`public/\`)
+   608→   608→- [ ] Replace the JSON-LD sample values (name, geo, phone, rating)
+   609→   609→      with the real practice's — then validate with the Rich Results
+   610→   610→      Test
+   611→   611→- [ ] Submit the sitemap in Search Console; claim the GBP and point
+   612→   612→      its appointment link at \`/contact\`
+   613→   613→- [ ] Test the booking flow end to end on a real phone
+   614→   614→- [ ] Run the local-SEO checklist section A once, fully
+   615→   615→
+   616→   616→## Customising beyond copy
+   617→   617→
+   618→   618→The content model is the contract: pages compose components; cards
+   619→   619→never invent fields. If you need a new section type, add it to the
+   620→   620→model first, then the component — the discipline is what keeps the
+   621→   621→site editable by non-developers a year from now.
+   622→   622→
+   623→   623→## Support
+   624→   624→
+   625→   625→support@omniforge.example — 30-day money-back guarantee.
+   626→   626→`,
+   627→   627→
+   628→   628→  "05-deploy/walkthrough-link.md": `# Walkthrough
+   629→   629→
+   630→   630→A 9-minute video build of this exact kit, from empty repo to
+   631→   631→deployed site:
+   632→   632→
+   633→   633→**→ https://omniforge.example/walkthroughs/C-WK-1**
+   634→   634→
+   635→   635→Contents:
+   636→   636→- 00:00 — What's in the kit (and what's deliberately not)
+   637→   637→- 01:00 — Pages, components and the content model
+   638→   638→- 02:45 — Swapping the sample data the honest way
+   639→   639→- 04:30 — The booking flow: spec → working form
+   640→   640→- 06:15 — SEO pack: JSON-LD, sitemap, the checklist's 80/20
+   641→   641→- 07:50 — Deploy + the post-deploy checklist
+   642→   642→
+   643→   643→Hosted (not bundled) so the kit stays under 200 KB.
+   644→   644→`,
+   645→   645→
+   646→   646→  "EXTENDED-PACK/patient-portal-wireframes.md": `# Patient portal wireframes — in production
+   647→   647→
+   648→   648→Status: **in production** — not in this archive.
+   649→   649→
+   650→   650→What the finished file will contain: wireframes and component specs
+   651→   651→for an optional secure patient portal — login, form history, visit
+   652→   652→summaries, document upload — with accessibility annotations and a
+   653→   653→data-minimisation review (what the practice stores vs what it
+   654→   654→merely displays).
+   655→   655→`,
+   656→   656→};
+   657→   657→
+   658→   658→export const demo: DemoContent = {
+   659→   659→  kind: "site",
+   660→   660→  siteName: "Brightline Dental",
+   661→   661→  vertical: "dental",
+   662→   662→  intro:
+   663→   663→    "Take the 25-second tour of the five authored pages — then submit the booking form. The tour pages are the kit's real MDX copy.",
+   664→   664→  pages: [
+   665→   665→    {
+   666→   666→      id: "home",
+   667→   667→      title: "Home",
+   668→   668→      sections: [
+   669→   669→        { kind: "hero", heading: "Dentistry that respects your time", copy: "Same-week appointments. Transparent pricing before we start. A team that explains everything — including what not to spend on." },
+   670→   670→        { kind: "services", heading: "Why patients stay", copy: "Two-thirds of new patients come from referrals. Appointments start on time (under 7-minute average wait), prices are visible before we begin, and anxious patients get headphones, a pause signal and sedation options." },
+   671→   671→        { kind: "proof", heading: "4.9 stars · 812 reviews", copy: "\"They told me what I didn't need before what I did. I've sent four friends.\" — Dana R., patient since 2023" },
+   672→   672→        { kind: "hours", heading: "Hours", copy: "Mon–Thu 7:30–18:00 · Fri 8:00–15:00 · Sat 9:00–13:00 (hygiene only) · Early mornings and Saturday slots exist for people who can't leave work." },
+   673→   673→      ],
+   674→   674→    },
+   675→   675→    {
+   676→   676→      id: "services",
+   677→   677→      title: "Treatments & prices",
+   678→   678→      sections: [
+   679→   679→        { kind: "hero", heading: "Prices, in the open", copy: "Every treatment lists a from-price and exactly what moves the number — so the estimate at the consultation matches this page." },
+   680→   680→        { kind: "services", heading: "Check-ups & hygiene — from $89", copy: "Comprehensive exam, x-rays when clinically needed, and a gum-health score you keep. Implants from $3,400 with a 10-year guarantee. Cosmetic from $290. Emergency from $120 with two same-day slots held daily." },
+   681→   681→        { kind: "proof", heading: "Quotes are ceilings, not targets", copy: "If you need less than we quoted, you pay the lower amount. Written estimates, valid 60 days." },
+   682→   682→      ],
+   683→   683→    },
+   684→   684→    {
+   685→   685→      id: "about",
+   686→   686→      title: "About",
+   687→   687→      sections: [
+   688→   688→        { kind: "hero", heading: "Built around the appointment you'd want", copy: "Brightline opened in 2016 with one rule: explain everything, including what not to spend on." },
+   689→   689→        { kind: "services", heading: "What we believe", copy: "Published prices are a trust decision. The best treatment plan is the smallest one that works — our planning template literally has a 'what we're NOT recommending and why' field. Anxious patients are the norm, not the exception." },
+   690→   690→      ],
+   691→   691→    },
+   692→   692→    {
+   693→   693→      id: "team",
+   694→   694→      title: "Team",
+   695→   695→      sections: [
+   696→   696→        { kind: "team", heading: "Who you'll actually meet", copy: "Dr. Elena Marsh, DDS (implants & restorative, 600+ placements) · Dr. Sofia Brandt, DMD (cosmetic & preventive) · Jonah Reyes, RDH (lead hygienist) · Amara Okafor (patient care coordinator). Five people, no rotating cast — the same dentist from consult to completion." },
+   697→   697→      ],
+   698→   698→    },
+   699→   699→    {
+   700→   700→      id: "contact",
+   701→   701→      title: "Book a visit",
+   702→   702→      sections: [
+   703→   703→        { kind: "booking", heading: "Two emergency slots held daily", copy: "In pain right now? Call 503-555-0164. Otherwise the form takes 60 seconds — we confirm by text within one business hour." },
+   704→   704→        { kind: "hours", heading: "1213 NW 13th Ave, Portland", copy: "Ground floor, step-free. Same-block parking (validated), bike racks, MAX Green & Yellow two blocks away." },
+   705→   705→      ],
+   706→   706→    },
+   707→   707→  ],
+   708→   708→  bookingFields: [
+   709→   709→    { key: "name", label: "Your name", type: "text" },
+   710→   710→    { key: "phone", label: "Phone", type: "tel" },
+   711→   711→    { key: "reason", label: "Reason", type: "select", options: ["Check-up & cleaning", "Implant consultation", "Cosmetic consult", "Emergency — I'm in pain"] },
+   712→   712→    { key: "time", label: "Preferred time", type: "select", options: ["Morning", "Afternoon", "First available"] },
+   713→   713→  ],
+   714→   714→};
+   715→   715→
