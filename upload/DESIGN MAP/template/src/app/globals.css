@@ -1,0 +1,378 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-mono);
+  --font-display: var(--font-display);
+  --font-serif: var(--font-serif);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   OMNIFORGE — Prestige token system (P1, D1 = obsidian + brass)
+   One finish system sits on top of the five family token sets.
+   Families keep their fonts and radii; they all gain the same
+   material vocabulary: plate bg, edge, foil, brass line, engrave,
+   grain, and the prestige easing curve.
+   ═══════════════════════════════════════════════════════════════ */
+:root {
+  /* === Plate surfaces === */
+  --plate-bg: #F7F4EE;              /* warm paper cream */
+  --plate-bg-deep: #EDE7DA;         /* slightly darker for inset */
+  --plate-edge: rgba(20,18,14,.10); /* 1px hairline */
+  --plate-inner-light: inset 0 1px 0 rgba(255,255,255,.65);
+  --shadow-contact: 0 1px 2px rgba(10,8,4,.10);
+  --shadow-ambient: 0 18px 40px -18px rgba(10,8,4,.28);
+  --shadow-lift: 0 24px 48px -20px rgba(10,8,4,.36);
+
+  /* === Brass foil (only on price, seal, plate number) === */
+  --foil: linear-gradient(135deg,#8A6A2F 0%,#E7C982 38%,#B8913F 62%,#F3DFA6 100%);
+  --brass-line: #B8913F;
+  --brass-soft: rgba(184,145,63,.40);
+
+  /* === Engraving (for plate number + policy chips) === */
+  --engrave: 0 1px 0 rgba(255,255,255,.55), 0 -1px 0 rgba(0,0,0,.18);
+
+  /* === Obsidian (dark sections, hero) === */
+  --obsidian: #0E0E10;
+  --obsidian-deep: #08080A;
+  --obsidian-edge: rgba(255,240,210,.08);
+
+  /* === Ink === */
+  --ink: #1A1814;
+  --ink-soft: #4A4640;
+  --ink-dim: #6B665E;
+
+  /* === Motion === */
+  --ease-prestige: cubic-bezier(.2,.7,.1,1);
+
+  /* === Grain overlay (≤ 4% opacity) === */
+  --grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+
+  /* === shadcn aliases === */
+  --background: var(--plate-bg);
+  --foreground: var(--ink);
+  --card: var(--plate-bg);
+  --card-foreground: var(--ink);
+  --popover: var(--plate-bg);
+  --popover-foreground: var(--ink);
+  --primary: var(--ink);
+  --primary-foreground: var(--plate-bg);
+  --secondary: var(--plate-bg-deep);
+  --secondary-foreground: var(--ink);
+  --muted: var(--plate-bg-deep);
+  --muted-foreground: var(--ink-dim);
+  --accent: var(--brass-line);
+  --accent-foreground: var(--plate-bg);
+  --destructive: #8B2A1F;
+  --border: var(--plate-edge);
+  --input: var(--plate-edge);
+  --ring: var(--brass-line);
+}
+
+@layer base {
+  * {
+    border-color: var(--plate-edge);
+  }
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 100px;
+  }
+  body {
+    background: var(--plate-bg);
+    color: var(--ink);
+    font-family: var(--font-mono), ui-monospace, monospace;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  /* Film-grain overlay (P1) */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.035;
+    mix-blend-mode: multiply;
+    background-image: var(--grain);
+  }
+  body > * {
+    position: relative;
+    z-index: 2;
+  }
+  .font-display { font-family: var(--font-display), 'Archivo', sans-serif; }
+  .font-mono { font-family: var(--font-mono), 'IBM Plex Mono', monospace; }
+  .font-serif { font-family: var(--font-serif), Georgia, serif; }
+  ::selection { background: var(--brass-line); color: var(--plate-bg); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PLATE ANATOMY (P1) — the 7-part ProductListingCard
+   ═══════════════════════════════════════════════════════════════ */
+.plate {
+  background: var(--plate-bg);
+  border: 1px solid var(--plate-edge);
+  box-shadow: var(--shadow-contact), var(--plate-inner-light);
+  position: relative;
+  transition: transform 180ms var(--ease-prestige), box-shadow 180ms var(--ease-prestige);
+}
+.plate:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lift), var(--plate-inner-light);
+}
+@media (prefers-reduced-motion: reduce) {
+  .plate:hover { transform: none; }
+}
+
+/* 1. Plate number — engraved, tabular */
+.plate-number {
+  font-family: var(--font-mono), monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  color: var(--ink-dim);
+  text-shadow: var(--engrave);
+  text-transform: uppercase;
+}
+
+/* 3. Brass inset frame around media window */
+.plate-frame {
+  position: relative;
+  border: 1px solid var(--brass-soft);
+}
+.plate-frame::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border: 1px solid rgba(184,145,63,.15);
+  pointer-events: none;
+}
+
+/* 4. Proof line */
+.plate-proof {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  color: var(--ink-soft);
+}
+
+/* 6. Policy chips — engraved pills */
+.plate-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  font-family: var(--font-mono), monospace;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  background: var(--plate-bg-deep);
+  border: 1px solid var(--plate-edge);
+  text-shadow: var(--engrave);
+}
+
+/* 7. Foil price + seal */
+.foil {
+  background: var(--foil);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 700;
+}
+.foil-solid {
+  background: var(--foil);
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+.wax-seal {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--foil);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-ambient), inset 0 1px 0 rgba(255,255,255,.4);
+  color: var(--obsidian-deep);
+  font-family: var(--font-display), sans-serif;
+  font-weight: 800;
+  font-size: 16px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MOTION CHOREOGRAPHY (P1)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Studio open — curtain lift */
+@keyframes curtain-lift {
+  from { clip-path: inset(100% 0 0 0); transform: translateY(8px); opacity: 0; }
+  to   { clip-path: inset(0 0 0 0);    transform: translateY(0);    opacity: 1; }
+}
+.curtain-open {
+  animation: curtain-lift 600ms var(--ease-prestige) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .curtain-open { animation: 150ms fade-in both; }
+  @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+}
+
+/* Wax seal stamp */
+@keyframes seal-stamp {
+  0%   { transform: scale(1.4) rotate(6deg); opacity: 0; }
+  60%  { transform: scale(0.95) rotate(-2deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+.seal-stamp {
+  animation: seal-stamp 420ms cubic-bezier(.34,1.56,.64,1) both;
+}
+
+/* Receipt tear-line reveal */
+@keyframes tear-draw {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+.tear-line {
+  transform-origin: left center;
+  animation: tear-draw 360ms linear both;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CSS-3D HOVER RECIPES (P4 T1) — one per family
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Template Packs — fanned deck */
+.hover-fan-deck {
+  perspective: 900px;
+  transition: transform 220ms var(--ease-prestige);
+}
+.hover-fan-deck:hover .fan-card:nth-child(1) { transform: rotateZ(-8deg) translateY(-6px); }
+.hover-fan-deck:hover .fan-card:nth-child(2) { transform: rotateZ(-4deg) translateY(-3px); }
+.hover-fan-deck:hover .fan-card:nth-child(3) { transform: rotateZ(0deg) translateY(0); }
+.hover-fan-deck:hover .fan-card:nth-child(4) { transform: rotateZ(4deg) translateY(-3px); }
+.hover-fan-deck:hover .fan-card:nth-child(5) { transform: rotateZ(8deg) translateY(-6px); }
+.fan-card {
+  transition: transform 220ms var(--ease-prestige);
+  transform-origin: bottom center;
+}
+
+/* Toolkits — exploded view */
+.hover-exploded {
+  perspective: 900px;
+  transition: transform 240ms var(--ease-prestige);
+}
+.hover-exploded:hover .explode-layer:nth-child(1) { transform: translateZ(0); }
+.hover-exploded:hover .explode-layer:nth-child(2) { transform: translateZ(18px); }
+.hover-exploded:hover .explode-layer:nth-child(3) { transform: translateZ(36px); }
+.explode-layer {
+  transition: transform 240ms var(--ease-prestige);
+}
+
+/* Notion Systems — isometric stack */
+.hover-isometric {
+  perspective: 900px;
+  transition: transform 240ms var(--ease-prestige);
+}
+.hover-isometric .iso-layer {
+  transition: transform 240ms var(--ease-prestige);
+  transform: rotateX(55deg) rotateZ(-45deg);
+}
+.hover-isometric:hover .iso-layer:nth-child(2) {
+  transform: rotateX(55deg) rotateZ(-45deg) translateZ(12px);
+}
+
+/* Assessments — medal flip */
+.hover-medal-flip {
+  perspective: 600px;
+}
+.hover-medal-flip:hover .medal-3d {
+  transform: rotateY(180deg);
+}
+.medal-3d {
+  transform-style: preserve-3d;
+  transition: transform 500ms var(--ease-prestige);
+  position: relative;
+}
+.medal-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.medal-back {
+  transform: rotateY(180deg);
+}
+
+/* Website Kits — pointer parallax tilt (driven by JS useTilt) */
+.hover-pointer-tilt {
+  transition: transform 150ms var(--ease-prestige);
+  transform-style: preserve-3d;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hover-fan-deck:hover .fan-card,
+  .hover-exploded:hover .explode-layer,
+  .hover-isometric:hover .iso-layer,
+  .hover-medal-flip:hover .medal-3d {
+    transform: none !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Utility — demo ribbon, sample tag, status dot
+   ═══════════════════════════════════════════════════════════════ */
+.ribbon-sample {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: var(--ink);
+  color: var(--plate-bg);
+  font-family: var(--font-mono), monospace;
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  padding: 3px 8px;
+  text-transform: uppercase;
+}
+.demo-data-tag {
+  display: inline-block;
+  font-family: var(--font-mono), monospace;
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  background: var(--plate-bg-deep);
+  padding: 1px 5px;
+  margin-left: 4px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--plate-bg); }
+::-webkit-scrollbar-thumb { background: var(--brass-soft); }
